@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/dialog_surround_color">
+
+    <LinearLayout
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/game_dialog_bck"
+        android:orientation="vertical"
+        android:padding="35dp">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_time_machine" />
+
+            <TextView
+                android:id="@+id/dialog_time_title"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:text="@string/time_travel"
+                android:textColor="@color/dialog_main_color"
+                android:textSize="20dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="1px"
+            android:layout_margin="5dp"
+            android:background="@color/dialog_main_color" />
+
+        <RelativeLayout
+            android:layout_width="160dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/time_ticker_bck"
+            android:padding="4dp">
+
+            <ImageView
+                android:id="@+id/dialog_time_img"
+                android:layout_width="160dp"
+                android:layout_height="150dp"
+                android:scaleType="centerCrop" />
+
+            <RelativeLayout
+                android:layout_width="220dp"
+                android:layout_height="30dp"
+                android:layout_alignParentBottom="true"
+                android:background="#99000000">
+
+                <TextView
+                    android:id="@+id/dialog_time_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_marginBottom="4dp"
+                    android:text="-00:00"
+                    android:textColor="#fff"
+                    android:textSize="15dp" />
+            </RelativeLayout>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="4dp"
+            android:padding="5dp">
+
+            <SeekBar
+                android:id="@+id/dialog_time_seek"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:maxHeight="200dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:progressDrawable="@drawable/seek_progress"
+                android:thumb="@drawable/seek_selector" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="1px"
+            android:layout_margin="5dp"
+            android:background="@color/dialog_main_color" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/dialog_time_btn_cancel"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/dialog_button_shape"
+                android:padding="10dp"
+                android:text="@string/cancel"
+                android:textColor="@color/dialog_main_color"
+                android:textSize="12dp" />
+
+            <Button
+                android:id="@+id/dialog_time_wheel_btn_ok"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/dialog_button_shape"
+                android:padding="10dp"
+                android:text="Ok"
+                android:textColor="@color/dialog_main_color"
+                android:textSize="12dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

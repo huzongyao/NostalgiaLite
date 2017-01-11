@@ -1,0 +1,62 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="nostalgia.libgbc">
+
+    <application
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme">
+        <activity android:name=".GbcGalleryActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".GbcEmulatorActivity"
+            android:theme="@style/AppTheme.FullScreen" />
+
+        <activity
+            android:name="nostalgia.framework.ui.preferences.GeneralPreferenceActivity"
+            android:label="@string/general_pref"
+            android:theme="@style/PrefTheme">
+            <intent-filter>
+                <action android:name="nostalgia.gbc.GENERALPREF" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="nostalgia.framework.ui.preferences.KeyboardSettingsActivity"
+            android:label="@string/key_pref"
+            android:theme="@style/PrefTheme">
+            <intent-filter>
+                <action android:name="nostalgia.gbc.KEYBOARDPREF" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="nostalgia.framework.ui.preferences.TouchControllerSettingsActivity"
+            android:label="@string/game_pref"
+            android:theme="@style/AppTheme.FullScreen">
+            <intent-filter>
+                <action android:name="nostalgia.gbc.TOUCHPREF" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="nostalgia.framework.ui.preferences.ScreenViewPortSettingsActivity"
+            android:label="@string/game_pref"
+            android:theme="@style/AppTheme.FullScreen">
+            <intent-filter>
+                <action android:name="nostalgia.gbc.SCREENPREF" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

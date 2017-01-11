@@ -1,0 +1,41 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/act_gallery_main_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1">
+
+            <ListView
+                android:id="@+id/act_cheats_list"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:cacheColorHint="#00000000"
+                android:fastScrollEnabled="true"
+                android:listSelector="@drawable/row_game_item_list_selector"
+                tools:listitem="@layout/row_cheat_list_item" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="1px"
+                android:background="@color/main_color" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="5dp"
+                android:layout_marginBottom="1dp"
+                android:background="@drawable/top_shadow" />
+        </FrameLayout>
+
+
+    </LinearLayout>
+
+</RelativeLayout>

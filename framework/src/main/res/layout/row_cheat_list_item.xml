@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:padding="4dp">
+
+    <CheckBox
+        android:id="@+id/row_cheat_enable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="5dp"
+        android:button="@drawable/checkbox_selector"
+        android:checked="true" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/row_cheat_chars"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:text="FF5467498465"
+            android:textColor="@color/main_color"
+            android:textSize="18dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/row_cheat_desc"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:singleLine="true"
+            android:text="Immortallity"
+            android:textColor="@color/main_color"
+            android:textSize="13dp" />
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/row_cheat_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/ab_button_selector"
+        android:src="@drawable/ic_cheat_edit"
+        android:visibility="visible" />
+
+    <ImageButton
+        android:id="@+id/row_cheat_remove"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/ab_button_selector"
+        android:src="@drawable/ic_cheat_remove"
+        android:visibility="visible" />
+
+</LinearLayout>

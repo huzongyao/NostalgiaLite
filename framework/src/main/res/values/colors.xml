@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#33b5e5</color>
+    <color name="main_color">#33b5e5</color>
+    <color name="dialog_main_color">#ffffff</color>
+    <color name="dialog_surround_color">#bb000000</color>
+    <color name="select_bck_color">#2233b5e5</color>
+    <color name="press_bck_color">#8833b5e5</color>
+    <color name="hint_bck_color">#db33b5e5</color>
+
+</resources>

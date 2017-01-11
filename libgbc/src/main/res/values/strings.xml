@@ -1,0 +1,11 @@
+<resources>
+
+    <string name="app_name">AppGBC</string>
+
+    <!-- Preference item itentn action -->
+    <string name="action_general_pref">nostalgia.gbc.GENERALPREF</string>
+    <string name="action_keyboard_pref">nostalgia.gbc.KEYBOARDPREF</string>
+    <string name="action_touch_pref">nostalgia.gbc.TOUCHPREF</string>
+    <string name="action_screen_pref">nostalgia.gbc.SCREENPREF</string>
+
+</resources>

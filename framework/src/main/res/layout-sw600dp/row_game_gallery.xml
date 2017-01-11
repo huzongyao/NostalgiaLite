@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="400dp"
+    android:layout_height="400dp"
+    android:background="#00ffffff"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="380dp"
+        android:layout_height="380dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/game_item_bck"
+            android:layout_width="380dp"
+            android:layout_height="380dp"
+            android:contentDescription="@string/empty_desc"
+            android:src="@drawable/game_item_bck" />
+
+        <ImageView
+            android:id="@+id/game_item_arrow"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="40dp"
+            android:contentDescription="@string/empty_desc"
+            android:src="@drawable/down_arrow" />
+
+        <ImageView
+            android:id="@+id/game_item_booklet"
+            android:layout_width="148dp"
+            android:layout_height="221dp"
+            android:layout_marginLeft="158dp"
+            android:layout_marginTop="17dp" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/row_game_item_name"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:text="sdf"
+        android:textColor="@drawable/row_game_item_text_selector"
+        android:textSize="25dp" />
+
+</LinearLayout>

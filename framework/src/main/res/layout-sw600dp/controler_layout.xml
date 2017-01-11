@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:multitouch="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/top_panel_touchcontroler_height"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="20dp">
+
+            <ImageView
+                android:id="@+id/ic_game_remote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="4dp"
+                android:src="@drawable/ic_game_remote" />
+
+            <ImageView
+                android:id="@+id/ic_game_zapper"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="4dp"
+                android:src="@drawable/ic_game_zapper" />
+
+            <ImageView
+                android:id="@+id/ic_game_pal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="4dp"
+                android:src="@drawable/ic_game_pal" />
+
+            <ImageView
+                android:id="@+id/ic_game_ntsc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="4dp"
+                android:src="@drawable/ic_game_ntsc" />
+
+            <ImageView
+                android:id="@+id/ic_game_muted"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="4dp"
+                android:src="@drawable/ic_device_access_volume_muted" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <nostalgia.framework.ui.multitouchbutton.MultitouchLayer
+        android:id="@+id/touch_layer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="20dp">
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:background="#000"
+            android:padding="1dp">
+
+            <nostalgia.framework.ui.multitouchbutton.MultitouchButton
+                android:id="@+id/button_select"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/button_top_panel_selector"
+                android:padding="2dp"
+                android:text="SELECT"
+                android:textColor="@color/main_color"
+                android:textSize="25dp"
+                android:textStyle="bold" />
+
+            <nostalgia.framework.ui.multitouchbutton.MultitouchButton
+                android:id="@+id/button_start"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/button_top_panel_selector"
+                android:padding="2dp"
+                android:text="START"
+                android:textColor="@color/main_color"
+                android:textSize="25dp"
+                android:textStyle="bold" />
+
+            <nostalgia.framework.ui.multitouchbutton.MultitouchImageButton
+                android:id="@+id/button_menu"
+                android:layout_width="60dp"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:background="@drawable/button_top_panel_selector"
+                android:padding="10dp"
+                android:src="@drawable/ic_menu"
+                android:text="MENU"
+                android:textColor="@color/main_color"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true">
+
+            <include layout="@layout/dpad_large" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="230dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:orientation="vertical">
+
+            <nostalgia.framework.ui.multitouchbutton.MultitouchImageButton
+                android:id="@+id/button_b"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginBottom="25dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="2dp"
+                android:background="#0000"
+                android:src="@drawable/r_button_b_selector" />
+
+            <nostalgia.framework.ui.multitouchbutton.MultitouchImageButton
+                android:id="@+id/button_a"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/button_b"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="5dp"
+                android:background="#0000"
+                android:src="@drawable/r_button_a_selector" />
+
+            <nostalgia.framework.ui.multitouchbutton.MultitouchImageButton
+                android:id="@+id/button_b_turbo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/button_b"
+                android:layout_marginRight="2dp"
+                android:layout_toLeftOf="@+id/button_b"
+                android:background="#0000"
+                android:src="@drawable/r_button_b_turbo_selector" />
+
+            <nostalgia.framework.ui.multitouchbutton.MultitouchTwoButton
+                android:id="@+id/button_ab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/button_b_turbo"
+                android:layout_margin="2dp"
+                android:layout_toLeftOf="@+id/button_b"
+                android:background="#0000"
+                android:src="@drawable/r_button_ab_selector"
+                multitouch:first_button="@id/button_a"
+                multitouch:second_button="@id/button_b" />
+
+            <nostalgia.framework.ui.multitouchbutton.MultitouchImageButton
+                android:id="@+id/button_a_turbo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/button_ab"
+                android:layout_marginRight="2dp"
+                android:layout_toLeftOf="@+id/button_a"
+                android:background="#0000"
+                android:src="@drawable/r_button_a_turbo_selector" />
+        </RelativeLayout>
+
+        <nostalgia.framework.ui.multitouchbutton.MultitouchImageButton
+            android:id="@+id/button_fast_forward"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/linearLayout2"
+            android:layout_margin="10dp"
+            android:background="@drawable/r_button_fast_forward_selector" />
+    </nostalgia.framework.ui.multitouchbutton.MultitouchLayer>
+
+</RelativeLayout>

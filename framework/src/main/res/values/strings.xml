@@ -1,0 +1,134 @@
+<resources>
+
+    <string name="app_name">Emudroid</string>
+    <string name="empty_desc">this component has no textual description</string>
+    <string name="menu_settings">Settings</string>
+    <string name="cancel">Cancel</string>
+    <string name="error">Error</string>
+    <string name="warning">Warning</string>
+    <string name="exit">Exit</string>
+    <string name="too_slow">We are sorry, the emulator is not responding. Your device\'s performance seems to be too low to run this app.</string>
+    <string name="act_emulator_invalid_cheat">Invalid cheat: \'%s\'</string>
+    <string name="act_emulator_load_game_failed">Failed to load game</string>
+    <string name="act_emulator_save_state_failed">Failed to save state</string>
+    <string name="act_emulator_load_state_failed">Failed to load state</string>
+
+    <!-- REmote controler -->
+    <string name="act_remote_controller_select_server">Select server</string>
+    <string name="act_remote_controller_set_manually">Set server manually</string>
+    <string name="dialog_select_port_title">Select port</string>
+
+    <!-- slot context menu menu -->
+    <string name="act_slot_popup_menu_send">Share state</string>
+    <string name="act_slot_hint">Long press on item to show pop up menu</string>
+
+    <!-- game -->
+    <string name="game_menu_reset">RESET</string>
+    <string name="game_menu_load">LOAD STATE</string>
+    <string name="game_menu_save">SAVE STATE</string>
+    <string name="game_menu_cheats">CHEATS</string>
+    <string name="game_menu_screenshot">TAKE SCREENSHOT</string>
+    <string name="game_menu_settings">GAME SETTINGS</string>
+    <string name="game_menu_back_to_past">REWIND</string>
+    <string name="game_zapper_collision">Zapper is in collision with remote controller!</string>
+    <string name="toast_cheats_enabled">Number of cheats enabled: %d</string>
+    <string name="act_game_screenshot_failed">Failed to save screenshot</string>
+    <string name="act_game_screenshot_saved">Screenshot saved to: %s</string>
+
+    <!-- touch controll settingspreferences -->
+    <string name="act_tcs_reset">RESET</string>
+
+    <!-- preferences -->
+    <string name="general_pref">General Preferences</string>
+    <string name="game_pref">Game Preferences</string>
+    <string name="key_pref">Keyboard/Gamepad Preferences</string>
+    <string name="key_profile_pref">Keyboard/Gamepad profile: %s</string>
+    <string name="key_select_profile_pref">Select Profile</string>
+    <string name="key_profile_edit">Edit Profile</string>
+    <string name="key_profile_select_input_method">Select Input Method</string>
+    <string name="key_profile_new">New profile</string>
+    <string name="game_pref_ui_pal_ntsc">Video Mode</string>
+    <string name="game_pref_ui_pal_ntsc_desc">Try switching in case of graphical glitches</string>
+    <string name="game_pref_ui_timeshift">Allow Rewinding</string>
+    <string name="game_pref_ui_timeshift_desc">Enabling may slow down emulation on some devices</string>
+    <string name="game_pref_ui_vibration">Vibrations</string>
+    <string name="game_pref_ui_vibration_no_vibrator">This device does not have an available vibrator</string>
+    <string name="general_pref_wifi_controlable">Wifi Control</string>
+    <string name="general_pref_wifi_controlable_desc">Allow controlling of app over wifi</string>
+    <string name="general_pref_turbo">Turbo Buttons</string>
+    <string name="general_pref_mute">Mute Sound</string>
+    <string name="general_pref_load_sav_files">Load Battery Saves</string>
+    <string name="general_pref_save_sav_files">Save Battery Saves</string>
+    <string name="general_pref_load_sav_files_desc">See Help for more info</string>
+    <string name="general_pref_ddpad">Dynamic D-Pad</string>
+    <string name="general_pref_ddpad_desc">Enable dynamically positioned D-pad</string>
+
+    <string name="general_pref_ab_button">A+B Button</string>
+    <string name="general_pref_fastforward_button">Enable FF Button</string>
+    <string name="general_pref_fastforward_toggle">Togglable FF</string>
+    <string name="general_pref_fastforward_toggle_desc">Behavior of FF button (or gamepad key)</string>
+    <string name="general_pref_fullscreen">Force Fullscreen</string>
+    <string name="game_pref_zapper">Zapper Gun</string>
+    <string name="general_pref_rotation">Orientation</string>
+    <string name="general_pref_quality">Emulation Quality</string>
+    <string name="general_pref_quality_desc">Set to "Low" if you experience lagging</string>
+    <string name="pref_other_settings">Other Settings</string>
+    <string name="pref_general_settings">General Settings</string>
+    <string name="pref_video_settings">Video Settings</string>
+
+    <string name="pref_touch_settings">Controller Layout</string>
+    <string name="pref_touch_desc">Customize layout of buttons</string>
+
+
+    <string name="pref_screen_settings">Game Screen Layout</string>
+    <string name="pref_screen_desc">Customize layout of game screen</string>
+
+    <string name="pref_keyboard_settings_restore_def">(Reset to defaults)</string>
+    <string name="pref_keyboard_settings_delete_prof">(Delete this profile)</string>
+
+    <string name="pref_keyboard_cannot_change_input_method">Cannot change input method</string>
+
+    <string name="press_key">Press a key for: %s</string>
+
+    <!-- gallery -->
+    <string name="gallery_menu_pref">PREFERENCES</string>
+    <string name="gallery_menu_wifi_on">WIFI CONTROL ON</string>
+    <string name="gallery_menu_wifi_off">WIFI CONTROL OFF</string>
+    <string name="gallery_menu_remote_control">REMOTE CONTROLLER</string>
+    <string name="gallery_menu_reload">SEARCH DEVICE FOR ROMS</string>
+    <string name="gallery_zip_search_label">Exploring the zip file.\nWait a minute please.</string>
+    <string name="gallery_sdcard_search_label">Searching for ROMs.\nWait a minute please.</string>
+    <string name="gallery_sd_card_not_mounted">Sorry, no SD card is mounted for write access.</string>
+    <string name="gallery_start_wifi_control_server">Started listening. Device IP:%s</string>
+    <string name="gallery_stop_wifi_control_server">Stopped listening</string>
+    <string name="gallery_count_of_found_games">Found %d ROMs</string>
+    <string name="gallery_rom_not_found">ROM was deleted.</string>
+    <string name="gallery_rom_not_found_reload">Search ROMs</string>
+    <string name="gallery_start_sip_search_label">Searching archives.\nWait a minute please.</string>
+
+    <!-- cheat -->
+    <string name="act_cheats_dialog_add_label">CHEAT</string> <!-- nejen game genie -->
+    <string name="act_cheats_dialog_chars_hint">INSERT CHEAT CODE</string>
+    <string name="act_cheats_dialog_desc_hint">INSERT CHEAT DESCRIPTION</string>
+    <string name="act_cheats_dialog_save">SAVE</string>
+
+
+    <!-- Rewind -->
+    <string name="time_travel">Rewind</string>
+
+    <!-- Preference item itentn action -->
+    <string name="action_general_pref">nostalgia.framework.GENERALPREF</string>
+    <string name="action_keyboard_pref">nostalgia.framework.KEYBOARDPREF</string>
+    <string name="action_touch_pref">nostalgia.framework.TOUCHPREF</string>
+    <string name="action_screen_pref">nostalgia.framework.SCREENPREF</string>
+
+    <string name="export_lite_ok">Data from the Lite version successfully imported.</string>
+    <string name="export_lite_error">An error has occurred while importing data from the Lite version.</string>
+    <string name="export_action">.EXPORT</string>
+    <string name="game_pref_ui_opacity">Opacity</string>
+    <string name="game_pref_ui_auto_hide">Auto-Hide</string>
+    <string name="general_pref_fastforward_settings">Fast Forward Settings</string>
+    <string name="game_pref_ui_vibration_desc">Strength of vibrations</string>
+    <string name="game_pref_ui_opacity_desc">Opacity of on-screen controls</string>
+    <string name="game_pref_ui_auto_hide_desc">Hide on-screen controls when using gamepad/keyboard/remote controller</string>
+</resources>

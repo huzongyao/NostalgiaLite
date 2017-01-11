@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">AppNes</string>
+
+    <!-- Preference item itentn action -->
+    <string name="action_general_pref">nostalgia.nes.GENERALPREF</string>
+    <string name="action_keyboard_pref">nostalgia.nes.KEYBOARDPREF</string>
+    <string name="action_touch_pref">nostalgia.nes.TOUCHPREF</string>
+    <string name="action_screen_pref">nostalgia.nes.SCREENPREF</string>
+</resources>

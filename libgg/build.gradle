@@ -1,0 +1,40 @@
+apply plugin: 'com.android.model.library'
+
+model {
+    android {
+        compileSdkVersion 25
+        buildToolsVersion "25.0.0"
+
+        defaultConfig {
+            minSdkVersion.apiLevel 15
+            targetSdkVersion.apiLevel 25
+            versionCode 1
+            versionName "1.0"
+        }
+
+        ndk {
+            moduleName "nostalgia"
+            abiFilters.addAll(['armeabi', 'armeabi-v7a'])
+            stl = "gnustl_static"
+            ldLibs.addAll(['z', 'log', 'jnigraphics', 'GLESv1_CM'])
+            CFlags.addAll(['-DPSS_STYLE=1', '-DHAVE_ASPRINTF', '-DLSB_FIRST', '-DFRAMESKIP',
+                           '-D_STLP_HAS_WCHAR_T', '-D_GLIBCXX_USE_WCHAR_T', '-fexceptions',
+                           '-frtti'])
+        }
+    }
+
+    android.buildTypes {
+        release {
+            shrinkResources true
+            useProguard true
+            proguardFiles.add(file('proguard-rules.pro'))
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:25.0.1'
+    compile project(':framework')
+}

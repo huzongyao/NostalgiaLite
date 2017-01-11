@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="dilog_button_margin">10dp</dimen>
+    <dimen name="dialog_bck_pading">19dp</dimen>
+    <dimen name="top_panel_touchcontroler_height">50dp</dimen>
+    <dimen name="slot_item_size">95dp</dimen>
+    <dimen name="slot_hint_text_size">22dp</dimen>
+
+</resources>

@@ -1,0 +1,188 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:key="pref_general_settings_cat"
+        android:title="@string/pref_general_settings">
+        <nostalgia.framework.ui.preferences.ControllableListPreference
+            android:defaultValue="1"
+            android:entries="@array/general_pref_quality_list"
+            android:entryValues="@array/general_pref_quality_values"
+            android:key="general_pref_quality"
+            android:summary="@string/general_pref_quality_desc"
+            android:title="@string/general_pref_quality" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="game_pref_ui_timeshift"
+            android:summary="@string/game_pref_ui_timeshift_desc"
+            android:title="@string/game_pref_ui_timeshift" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="general_pref_wifi_server_enable"
+            android:summary="@string/general_pref_wifi_controlable_desc"
+            android:title="@string/general_pref_wifi_controlable" />
+
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="general_pref_mute"
+            android:title="@string/general_pref_mute" />
+
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="general_pref_quicksave"
+            android:summary="Double tap to quick-save (right half of screen) or quick-load (left half of screen)"
+            android:title="Quick Save/Load" />
+
+    </PreferenceCategory>
+
+
+    <PreferenceCategory android:title="Layout">
+        <Preference
+            android:key="general_pref_touch_layout"
+            android:summary="@string/pref_touch_desc"
+            android:title="@string/pref_touch_settings">
+            <intent
+                android:action="@string/action_touch_pref"
+                android:key="void" />
+        </Preference>
+        <Preference
+            android:key="general_pref_screen_layout"
+            android:summary="@string/pref_screen_desc"
+            android:title="@string/pref_screen_settings">
+            <intent
+                android:action="@string/action_screen_pref"
+                android:key="void" />
+        </Preference>
+    </PreferenceCategory>
+
+
+    <PreferenceCategory android:title="Display Settings">
+
+        <nostalgia.framework.ui.preferences.ControllableListPreference
+            android:defaultValue="0"
+            android:entries="@array/general_pref_rotation_list"
+            android:entryValues="@array/general_pref_rotation_values"
+            android:key="general_pref_rotation"
+            android:title="@string/general_pref_rotation" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="general_pref_fullscreen"
+            android:title="@string/general_pref_fullscreen" />
+
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:icon="@drawable/ic_about"
+        android:key="pref_general_touch_cat"
+        android:title="Touch Controller Settings">
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="general_pref_ddpad"
+            android:summary="@string/general_pref_ddpad_desc"
+            android:title="@string/general_pref_ddpad" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="general_pref_turbo"
+            android:title="@string/general_pref_turbo" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="general_pref_ab_button"
+            android:title="@string/general_pref_ab_button" />
+
+
+        <nostalgia.framework.ui.preferences.SeekBarVibrationPreference
+            android:defaultValue="0"
+            android:dialogMessage=""
+            android:key="game_pref_ui_strong_vibration"
+            android:max="100"
+            android:summary="@string/game_pref_ui_vibration_desc"
+            android:text="%"
+            android:title="@string/game_pref_ui_vibration" />
+
+        <nostalgia.framework.ui.widget.SeekBarPreference
+            android:defaultValue="100"
+            android:dialogMessage=""
+            android:key="general_pref_ui_opacity"
+            android:max="100"
+            android:summary="@string/game_pref_ui_opacity_desc"
+            android:text="%"
+            android:title="@string/game_pref_ui_opacity" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="general_pref_ui_autohide"
+            android:summary="@string/game_pref_ui_auto_hide_desc"
+            android:title="@string/game_pref_ui_auto_hide" />
+
+
+    </PreferenceCategory>
+
+
+    <PreferenceCategory
+        android:key="general_pref_ff_cat"
+        android:title="@string/general_pref_fastforward_settings">
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="general_pref_fastforward"
+            android:title="@string/general_pref_fastforward_button" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="general_pref_fastforward_toggle"
+            android:summary="@string/general_pref_fastforward_toggle_desc"
+            android:title="@string/general_pref_fastforward_toggle" />
+
+        <nostalgia.framework.ui.widget.SeekBarPreference
+            android:defaultValue="4"
+            android:dialogMessage=""
+            android:key="general_pref_ff_speed"
+            android:max="5"
+            android:text="[hack]"
+            android:title="Fast Forward Speed" />
+
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="SAV File Settings">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="general_pref_load_sav_files"
+            android:summary="@string/general_pref_load_sav_files_desc"
+            android:title="@string/general_pref_load_sav_files" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="general_pref_save_sav_files"
+            android:summary="@string/general_pref_load_sav_files_desc"
+            android:title="@string/general_pref_save_sav_files" />
+
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="pref_keyboard_cat"
+        android:title="@string/key_pref">
+        <nostalgia.framework.ui.preferences.ControllableListPreference
+            android:key="pref_game_keyboard_profile"
+            android:title="@string/key_select_profile_pref" />
+
+        <Preference
+            android:key="pref_game_keyboard_edit_profile"
+            android:title="@string/key_profile_edit">
+            <intent
+                android:action="@string/action_keyboard_pref"
+                android:key="void" />
+        </Preference>
+
+        <Preference
+            android:key="pref_game_keyboard_select_input_method"
+            android:title="@string/key_profile_select_input_method" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

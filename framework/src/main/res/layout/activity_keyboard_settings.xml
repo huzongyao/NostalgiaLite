@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <nostalgia.framework.ui.preferences.PlayersLabelView
+        android:id="@+id/act_keyboard_settings_plv"
+        android:layout_width="40dp"
+        android:layout_height="match_parent" />
+
+    <View
+        android:layout_width="1px"
+        android:layout_height="match_parent"
+        android:background="#888888" />
+
+    <ListView
+        android:id="@+id/act_keyboard_settings_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollingCache="false"
+        tools:listitem="@layout/row_keyboard_settings" />
+
+</LinearLayout>

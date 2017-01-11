@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:multitouch="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/direction"
+    android:layout_width="230dp"
+    android:layout_height="230dp"
+    android:layout_centerVertical="true"
+    android:layout_margin="5dp">
+
+    <nostalgia.framework.ui.multitouchbutton.MultitouchImageButton
+        android:id="@+id/button_up"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:background="#0000"
+        android:src="@drawable/r_button_up_selector" />
+
+    <nostalgia.framework.ui.multitouchbutton.MultitouchImageButton
+        android:id="@+id/button_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:background="#0000"
+        android:src="@drawable/r_button_right_selector" />
+
+    <nostalgia.framework.ui.multitouchbutton.MultitouchImageButton
+        android:id="@+id/button_down"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="#0000"
+        android:src="@drawable/r_button_down_selector" />
+
+    <nostalgia.framework.ui.multitouchbutton.MultitouchImageButton
+        android:id="@+id/button_left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:background="#0000"
+        android:src="@drawable/r_button_left_selector" />
+
+    <nostalgia.framework.ui.multitouchbutton.MultitouchImageButton
+        android:id="@+id/button_center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="#0000"
+        android:src="@drawable/r_button_center_selector" />
+
+    <nostalgia.framework.ui.multitouchbutton.MultitouchTwoButtonArea
+        android:id="@+id/button_up_left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#0000"
+        android:src="@drawable/r_button_left_up_mask"
+        multitouch:first_button="@id/button_up"
+        multitouch:second_button="@id/button_left" />
+
+    <nostalgia.framework.ui.multitouchbutton.MultitouchTwoButtonArea
+        android:id="@+id/button_up_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:background="#0000"
+        android:src="@drawable/r_button_right_up_mask"
+        multitouch:first_button="@id/button_up"
+        multitouch:second_button="@id/button_right" />
+
+    <nostalgia.framework.ui.multitouchbutton.MultitouchTwoButtonArea
+        android:id="@+id/button_down_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:background="#0000"
+        android:src="@drawable/r_button_right_down_mask"
+        multitouch:first_button="@id/button_down"
+        multitouch:second_button="@id/button_right" />
+
+    <nostalgia.framework.ui.multitouchbutton.MultitouchTwoButtonArea
+        android:id="@+id/button_down_left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#0000"
+        android:src="@drawable/r_button_left_down_mask"
+        multitouch:first_button="@id/button_down"
+        multitouch:second_button="@id/button_left" />
+
+</RelativeLayout>

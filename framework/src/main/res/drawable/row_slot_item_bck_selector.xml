@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:drawable="@drawable/slot_select_bck_shape" android:state_pressed="true" /> <!-- pressed -->
+
+    <item android:drawable="@drawable/slot_focus_bck_shape" android:state_focused="true" /> <!-- focused -->
+
+    <item android:drawable="@drawable/slot_bck_shape" /> <!-- default -->
+
+</selector>

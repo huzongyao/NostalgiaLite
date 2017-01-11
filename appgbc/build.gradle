@@ -1,0 +1,41 @@
+apply plugin: 'com.android.model.application'
+
+model {
+    android {
+        compileSdkVersion 25
+        buildToolsVersion "25.0.0"
+
+        defaultConfig {
+            applicationId "nostalgia.appgbc"
+            minSdkVersion.apiLevel 15
+            targetSdkVersion.apiLevel 25
+            versionCode 1
+            versionName "1.0"
+        }
+    }
+
+    android.signingConfigs {
+        create("release") {
+            storeFile file('demokey.jks')
+            storePassword 'demokey'
+            keyAlias 'demokey'
+            keyPassword 'demokey'
+        }
+    }
+
+    android.buildTypes {
+        release {
+            shrinkResources true
+            useProguard true
+            proguardFiles.add(file('proguard-rules.pro'))
+            signingConfig = $("android.signingConfigs.release")
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:25.0.1'
+    compile project(':libgbc')
+}

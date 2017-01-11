@@ -1,0 +1,32 @@
+<resources>
+
+    <style name="PrefTheme" parent="Theme.AppCompat" />
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.FullScreen">
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+    <style name="GameDialogTheme" parent="@android:style/Theme.Translucent.NoTitleBar" />
+
+    <style name="DialogTheme" parent="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
+        <item name="android:background">@color/dialog_surround_color</item>
+    </style>
+
+    <style name="HintTheme" parent="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
+        <item name="android:background">@null</item>
+    </style>
+
+</resources>

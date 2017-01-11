@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="20dp"
+        android:background="@drawable/game_dialog_bck"
+        android:orientation="vertical"
+        android:padding="35dp">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/dialog_select_server_title"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:text="Insert IP adress"
+                android:textColor="@color/dialog_main_color"
+                android:textSize="25dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="1px"
+            android:layout_margin="5dp"
+            android:background="@color/dialog_main_color" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/dialog_manually_server_set_ip_prefix"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10.0.0."
+                android:textColor="#ccc"
+                android:textSize="20dp" />
+
+            <EditText
+                android:id="@+id/dialog_manually_server_set"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="#0000"
+                android:inputType="numberDecimal"
+                android:text="1"
+                android:textColor="@color/dialog_main_color"
+                android:textSize="20dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="1px"
+            android:layout_margin="5dp"
+            android:background="@color/dialog_main_color" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/dialog_select_server_btn_cancel"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/dialog_button_shape"
+                android:padding="10dp"
+                android:text="@string/cancel"
+                android:textColor="@color/dialog_main_color" />
+
+            <Button
+                android:id="@+id/dialog_select_server_btn_ok"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/dialog_button_shape"
+                android:padding="10dp"
+                android:text="Ok"
+                android:textColor="@color/dialog_main_color" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

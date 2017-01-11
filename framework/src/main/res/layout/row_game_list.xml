@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/row_game_list"
+    android:layout_width="fill_parent"
+    android:layout_height="50dp"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/game_item_bck"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="5dp"
+        android:contentDescription="@string/empty_desc"
+        android:src="@drawable/game_item_small_bck" />
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1" />
+
+            <ProgressBar
+                android:id="@+id/row_game_item_progressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:progress="100"
+                android:progressDrawable="@drawable/row_gallery_item_progress"
+                android:visibility="gone" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+
+            <TextView
+                android:id="@+id/row_game_item_name"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:maxLines="2"
+                android:textColor="@drawable/row_game_item_text_selector"
+                android:textSize="18dp" />
+
+            <ImageView
+                android:id="@+id/game_item_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_next_arrow" />
+        </LinearLayout>
+    </RelativeLayout>
+
+</LinearLayout>
