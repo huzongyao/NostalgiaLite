@@ -9,7 +9,6 @@ import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.support.design.widget.TabLayout;
@@ -26,7 +25,6 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.zip.ZipException;
 
-import nostalgia.framework.EmulatorApplication;
 import nostalgia.framework.R;
 import nostalgia.framework.base.EmulatorActivity;
 import nostalgia.framework.base.GameMenu;
@@ -76,7 +74,7 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity implements
 
         mTabLayout = (TabLayout) findViewById(R.id.game_gallery_tab);
         mTabLayout.setupWithViewPager(pager);
-        mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
+        mTabLayout.setTabMode(TabLayout.MODE_FIXED);
 
         if (savedInstanceState != null) {
             pager.setCurrentItem(savedInstanceState.getInt(EXTRA_TABS_IDX, 0));
@@ -90,12 +88,6 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity implements
         inZipExts = getRomExtensions();
 
         SharedPreferences pref = getSharedPreferences(importPref, MODE_PRIVATE);
-        EmulatorApplication app = (EmulatorApplication) getApplication();
-        if (app.getPreviousVersionCode() != -1
-                && (app.getCurrentVersionCode() > app.getPreviousVersionCode())) {
-            pref.edit().putBoolean("import", true);
-        }
-
         if (!pref.contains("import")) {
             String action = getString(R.string.export_action);
             if (Utils.isIntentAvailable(GalleryActivity.this, action)) {
@@ -106,14 +98,10 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity implements
                     startActivityForResult(i, REQUEST_IMPORT);
                 } catch (ActivityNotFoundException e) {
                     NLog.w(TAG, "lite version not found");
-                    Editor editor = pref.edit();
-                    editor.putBoolean("import", true);
-                    editor.apply();
+                    pref.edit().putBoolean("import", true).apply();
                 }
             } else {
-                Editor editor = pref.edit();
-                editor.putBoolean("import", true);
-                editor.apply();
+                pref.edit().putBoolean("import", true).apply();
             }
         }
     }
@@ -145,7 +133,6 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity implements
                             MODE_PRIVATE);
                     String sSource = data.getStringExtra("PATH");
                     NLog.e(TAG, "PATH:" + sSource);
-
                     try {
                         MigrationManager.doImport(this, sSource);
                         Editor editor = pref.edit();
@@ -229,16 +216,13 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity implements
     public void onGameMenuOpened(GameMenu menu) {
     }
 
-    @SuppressLint("InlinedApi")
     @Override
     public void onGameMenuItemSelected(GameMenu menu, GameMenuItem item) {
         if (item.getId() == R.string.gallery_menu_pref) {
             Intent i = new Intent(this, GeneralPreferenceActivity.class);
-            if (Build.VERSION.SDK_INT >= 11) {
-                i.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
-                        GeneralPreferenceFragment.class.getName());
-                i.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
-            }
+            i.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
+                    GeneralPreferenceFragment.class.getName());
+            i.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
             startActivity(i);
         } else if (item.getId() == R.string.gallery_menu_remote_control) {
             final Intent intent = new Intent(GalleryActivity.this, RemoteControllerActivity.class);
@@ -253,29 +237,22 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity implements
                             rotateAnim = true;
                         }
                     });
-
         } else if (item.getId() == R.string.gallery_menu_reload) {
             reloadGames(true, null);
-
         } else if (item.getId() == R.string.gallery_menu_wifi_on) {
             PreferenceUtil.setWifiServerEnable(this, false);
             Toast.makeText(this, R.string.gallery_stop_wifi_control_server,
                     Toast.LENGTH_LONG).show();
             stopWifiListening();
-
         } else if (item.getId() == R.string.gallery_menu_wifi_off) {
             PreferenceUtil.setWifiServerEnable(this, true);
-            Toast.makeText(
-                    this,
-                    String.format(
-                            getString(R.string.gallery_start_wifi_control_server),
-                            Utils.getIpAddr(this)), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, String.format(
+                    getString(R.string.gallery_start_wifi_control_server),
+                    Utils.getIpAddr(this)), Toast.LENGTH_LONG).show();
             startWifiListening();
-
         } else if (item.getId() == R.string.game_menu_cheats) {
             Intent i = new Intent(this, TouchControllerSettingsActivity.class);
             startActivity(i);
-
         }
     }
 
@@ -485,9 +462,7 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity implements
         if (keyCode == KeyEvent.KEYCODE_MENU) {
             openGameMenu();
             return true;
-
         }
-
         return super.onKeyDown(keyCode, event);
     }
 

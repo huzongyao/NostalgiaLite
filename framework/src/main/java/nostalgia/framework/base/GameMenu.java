@@ -202,15 +202,11 @@ public class GameMenu {
 
     public interface OnGameMenuListener {
 
-
         void onGameMenuCreate(GameMenu menu);
-
 
         void onGameMenuPrepare(GameMenu menu);
 
-
         void onGameMenuOpened(GameMenu menu);
-
 
         void onGameMenuClosed(GameMenu menu);
 

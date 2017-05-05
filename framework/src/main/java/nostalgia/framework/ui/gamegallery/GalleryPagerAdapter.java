@@ -70,8 +70,7 @@ public class GalleryPagerAdapter extends PagerAdapter {
         list.setAdapter(listAdapters[position]);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-                                    long arg3) {
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
                 RowItem item = (RowItem) listAdapters[position].getItem(arg2);
                 listener.onItemClick(item.game);
             }
@@ -80,12 +79,10 @@ public class GalleryPagerAdapter extends PagerAdapter {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
                 NLog.i("list", position + ":" + scrollState + "");
-
                 if (scrollState == OnScrollListener.SCROLL_STATE_IDLE) {
                     yOffsets[position] = list.getFirstVisiblePosition();
                 }
             }
-
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem,
                                  int visibleItemCount, int totalItemCount) {
@@ -111,11 +108,9 @@ public class GalleryPagerAdapter extends PagerAdapter {
 
     public int addGames(ArrayList<GameDescription> newGames) {
         int result = 0;
-
         for (GalleryAdapter adapter : listAdapters) {
             result = adapter.addGames(new ArrayList<GameDescription>(newGames));
         }
-
         return result;
     }
 
@@ -134,7 +129,6 @@ public class GalleryPagerAdapter extends PagerAdapter {
             if (lists[i] != null)
                 lists[i].setSelection(yOffsets[i]);
         }
-
         super.notifyDataSetChanged();
     }
 

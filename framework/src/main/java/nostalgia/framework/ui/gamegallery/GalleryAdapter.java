@@ -2,13 +2,10 @@ package nostalgia.framework.ui.gamegallery;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -31,9 +28,7 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
     public static final int SORT_BY_INSERT_DATE = 1;
     public static final int SORT_BY_MOST_PLAYED = 2;
     public static final int SORT_BY_LAST_PLAYED = 3;
-    SparseArray<ImageView> arrows = new SparseArray<ImageView>();
     HashMap<Character, Integer> alphaIndexer = new HashMap<Character, Integer>();
-    ImageView lastArrow = null;
     String filter = "";
     Character[] sections;
     private LayoutInflater inflater;
@@ -145,7 +140,6 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
                 games.add(game);
             }
         }
-
         filterGames();
         return games.size();
     }
@@ -168,8 +162,6 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
         }
 
         String containsFilter = " " + filter;
-        char lastLetter = '0';
-        int counter = 0;
         sumRuns = 0;
 
         for (GameDescription game : games) {
@@ -188,9 +180,7 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
                 RowItem item = new RowItem();
                 item.game = game;
                 item.firstLetter = name.charAt(0);
-                lastLetter = item.firstLetter;
                 filterGames.add(item);
-                counter++;
             }
         }
 

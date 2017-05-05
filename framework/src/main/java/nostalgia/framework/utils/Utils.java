@@ -1,6 +1,5 @@
 package nostalgia.framework.utils;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -142,7 +141,6 @@ public class Utils {
         }
     }
 
-    // http://stackoverflow.com/questions/6450709/detect-if-opengl-es-2-0-is-available-or-not
     public static boolean checkGL20Support(Context context) {
         EGL10 egl = (EGL10) EGLContext.getEGL();
         EGLDisplay display = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
@@ -160,11 +158,10 @@ public class Utils {
         return num_config[0] > 0;
     }
 
-    public static void extractFile(File zipFile, String entryName,
-                                   File outputFile) throws ZipException, IOException {
-        NLog.i(TAG,
-                "extract " + entryName + " from " + zipFile.getAbsolutePath()
-                        + " to " + outputFile.getAbsolutePath());
+    public static void extractFile(File zipFile, String entryName, File outputFile)
+            throws ZipException, IOException {
+        NLog.i(TAG, "extract " + entryName + " from " + zipFile.getAbsolutePath()
+                + " to " + outputFile.getAbsolutePath());
         ZipFile zipFile2 = new ZipFile(zipFile);
         ZipEntry ze = zipFile2.getEntry(entryName);
 
@@ -186,10 +183,8 @@ public class Utils {
 
     public static String removeExt(String fileName) {
         int idx = fileName.lastIndexOf('.');
-
         if (idx > 0) {
             return fileName.substring(0, idx);
-
         } else {
             return fileName;
         }
@@ -197,10 +192,8 @@ public class Utils {
 
     public static String getExt(String fileName) {
         int idx = fileName.lastIndexOf('.');
-
         if (idx > 0) {
             return fileName.substring(idx + 1);
-
         } else {
             return "";
         }
@@ -216,28 +209,14 @@ public class Utils {
         }
     }
 
-    @SuppressWarnings("deprecation")
-    @SuppressLint("NewApi")
     public static int getDisplayWidth(Display display) {
-        if (Build.VERSION.SDK_INT >= 13) {
-            display.getSize(size);
-            return size.x;
-
-        } else {
-            return display.getWidth();
-        }
+        display.getSize(size);
+        return size.x;
     }
 
-    @SuppressWarnings("deprecation")
-    @SuppressLint("NewApi")
     public static int getDisplayHeight(Display display) {
-        if (Build.VERSION.SDK_INT >= 13) {
-            display.getSize(size);
-            return size.y;
-
-        } else {
-            return display.getHeight();
-        }
+        display.getSize(size);
+        return size.y;
     }
 
     public static boolean isDebuggable(Context ctx) {
@@ -276,56 +255,38 @@ public class Utils {
     }
 
     private static IpInfo getIP() {
-        if (Build.VERSION.SDK_INT > 9) {
-            try {
-                IpInfo result = new IpInfo();
-                List<NetworkInterface> interfaces = Collections
-                        .list(NetworkInterface.getNetworkInterfaces());
-
-                for (NetworkInterface intf : interfaces) {
-                    List<InetAddress> addrs = Collections.list(intf
-                            .getInetAddresses());
-                    int j = 0;
-
-                    for (InetAddress addr : addrs) {
-                        if (!addr.isLoopbackAddress()) {
-                            int prefixLen = Integer.MAX_VALUE;
-
-                            for (InterfaceAddress address : intf
-                                    .getInterfaceAddresses()) {
-                                if (address.getNetworkPrefixLength() < prefixLen) {
-                                    prefixLen = address
-                                            .getNetworkPrefixLength();
-                                }
-                            }
-
-                            String sAddr = addr.getHostAddress().toUpperCase();
-                            byte[] ip = addr.getAddress();
-                            int iAddr = ((int) ip[0] << (24)) & 0xFF000000
-                                    | ((int) ip[1] << (16)) & 0x00FF0000
-                                    | ((int) ip[2] << (8)) & 0x0000FF00
-                                    | ((int) ip[3] << (0)) & 0x000000FF;
-                            boolean isIPv4 = addr instanceof Inet4Address;
-
-                            if (isIPv4) {
-                                result.sAddress = sAddr;
-                                result.address = iAddr;
-                                result.setPrefixLen(prefixLen);
-                                return result;
+        try {
+            IpInfo result = new IpInfo();
+            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+            for (NetworkInterface intf : interfaces) {
+                List<InetAddress> addrs = Collections.list(intf.getInetAddresses());
+                for (InetAddress addr : addrs) {
+                    if (!addr.isLoopbackAddress()) {
+                        int prefixLen = Integer.MAX_VALUE;
+                        for (InterfaceAddress address : intf.getInterfaceAddresses()) {
+                            if (address.getNetworkPrefixLength() < prefixLen) {
+                                prefixLen = address.getNetworkPrefixLength();
                             }
                         }
-
-                        j++;
+                        String sAddr = addr.getHostAddress().toUpperCase();
+                        byte[] ip = addr.getAddress();
+                        int iAddr = ((int) ip[0] << (24)) & 0xFF000000
+                                | ((int) ip[1] << (16)) & 0x00FF0000
+                                | ((int) ip[2] << (8)) & 0x0000FF00
+                                | ((int) ip[3] << (0)) & 0x000000FF;
+                        boolean isIPv4 = addr instanceof Inet4Address;
+                        if (isIPv4) {
+                            result.sAddress = sAddr;
+                            result.address = iAddr;
+                            result.setPrefixLen(prefixLen);
+                            return result;
+                        }
                     }
                 }
-
-            } catch (Exception ex) {
             }
-
-            return new IpInfo();
+        } catch (Exception ex) {
         }
-
-        return null;
+        return new IpInfo();
     }
 
     public static String getNetPrefix(Context context) {
@@ -384,8 +345,7 @@ public class Utils {
     public static boolean isIntentAvailable(Context context, String action) {
         final PackageManager packageManager = context.getPackageManager();
         final Intent intent = new Intent(action);
-        List<ResolveInfo> list = packageManager.queryIntentActivities(intent,
-                PackageManager.MATCH_DEFAULT_ONLY);
+        List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
         return list.size() > 0;
     }
 
