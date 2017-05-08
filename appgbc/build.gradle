@@ -25,7 +25,6 @@ model {
 
     android.buildTypes {
         release {
-            shrinkResources true
             useProguard true
             proguardFiles.add(file('proguard-rules.pro'))
             signingConfig = $("android.signingConfigs.release")
