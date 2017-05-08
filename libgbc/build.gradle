@@ -14,7 +14,7 @@ model {
 
         ndk {
             moduleName "nostalgia"
-            abiFilters.addAll(['armeabi', 'armeabi-v7a'])
+            abiFilters.addAll(['armeabi', 'armeabi-v7a', 'x86'])
             stl = "gnustl_static"
             cppFlags.add('-I' + file("src/main/jni/common"))
             cppFlags.add('-I' + file("src/main/jni/common/resample"))

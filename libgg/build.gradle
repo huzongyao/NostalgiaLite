@@ -14,7 +14,7 @@ model {
 
         ndk {
             moduleName "nostalgia"
-            abiFilters.addAll(['armeabi', 'armeabi-v7a'])
+            abiFilters.addAll(['armeabi', 'armeabi-v7a', 'x86'])
             stl = "gnustl_static"
             ldLibs.addAll(['z', 'log', 'jnigraphics', 'GLESv1_CM'])
             CFlags.addAll(['-DPSS_STYLE=1', '-DHAVE_ASPRINTF', '-DLSB_FIRST', '-DFRAMESKIP',
