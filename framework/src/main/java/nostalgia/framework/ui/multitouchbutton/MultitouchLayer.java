@@ -51,12 +51,10 @@ import nostalgia.framework.utils.NLog;
 import nostalgia.framework.utils.Utils;
 
 public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
-    private static final String TAG = "package nostalgia.framework.ui.multitouchbutton.MultitouchLayer";
+    private static final String TAG = "MultitouchLayer";
     private static final int EMPTY_COLOR = 0x00;
     private static final int BUTTON_MIN_SIZE_DP = 20;
-    private static final int[] VIDEOMODE_COLORS = new int[]{0xffff8800,
-            0xff99cc00
-    };
+    private static final int[] VIDEOMODE_COLORS = new int[]{0xffff8800, 0xff99cc00};
     private static final int MAX_POINTERS = 6;
     private static final int COUNT_SKIP_MOVE_EVENT = 3;
     Paint videoModeLabelPaint = new Paint();
@@ -87,12 +85,6 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
     int counter = 0;
     HashMap<String, RectF> viewPortsEnvelops = new HashMap<String, RectF>();
     boolean isResizing = false;
-    @SuppressLint("HandlerLeak")
-    Handler updateHandler = new Handler() {
-        public void handleMessage(android.os.Message msg) {
-            invalidate();
-        }
-    };
     Timer timer = new Timer();
     int cacheRotation = -1;
     int cacheW = -1;
@@ -119,10 +111,8 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
     private String lastGfxProfileName = null;
     private boolean loadingSettings = true;
     private boolean staticDPADEnabled = true;
+    private Paint pp;
 
-    @Deprecated()
-
-    @SuppressLint("NewApi")
     public MultitouchLayer(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init(context);
@@ -139,62 +129,12 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
     }
 
     static String getPrefName(int rot) {
-        String prefName = "-mtl-".concat(Integer.toString(rot))
+        return "-mtl-".concat(Integer.toString(rot))
                 .concat(".settings");
-        return prefName;
     }
 
-    private void fixBug(HashMap<String, String> currentMap, int type) {
-        String emu = type == 0 ? "nes_lite" : "gbc_lite";
-        String[] gbcLite = new String[]{"2131099685|10-2-198-43",
-                "2131099750|8-666-107-762", "2131099698|342-669-472-770",
-                "2131099686|214-2-401-43", "2131099697|342-565-472-666",
-                "2131099689|417-2-470-43", "2131099747|8-522-104-621",
-                "2131099691|62-522-193-603", "2131099693|62-681-193-762",
-                "2131099716|252-607-339-687", "2131099692|167-576-248-707",
-                "2131099715|252-524-339-604", "2131099695|86-600-170-684",
-                "2131099694|8-576-89-707", "2131099717|252-690-339-770",
-                "2131099748|149-522-248-618", "2131099749|152-663-248-762",
-        };
-        String[] nesLite = new String[]{"2131099750|149-522-248-618",
-                "2131099699|342-565-472-666", "2131099687|10-2-198-43",
-                "2131099696|8-576-89-707", "2131099688|214-2-401-43",
-                "2131099697|86-600-170-684", "2131099719|252-690-339-770",
-                "2131099691|417-2-470-43", "2131099693|62-522-193-603",
-                "2131099751|152-663-248-762", "2131099752|8-666-107-762",
-                "2131099695|62-681-193-762", "2131099718|252-607-339-687",
-                "2131099694|167-576-248-707", "2131099717|252-524-339-604",
-                "2131099700|342-669-472-770", "2131099749|8-522-104-621",
-        };
-        String[][] data = new String[2][];
-        data[0] = nesLite;
-        data[1] = gbcLite;
-        NLog.e("bugfix", "*********************************");
-
-        for (String gbc : data[type]) {
-            String[] parts = gbc.split("\\|");
-            String id = parts[0];
-            String coords = parts[1];
-            String name = currentMap.get(coords);
-            NLog.e("bugfix", emu + ".put(" + id + ", R.id." + name + ");");
-        }
-    }
-
-    private void remapOldMTLprefToNew(SharedPreferences pref,
-                                      Map<String, ?> prefMap) {
+    private void remapOldMTLprefToNew(SharedPreferences pref, Map<String, ?> prefMap) {
         HashMap<Integer, Integer> oldIdsToNewMap = null;
-        String packageName = getContext().getPackageName();
-        long sum = 0;
-
-        for (String key : prefMap.keySet()) {
-            try {
-                sum += Integer.parseInt(key);
-
-            } catch (NumberFormatException e) {
-                NLog.e(TAG, "", e);
-            }
-        }
-
         Editor editor = pref.edit();
         HashSet<String> keysToRemove = new HashSet<String>();
         boolean wrongFormat = false;
@@ -205,12 +145,9 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
             Integer oldBtnId = Integer.parseInt(entry.getKey());
             Integer newBtnId = oldIdsToNewMap.get(oldBtnId);
             int newKey = btnIdMap.indexOf(newBtnId);
-
             if (newBtnId == 0 || newKey == -1) {
-                NLog.e(TAG, "oldBtnId:" + oldBtnId + " newBtnId:" + newBtnId
-                        + " newKey:" + newKey);
+                NLog.e(TAG, "oldBtnId:" + oldBtnId + " newBtnId:" + newBtnId + " newKey:" + newKey);
                 wrongFormat = true;
-
             } else {
                 editor.putString(newKey + "", value);
             }
@@ -218,13 +155,11 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
 
         if (wrongFormat) {
             editor.clear();
-
         } else {
             for (String key : keysToRemove) {
                 editor.remove(key);
             }
         }
-
         editor.apply();
     }
 
@@ -234,7 +169,6 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
         }
     }
 
-    @SuppressLint("UseSparseArrays")
     private void init(Context context) {
         dpadRIDs.add(R.id.button_center);
         dpadRIDs.add(R.id.button_down);
@@ -273,22 +207,20 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
             initScreenElement(false);
         }
 
+        pp = new Paint();
+        pp.setColor(0x5500ff00);
+
         setBackgroundColor(0x01000000);
         paint.setFilterBitmap(true);
-        editElementPaint.setColor(getContext().getResources().getColor(
-                R.color.main_color));
+        editElementPaint.setColor(getContext().getResources().getColor(R.color.main_color));
         editElementPaint.setStyle(Style.STROKE);
-        DashPathEffect dashPathEffect = new DashPathEffect(
-                new float[]{1, 4}, 0);
+        DashPathEffect dashPathEffect = new DashPathEffect(new float[]{1, 4}, 0);
         editElementPaint.setPathEffect(dashPathEffect);
         bitmapRectPaint.setStyle(Style.STROKE);
         bitmapRectPaint.setColor(editElementPaint.getColor());
-        resizeIcon = BitmapFactory.decodeResource(getResources(),
-                R.drawable.resize_icon);
-        buttonMinSizePx = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, BUTTON_MIN_SIZE_DP, getResources()
-                        .getDisplayMetrics());
-
+        resizeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.resize_icon);
+        buttonMinSizePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, BUTTON_MIN_SIZE_DP,
+                getResources().getDisplayMetrics());
         if (!isInEditMode()) {
             ViewTreeObserver vto = getViewTreeObserver();
             touchLayer = new LinearLayout(getContext());
@@ -297,7 +229,6 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                 public void onGlobalLayout() {
                     int w = getMeasuredWidth();
                     int h = getMeasuredHeight();
-
                     if (w != lastW || h != lastH) {
                         lastW = w;
                         lastH = h;
@@ -309,22 +240,19 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                     Context.VIBRATOR_SERVICE);
         }
 
-        float videoModeLabelSize = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, 14, getResources()
-                        .getDisplayMetrics());
+        float videoModeLabelSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                14, getResources().getDisplayMetrics());
         videoModeLabelPaint.setTextSize(videoModeLabelSize);
         videoModeLabelPaint.setStyle(Style.STROKE);
     }
 
     private void initMultiTouchMap() {
         initCounter++;
-
         for (int i = 0; i < 100; i++)
             pointerMap.put(i, EMPTY_COLOR);
-
         ridToIdxMap.clear();
-        NLog.d(TAG, " create touch map width " + getMeasuredWidth() + " height:"
-                + getMeasuredHeight());
+        NLog.d(TAG, " create touch map width " + getMeasuredWidth() +
+                " height:" + getMeasuredHeight());
         touchMapWidth = getMeasuredWidth();
         touchMapHeight = getMeasuredHeight();
         Rect r = new Rect();
@@ -402,21 +330,14 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                 } else {
                     buttonsBitmaps[idx] = null;
                     pressedButtonsBitmaps[idx] = null;
-                    Handler h = new Handler() {
-                        public void handleMessage(android.os.Message msg) {
-                            if (initCounter < 15) {
-                                initMultiTouchMap();
-
-                            } else {
-                                throw new IllegalStateException(
-                                        "Prekrocen max pocet inicializaci multitouchlayeru");
-                            }
+                    postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            initMultiTouchMap();
                         }
-                    };
-                    h.sendEmptyMessageDelayed(0, 1000);
+                    }, 1000);
                 }
             }
-
             idx++;
         }
 
@@ -427,8 +348,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
 
         touchLayer.setOnTouchListener(this);
         removeAllViews();
-        addView(touchLayer, LinearLayout.LayoutParams.MATCH_PARENT,
-                getMeasuredHeight());
+        addView(touchLayer, LinearLayout.LayoutParams.MATCH_PARENT, getMeasuredHeight());
         boolean hasSelect = EmulatorHolder.getInfo().getKeyMapping()
                 .get(EmulatorController.KEY_SELECT) != -1;
 
@@ -437,10 +357,8 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                     buttonMinSizePx).saveHistory());
         }
 
-        editElements.add(new EditElement(R.id.button_start, true,
-                buttonMinSizePx).saveHistory());
-        EditElement dpad = new EditElement(R.id.button_center, true,
-                buttonMinSizePx * 5);
+        editElements.add(new EditElement(R.id.button_start, true, buttonMinSizePx).saveHistory());
+        EditElement dpad = new EditElement(R.id.button_center, true, buttonMinSizePx * 5);
         dpad.add(R.id.button_down);
         dpad.add(R.id.button_up);
         dpad.add(R.id.button_left);
@@ -451,20 +369,13 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
         dpad.add(R.id.button_down_right);
         dpad.saveHistory();
         editElements.add(dpad);
-        editElements.add(new EditElement(R.id.button_a, true, buttonMinSizePx)
-                .saveHistory());
-        editElements.add(new EditElement(R.id.button_b, true, buttonMinSizePx)
-                .saveHistory());
-        editElements.add(new EditElement(R.id.button_a_turbo, true,
-                buttonMinSizePx).saveHistory());
-        editElements.add(new EditElement(R.id.button_b_turbo, true,
-                buttonMinSizePx).saveHistory());
-        editElements.add(new EditElement(R.id.button_ab, true, buttonMinSizePx)
-                .saveHistory());
-        editElements.add(new EditElement(R.id.button_fast_forward, true,
-                buttonMinSizePx).saveHistory());
-        EditElement menu = new EditElement(R.id.button_menu, false,
-                buttonMinSizePx).saveHistory();
+        editElements.add(new EditElement(R.id.button_a, true, buttonMinSizePx).saveHistory());
+        editElements.add(new EditElement(R.id.button_b, true, buttonMinSizePx).saveHistory());
+        editElements.add(new EditElement(R.id.button_a_turbo, true, buttonMinSizePx).saveHistory());
+        editElements.add(new EditElement(R.id.button_b_turbo, true, buttonMinSizePx).saveHistory());
+        editElements.add(new EditElement(R.id.button_ab, true, buttonMinSizePx).saveHistory());
+        editElements.add(new EditElement(R.id.button_fast_forward, true, buttonMinSizePx).saveHistory());
+        EditElement menu = new EditElement(R.id.button_menu, false, buttonMinSizePx).saveHistory();
         menu.setOnClickListener(new OnEditItemClickListener() {
             @Override
             public void onClick() {
@@ -527,10 +438,8 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                         }
                     }
                 }
-
                 idx++;
             }
-
         } else {
             NLog.i(TAG, hashCode() + " nic se nezmenilo");
         }
@@ -544,15 +453,12 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                 Rect bb = boundingBoxs[idx];
                 int len = bb.width() * bb.height();
                 byte[] map = maps[idx];
-
                 if (map == null || (map.length != len)) {
                     return false;
                 }
             }
-
             idx++;
         }
-
         return true;
     }
 
@@ -562,7 +468,6 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
 
             if (v instanceof ViewGroup) {
                 getAllImageButtons((ViewGroup) v, allButtons);
-
             } else if (v instanceof MultitouchBtnInterface) {
                 allButtons.add(v);
             }
@@ -571,10 +476,8 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
 
     private int getRelativeLeft(View myView, View rootView) {
         ViewParent parent = myView.getParent();
-
         if (parent == null || parent == rootView)
             return myView.getLeft();
-
         else
             return myView.getLeft() + getRelativeLeft((View) parent, rootView);
     }
@@ -584,7 +487,6 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
 
         if (parent == null || parent == rootView)
             return myView.getTop();
-
         else
             return myView.getTop() + getRelativeTop((View) parent, rootView);
     }
@@ -596,16 +498,13 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                 optimCounters[pointerId]++;
                 return;
             }
-
             optimCounters[pointerId] = 0;
         }
-
         if (x < 0 || y < 0 || x >= touchMapWidth || y >= touchMapHeight) {
             return;
         }
 
         int newBtnIdx = EMPTY_COLOR;
-
         for (int i = maps.length - 1; i >= 0; i--) {
             Rect boundingBox = boundingBoxs[i];
 
@@ -716,28 +615,20 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
         return pointerMap.get(pointerId) != EMPTY_COLOR;
     }
 
-    @SuppressLint("DrawAllocation")
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
         if (!isInEditMode() && editMode == EDIT_MODE.NONE) {
             for (int idx = 0; idx < boundingBoxs.length; idx++) {
-                MultitouchBtnInterface btn = (MultitouchBtnInterface) btns
-                        .get(idx);
+                MultitouchBtnInterface btn = (MultitouchBtnInterface) btns.get(idx);
                 btn.removeRequestRepaint();
-
                 if (btn.getVisibility() == View.VISIBLE) {
-                    Bitmap b = btn.isPressed() ? pressedButtonsBitmaps[idx]
-                            : buttonsBitmaps[idx];
-
+                    Bitmap b = btn.isPressed() ? pressedButtonsBitmaps[idx] : buttonsBitmaps[idx];
                     if (b != null) {
                         Rect bb = boundingBoxs[idx];
                         canvas.drawBitmap(b, bb.left, bb.top, paint);
-
                         if (editMode != EDIT_MODE.NONE) {
-                            Paint pp = new Paint();
-                            pp.setColor(0x5500ff00);
                             canvas.drawRect(bb, pp);
                         }
                     }
@@ -770,14 +661,10 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                 counter++;
             }
 
-            dstScreenShotrect.left = bb.left + env.left * bb.width()
-                    + (counter * 2) + 2;
-            dstScreenShotrect.top = bb.top + env.top * bb.height()
-                    + (counter * 2) + 2;
-            dstScreenShotrect.right = bb.right - env.right * bb.width()
-                    - ((counter * 2) + 1);
-            dstScreenShotrect.bottom = bb.bottom - env.bottom * bb.height()
-                    - ((counter * 2) + 1);
+            dstScreenShotrect.left = bb.left + env.left * bb.width() + (counter * 2) + 2;
+            dstScreenShotrect.top = bb.top + env.top * bb.height() + (counter * 2) + 2;
+            dstScreenShotrect.right = bb.right - env.right * bb.width() - ((counter * 2) + 1);
+            dstScreenShotrect.bottom = bb.bottom - env.bottom * bb.height() - ((counter * 2) + 1);
 
         } else {
             dstScreenShotrect.set(screenElement.boundingbox);
@@ -804,20 +691,15 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                 RectF env = entry.getValue();
                 rect.left = bb.left + env.left * bb.width() + (counter * 2) + 2;
                 rect.top = bb.top + env.top * bb.height() + (counter * 2) + 2;
-                rect.right = bb.right - env.right * bb.width()
-                        - ((counter * 2) + 1);
-                rect.bottom = bb.bottom - env.bottom * bb.height()
-                        - ((counter * 2) + 1);
-                videoModeLabelPaint.setColor(VIDEOMODE_COLORS[counter
-                        % VIDEOMODE_COLORS.length]);
+                rect.right = bb.right - env.right * bb.width() - ((counter * 2) + 1);
+                rect.bottom = bb.bottom - env.bottom * bb.height() - ((counter * 2) + 1);
+                videoModeLabelPaint.setColor(VIDEOMODE_COLORS[counter % VIDEOMODE_COLORS.length]);
                 canvas.drawRect(rect, videoModeLabelPaint);
-                videoModeLabelPaint.setTextAlign(counter % 2 == 0 ? Align.LEFT
-                        : Align.RIGHT);
+                videoModeLabelPaint.setTextAlign(counter % 2 == 0 ? Align.LEFT : Align.RIGHT);
                 canvas.drawText(
                         entry.getKey(),
-                        counter % 2 == 0 ? (rect.left + videoModeLabelPaint
-                                .getTextSize() / 4) : rect.right
-                                - videoModeLabelPaint.getTextSize() / 4,
+                        counter % 2 == 0 ? (rect.left + videoModeLabelPaint.getTextSize() / 4) :
+                                rect.right - videoModeLabelPaint.getTextSize() / 4,
                         rect.bottom - videoModeLabelPaint.getTextSize() / 4,
                         videoModeLabelPaint);
                 counter++;
@@ -829,15 +711,12 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
 
             if (btn.getId() == R.id.button_menu) {
                 paint.setAlpha(255);
-
             } else {
                 paint.setAlpha(editMode == EDIT_MODE.SCREEN ? 64 : 255);
             }
 
             btn.removeRequestRepaint();
-            Bitmap b = btn.isPressed() ? pressedButtonsBitmaps[idx]
-                    : buttonsBitmaps[idx];
-
+            Bitmap b = btn.isPressed() ? pressedButtonsBitmaps[idx] : buttonsBitmaps[idx];
             if (b != null) {
                 Rect bb = boundingBoxs[idx];
                 Rect bRect = new Rect(0, 0, b.getWidth(), b.getHeight());
@@ -853,7 +732,6 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                     if (!e.validPosition) {
                         canvas.drawRect(e.boundingbox, editPaint);
                     }
-
                     canvas.drawRect(e.boundingbox, editElementPaint);
                     RectF r = e.getResizingBox();
                     canvas.drawBitmap(resizeIcon, r.left, r.top,
@@ -879,7 +757,6 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
     private void onTouchInEditMode(MotionEvent event) {
         if (!isResizing) {
             onTouchInEditModeMove(event);
-
         } else {
             onTouchInEditModeResize(event);
         }
@@ -892,8 +769,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
         if (e.listener != null && boundingBox.contains(x, y)) {
             e.listener.onClick();
 
-        } else if ((resizingAnchor.contains(x, y) || boundingBox.contains(x, y))
-                && e.movable) {
+        } else if ((resizingAnchor.contains(x, y) || boundingBox.contains(x, y)) && e.movable) {
             lastValidBB.set(e.boundingbox);
             isResizing = resizingAnchor.contains(x, y);
             selectIdx = idx;
@@ -908,7 +784,6 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
 
             if (isResizing) {
                 e.resizeRects.clear();
-
                 for (int i = 0; i < e.ids.size(); i++) {
                     int id = e.ids.get(i);
                     e.resizeRects.add(new RectF(boundingBoxs[id]));
@@ -1006,26 +881,21 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
             case MotionEvent.ACTION_MOVE:
 
                 if (selectIdx != -1) {
-                    EditElement element = editMode == EDIT_MODE.TOUCH ? editElements
-                            .get(selectIdx) : screenElement;
+                    EditElement element = editMode == EDIT_MODE.TOUCH ?
+                            editElements.get(selectIdx) : screenElement;
                     RectF elementBb = element.boundingbox;
                     float newW = x - startDragX + startDragXoffset;
                     float scaleFactorW = (newW / selectW);
                     elementBb.set(startDragX, startDragY, x + startDragXoffset,
                             startDragY + selectH * scaleFactorW);
-
                     if (editMode == EDIT_MODE.TOUCH)
                         recomputeBtn(element);
-
                     element.validPosition = isRectValid(elementBb, element);
-
                     if (element.validPosition) {
                         lastValidBB.set(element.boundingbox);
                     }
-
                     invalidate();
                 }
-
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
@@ -1063,18 +933,14 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
         if (selectIdx != -1) {
             EditElement element = editMode == EDIT_MODE.TOUCH ? editElements
                     .get(selectIdx) : screenElement;
-
             if (!element.validPosition) {
                 element.boundingbox.set(lastValidBB);
             }
-
             if (editMode == EDIT_MODE.TOUCH)
                 recomputeBtn(element);
-
             element.validPosition = true;
             selectIdx = -1;
         }
-
         invalidate();
     }
 
@@ -1091,7 +957,6 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                     }
                 }
             }
-
         } else {
             isvalid = false;
         }
@@ -1100,7 +965,6 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                 || element.boundingbox.height() < element.minimalSize) {
             isvalid = false;
         }
-
         return isvalid;
     }
 
@@ -1185,10 +1049,8 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
             @Override
             public void run() {
                 counter++;
-                editElementPaint.setPathEffect(new DashPathEffect(new float[]{
-                        4, 4
-                }, counter % 8));
-                updateHandler.sendEmptyMessage(0);
+                editElementPaint.setPathEffect(new DashPathEffect(new float[]{4, 4}, counter % 8));
+                postInvalidate();
             }
         }, 0, 50);
 
@@ -1296,7 +1158,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
         invalidate();
         Editor edit = getPref().edit();
         edit.clear();
-        edit.commit();
+        edit.apply();
     }
 
     public void resetScreenElement() {

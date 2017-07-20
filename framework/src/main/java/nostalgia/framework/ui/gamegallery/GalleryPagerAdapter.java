@@ -21,9 +21,7 @@ public class GalleryPagerAdapter extends PagerAdapter {
     public static final String EXTRA_POSITIONS = "EXTRA_POSITIONS";
     private final static int[] SORT_TYPES = new int[]{
             GalleryAdapter.SORT_BY_NAME,
-            GalleryAdapter.SORT_BY_MOST_PLAYED,
-            GalleryAdapter.SORT_BY_LAST_PLAYED,
-            GalleryAdapter.SORT_BY_INSERT_DATE
+            GalleryAdapter.SORT_BY_LAST_PLAYED
     };
     private final String[] mTabTitles;
 
@@ -83,6 +81,7 @@ public class GalleryPagerAdapter extends PagerAdapter {
                     yOffsets[position] = list.getFirstVisiblePosition();
                 }
             }
+
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem,
                                  int visibleItemCount, int totalItemCount) {
@@ -101,7 +100,7 @@ public class GalleryPagerAdapter extends PagerAdapter {
 
     public void setGames(ArrayList<GameDescription> games) {
         for (GalleryAdapter adapter : listAdapters) {
-            adapter.setGames(new ArrayList<GameDescription>(games));
+            adapter.setGames(new ArrayList<>(games));
         }
     }
 
@@ -109,7 +108,7 @@ public class GalleryPagerAdapter extends PagerAdapter {
     public int addGames(ArrayList<GameDescription> newGames) {
         int result = 0;
         for (GalleryAdapter adapter : listAdapters) {
-            result = adapter.addGames(new ArrayList<GameDescription>(newGames));
+            result = adapter.addGames(new ArrayList<>(newGames));
         }
         return result;
     }
@@ -122,10 +121,9 @@ public class GalleryPagerAdapter extends PagerAdapter {
 
     @Override
     public void notifyDataSetChanged() {
-        for (int i = 0; i < mTabTitles.length; i++) {
+        for (int i = 0; i < SORT_TYPES.length; i++) {
             GalleryAdapter adapter = listAdapters[i];
             adapter.notifyDataSetChanged();
-
             if (lists[i] != null)
                 lists[i].setSelection(yOffsets[i]);
         }
@@ -139,7 +137,6 @@ public class GalleryPagerAdapter extends PagerAdapter {
     public void onRestoreInstanceState(Bundle inState) {
         if (inState != null) {
             yOffsets = inState.getIntArray(EXTRA_POSITIONS);
-
             if (yOffsets == null)
                 yOffsets = new int[mTabTitles.length];
         }

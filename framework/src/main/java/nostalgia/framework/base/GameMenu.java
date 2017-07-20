@@ -75,7 +75,6 @@ public class GameMenu {
         return dialog != null && dialog.isShowing();
     }
 
-    @SuppressWarnings("deprecation")
     public void open() {
         if (dialog != null) {
             dialog.dismiss();
@@ -112,7 +111,7 @@ public class GameMenu {
 
         for (int i = 0; i < items.size(); i++) {
             if (landsacpe) {
-                LayoutParams pp = new LayoutParams(LayoutParams.FILL_PARENT,
+                LayoutParams pp = new LayoutParams(LayoutParams.MATCH_PARENT,
                         LayoutParams.WRAP_CONTENT, 1);
                 pp.gravity = Gravity.CENTER_VERTICAL;
                 LinearLayout menuRow = new LinearLayout(context);
@@ -123,7 +122,7 @@ public class GameMenu {
                 if (i < items.size()) {
                     LinearLayout lineSeparator = new LinearLayout(context);
                     lineSeparator.setBackgroundColor(0xffffffff);
-                    menuRow.addView(lineSeparator, 1, LayoutParams.FILL_PARENT);
+                    menuRow.addView(lineSeparator, 1, LayoutParams.MATCH_PARENT);
                     GameMenuItem item2 = items.get(i);
                     menuRow.addView(createButton(item2, margin, dialog), pp);
                 }
@@ -133,13 +132,13 @@ public class GameMenu {
             } else {
                 GameMenuItem item = items.get(i);
                 container.addView(createButton(item, margin, dialog),
-                        LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+                        LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
             }
 
             if (i < (items.size() - 1)) {
                 LinearLayout linSeperator = new LinearLayout(context);
                 linSeperator.setBackgroundColor(0xffffffff);
-                container.addView(linSeperator, LayoutParams.FILL_PARENT, 1);
+                container.addView(linSeperator, LayoutParams.MATCH_PARENT, 1);
             }
         }
 

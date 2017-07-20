@@ -3,7 +3,7 @@ apply plugin: 'com.android.model.library'
 model {
     android {
         compileSdkVersion 25
-        buildToolsVersion "25.0.0"
+        buildToolsVersion "25.0.3"
 
         defaultConfig {
             minSdkVersion.apiLevel 15
@@ -14,14 +14,15 @@ model {
 
         ndk {
             moduleName "nostalgia"
+            platformVersion 18
             abiFilters.addAll(['armeabi', 'armeabi-v7a', 'x86'])
             stl = "gnustl_static"
-            ldLibs.addAll(['z', 'log', 'jnigraphics', 'GLESv1_CM'])
             cppFlags.addAll(['-DPSS_STYLE=1', '-DHAVE_ASPRINTF', '-DLSB_FIRST', '-DFRAMESKIP',
                              '-D_STLP_HAS_WCHAR_T', '-D_GLIBCXX_USE_WCHAR_T', '-Wno-write-strings',
                              '-Ofast', '-ffast-math', '-fexceptions', '-frtti', '-fno-builtin-sin',
                              '-fno-builtin-cos', '-fmerge-all-constants', '-fvisibility=hidden',
                              '-fvisibility-inlines-hidden', '-funroll-loops'])
+            ldLibs.addAll(['z', 'log', 'jnigraphics', 'GLESv1_CM'])
         }
     }
 
@@ -37,6 +38,5 @@ model {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:25.0.1'
     compile project(':framework')
 }

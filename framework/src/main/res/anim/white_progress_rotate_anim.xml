@@ -6,4 +6,4 @@
     android:pivotX="50%"
     android:pivotY="50%"
     android:repeatCount="infinite"
-    android:toDegrees="0"></rotate>
+    android:toDegrees="0" />

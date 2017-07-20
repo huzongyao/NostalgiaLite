@@ -28,7 +28,8 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
     public static final int SORT_BY_INSERT_DATE = 1;
     public static final int SORT_BY_MOST_PLAYED = 2;
     public static final int SORT_BY_LAST_PLAYED = 3;
-    HashMap<Character, Integer> alphaIndexer = new HashMap<Character, Integer>();
+
+    private HashMap<Character, Integer> alphaIndexer = new HashMap<Character, Integer>();
     String filter = "";
     Character[] sections;
     private LayoutInflater inflater;
@@ -70,7 +71,7 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
     private Comparator<GameDescription> playedCountComparator = new Comparator<GameDescription>() {
         @Override
         public int compare(GameDescription lhs, GameDescription rhs) {
-            return (int) (-lhs.runCount + rhs.runCount);
+            return -lhs.runCount + rhs.runCount;
         }
     };
 
@@ -129,8 +130,7 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
     }
 
     public void setGames(ArrayList<GameDescription> games) {
-        this.games = new ArrayList<GameDescription>();
-        this.games.addAll(games);
+        this.games = new ArrayList<>(games);
         filterGames();
     }
 
@@ -210,14 +210,11 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
         try {
             Character ch = Character.toLowerCase(sections[section]);
             Integer pos = alphaIndexer.get(ch);
-
             if (pos == null) {
                 return 0;
-
             } else {
                 return pos;
             }
-
         } catch (ArrayIndexOutOfBoundsException e) {
             return 0;
         }
@@ -227,15 +224,12 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
     public int getSectionForPosition(int position) {
         RowItem item = (RowItem) getItem(position);
         char ch = Character.toUpperCase(item.firstLetter);
-
         for (int i = 0; i < sections.length; i++) {
             Character ch1 = sections[i];
-
             if (ch1.equals(ch)) {
                 return i;
             }
         }
-
         return 1;
     }
 
@@ -250,10 +244,8 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
                 return lhs.compareTo(rhs);
             }
         });
-
         for (int i = 0; i < sections.length; i++)
             sections[i] = Character.toUpperCase(sections[i]);
-
         return sections;
     }
 

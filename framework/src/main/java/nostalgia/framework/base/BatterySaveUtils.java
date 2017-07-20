@@ -121,9 +121,7 @@ public class BatterySaveUtils {
         String batteryPath = directory;
         boolean isWriteable = new File(batteryPath).canWrite();
 
-        if (!isWriteable
-                || directory.equals(context.getExternalCacheDir()
-                .getAbsolutePath())) {
+        if (!isWriteable || directory.equals(context.getExternalCacheDir().getAbsolutePath())) {
             batteryPath = EmulatorUtils.getBaseDir(context);
         }
 

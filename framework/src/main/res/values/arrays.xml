@@ -2,8 +2,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string-array name="gallery_page_tab_names">
         <item>BY NAME</item>
-        <item>LAST INSERTED</item>
         <item>LAST PLAYED</item>
+        <item>LAST INSERTED</item>
         <item>MOST PLAYED</item>
     </string-array>
     <string-array name="general_pref_rotation_list">

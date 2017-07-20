@@ -2,8 +2,8 @@
 <resources>
     <string-array name="gallery_page_tab_names">
         <item>名称</item>
-        <item>最后插入</item>
         <item>最后使用</item>
+        <item>最后插入</item>
         <item>最多使用</item>
     </string-array>
     <string-array name="general_pref_rotation_list">

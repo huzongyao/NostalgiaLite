@@ -43,7 +43,6 @@ import nostalgia.framework.ui.multitouchbutton.MultitouchImageButton;
 import nostalgia.framework.ui.multitouchbutton.MultitouchLayer;
 import nostalgia.framework.ui.multitouchbutton.OnMultitouchEventListener;
 import nostalgia.framework.ui.preferences.PreferenceUtil;
-import nostalgia.framework.utils.ActivitySwitcher;
 import nostalgia.framework.utils.NLog;
 import nostalgia.framework.utils.Utils;
 
@@ -165,8 +164,6 @@ public class RemoteControllerActivity extends Activity {
                 .getDefaultSharedPreferences(this);
         ip = prefs.getString("IP", "10.0.0.5");
         setPort(prefs.getInt("port", 0));
-        ActivitySwitcher.animationIn(findViewById(R.id.root),
-                getWindowManager());
         MultitouchImageButton connect = (MultitouchImageButton) findViewById(R.id.button_connect);
         connect.setOnMultitouchEventlistener(new OnMultitouchEventListener() {
             @Override
@@ -484,15 +481,8 @@ public class RemoteControllerActivity extends Activity {
 
     @Override
     public void finish() {
-        ActivitySwitcher.animationOut(findViewById(R.id.root),
-                getWindowManager(),
-                new ActivitySwitcher.AnimationFinishedListener() {
-                    @Override
-                    public void onAnimationFinished() {
-                        RemoteControllerActivity.super.finish();
-                        overridePendingTransition(0, 0);
-                    }
-                });
+        RemoteControllerActivity.super.finish();
+        overridePendingTransition(0, 0);
     }
 
     @Override

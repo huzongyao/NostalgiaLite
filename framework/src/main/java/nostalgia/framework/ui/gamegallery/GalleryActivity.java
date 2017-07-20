@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.zip.ZipException;
 
 import nostalgia.framework.R;
 import nostalgia.framework.base.EmulatorActivity;
@@ -37,7 +36,6 @@ import nostalgia.framework.ui.preferences.GeneralPreferenceFragment;
 import nostalgia.framework.ui.preferences.PreferenceUtil;
 import nostalgia.framework.ui.preferences.TouchControllerSettingsActivity;
 import nostalgia.framework.ui.remotecontroller.RemoteControllerActivity;
-import nostalgia.framework.utils.ActivitySwitcher;
 import nostalgia.framework.utils.DatabaseHelper;
 import nostalgia.framework.utils.DialogUtils;
 import nostalgia.framework.utils.NLog;
@@ -78,7 +76,6 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity implements
 
         if (savedInstanceState != null) {
             pager.setCurrentItem(savedInstanceState.getInt(EXTRA_TABS_IDX, 0));
-
         } else {
             pager.setCurrentItem(PreferenceUtil.getLastGalleryTab(this));
         }
@@ -172,9 +169,6 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity implements
     protected void onResume() {
         super.onResume();
         if (rotateAnim) {
-            ActivitySwitcher.animationIn(
-                    findViewById(R.id.act_gallery_main_container),
-                    getWindowManager());
             rotateAnim = false;
         }
         adapter.notifyDataSetChanged();
@@ -193,8 +187,7 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity implements
     @Override
     public void onGameMenuCreate(GameMenu menu) {
         if (Utils.getDeviceType(this) == ServerType.mobile) {
-            menu.add(R.string.gallery_menu_remote_control,
-                    R.drawable.ic_gamepad);
+            menu.add(R.string.gallery_menu_remote_control, R.drawable.ic_gamepad);
         }
         menu.add(R.string.gallery_menu_reload, R.drawable.ic_reset);
         menu.add(R.string.gallery_menu_pref, R.drawable.ic_game_settings);
@@ -220,23 +213,14 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity implements
     public void onGameMenuItemSelected(GameMenu menu, GameMenuItem item) {
         if (item.getId() == R.string.gallery_menu_pref) {
             Intent i = new Intent(this, GeneralPreferenceActivity.class);
-            i.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
-                    GeneralPreferenceFragment.class.getName());
+            i.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT, GeneralPreferenceFragment.class.getName());
             i.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
             startActivity(i);
         } else if (item.getId() == R.string.gallery_menu_remote_control) {
             final Intent intent = new Intent(GalleryActivity.this, RemoteControllerActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            ActivitySwitcher.animationOut(
-                    findViewById(R.id.act_gallery_main_container),
-                    getWindowManager(),
-                    new ActivitySwitcher.AnimationFinishedListener() {
-                        @Override
-                        public void onAnimationFinished() {
-                            startActivity(intent);
-                            rotateAnim = true;
-                        }
-                    });
+            startActivity(intent);
+            rotateAnim = true;
         } else if (item.getId() == R.string.gallery_menu_reload) {
             reloadGames(true, null);
         } else if (item.getId() == R.string.gallery_menu_wifi_on) {
@@ -272,10 +256,6 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity implements
             if (!gameFile.exists()) {
                 try {
                     Utils.extractFile(zipFile, game.name, gameFile);
-
-                } catch (ZipException e) {
-                    NLog.e(TAG, "", e);
-
                 } catch (IOException e) {
                     NLog.e(TAG, "", e);
                 }
@@ -298,8 +278,7 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity implements
             AlertDialog dialog = builder
                     .setMessage(getString(R.string.gallery_rom_not_found))
                     .setTitle(R.string.error)
-                    .setPositiveButton(
-                            R.string.gallery_rom_not_found_reload,
+                    .setPositiveButton(R.string.gallery_rom_not_found_reload,
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog,
@@ -340,7 +319,6 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity implements
         pager.setVisibility(isListEmpty ? View.INVISIBLE : View.VISIBLE);
     }
 
-    @SuppressLint("NewApi")
     private void showSearchProgressDialog(boolean zipMode) {
         searchDialog = new ProgressDialog(this);
         searchDialog.setMessage(getString(zipMode ?
