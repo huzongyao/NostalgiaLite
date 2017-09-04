@@ -28,8 +28,7 @@ public class GamePreferenceActivity extends PreferenceActivity {
 
     static void initVideoPreference(ListPreference preference,
                                     PreferenceCategory category, PreferenceScreen screen) {
-        List<GfxProfile> profiles = EmulatorHolder.getInfo()
-                .getAvailableGfxProfiles();
+        List<GfxProfile> profiles = EmulatorHolder.getInfo().getAvailableGfxProfiles();
 
         if (profiles.size() > 1) {
             CharSequence[] res = new CharSequence[EmulatorHolder.getInfo()
@@ -60,7 +59,6 @@ public class GamePreferenceActivity extends PreferenceActivity {
         return true;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

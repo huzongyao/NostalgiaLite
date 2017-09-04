@@ -1,6 +1,5 @@
 package nostalgia.framework.ui.preferences;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -27,7 +26,6 @@ public class GamePreferenceFragment extends PreferenceFragment {
         final PreferenceCategory zapperCategory = (PreferenceCategory) findPreference("game_pref_other_category");
         final Preference zapper = findPreference("game_pref_zapper");
         GamePreferenceActivity.initZapper(zapper, zapperCategory);
-        GamePreferenceActivity.initVideoPreference(videoProfile,
-                videoProfileCategory, getPreferenceScreen());
+        GamePreferenceActivity.initVideoPreference(videoProfile, videoProfileCategory, getPreferenceScreen());
     }
 }

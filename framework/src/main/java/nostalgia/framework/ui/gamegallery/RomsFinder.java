@@ -1,10 +1,8 @@
 package nostalgia.framework.ui.gamegallery;
 
-import android.annotation.SuppressLint;
 import android.os.Environment;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -12,11 +10,11 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import nostalgia.framework.utils.DatabaseHelper;
@@ -25,40 +23,36 @@ import nostalgia.framework.utils.SDCardUtil;
 import nostalgia.framework.utils.Utils;
 
 public class RomsFinder extends Thread {
-    private static final String TAG = "ui.gamegallery.RomsFinder";
+    private static final String TAG = "RomsFinder";
     private FilenameExtFilter filenameExtFilter;
-    private FilenameExtFilter inZipfilenameExtFilter;
+    private FilenameExtFilter inZipFileNameExtFilter;
     private String androidAppDataFolder = "";
-    private HashMap<String, GameDescription> oldGames = new HashMap<String, GameDescription>();
+    private HashMap<String, GameDescription> oldGames = new HashMap<>();
     private DatabaseHelper dbHelper;
-    private ArrayList<GameDescription> games = new ArrayList<GameDescription>();
+    private ArrayList<GameDescription> games = new ArrayList<>();
     private OnRomsFinderListener listener;
     private BaseGameGalleryActivity activity;
     private boolean searchNew = true;
     private File selectedFolder;
     private AtomicBoolean running = new AtomicBoolean(false);
 
-    public RomsFinder(Set<String> exts, Set<String> inZipExts,
-                      BaseGameGalleryActivity activity, OnRomsFinderListener listener,
-                      boolean searchNew, File selectedFolder) {
+    public RomsFinder(Set<String> exts, Set<String> inZipExts, BaseGameGalleryActivity activity,
+                      OnRomsFinderListener listener, boolean searchNew, File selectedFolder) {
         this.listener = listener;
         this.activity = activity;
         this.searchNew = searchNew;
         this.selectedFolder = selectedFolder;
         filenameExtFilter = new FilenameExtFilter(exts, true, false);
-        inZipfilenameExtFilter = new FilenameExtFilter(inZipExts, true, false);
-        androidAppDataFolder = Environment.getExternalStorageDirectory()
-                .getAbsolutePath() + "/Android";
+        inZipFileNameExtFilter = new FilenameExtFilter(inZipExts, true, false);
+        androidAppDataFolder = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android";
         dbHelper = new DatabaseHelper(activity);
     }
 
     public static ArrayList<GameDescription> getAllGames(DatabaseHelper helper) {
-        return helper.selectObjsFromDb(GameDescription.class, false,
-                "GROUP BY checksum", null);
+        return helper.selectObjsFromDb(GameDescription.class, false, "GROUP BY checksum", null);
     }
 
-    private void getRomAndPackedFiles(File root, List<File> result,
-                                      HashSet<String> usedPaths) {
+    private void getRomAndPackedFiles(File root, List<File> result, HashSet<String> usedPaths) {
         String dirPath = null;
         Stack<DirInfo> dirStack = new Stack<DirInfo>();
         dirStack.removeAllElements();
@@ -75,8 +69,7 @@ public class RomsFinder extends Thread {
                 NLog.e(TAG, "search error", e1);
             }
 
-            if (dirPath != null && !usedPaths.contains(dirPath)
-                    && dir.level <= MAX_LEVEL) {
+            if (dirPath != null && !usedPaths.contains(dirPath) && dir.level <= MAX_LEVEL) {
                 usedPaths.add(dirPath);
                 File[] files = dir.file.listFiles(filenameExtFilter);
 
@@ -84,35 +77,26 @@ public class RomsFinder extends Thread {
                     for (File file : files) {
                         if (file.isDirectory()) {
                             String canonicalPath = null;
-
                             try {
                                 canonicalPath = file.getCanonicalPath();
-
                             } catch (IOException e) {
                                 NLog.e(TAG, "search error", e);
                             }
-
                             if (canonicalPath != null
                                     && (!usedPaths.contains(canonicalPath))) {
                                 if (canonicalPath.equals(androidAppDataFolder)) {
                                     NLog.i(TAG, "ignore " + androidAppDataFolder);
-
                                 } else {
-                                    dirStack.add(new DirInfo(file,
-                                            dir.level + 1));
+                                    dirStack.add(new DirInfo(file, dir.level + 1));
                                 }
-
                             } else {
-                                NLog.i(TAG, "cesta " + canonicalPath
-                                        + " jiz byla prohledana");
+                                NLog.i(TAG, "cesta " + canonicalPath + " jiz byla prohledana");
                             }
-
                         } else {
                             result.add(file);
                         }
                     }
                 }
-
             } else {
                 NLog.i(TAG, "cesta " + dirPath + " jiz byla prohledana");
             }
@@ -121,8 +105,7 @@ public class RomsFinder extends Thread {
 
     @Override
     public void run() {
-        android.os.Process
-                .setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
         running.set(true);
         NLog.i(TAG, "start");
         activity.runOnUiThread(new Runnable() {
@@ -190,7 +173,7 @@ public class RomsFinder extends Thread {
 
                         if (running.get() && (!ze.isDirectory())) {
                             String filename = ze.getName();
-                            if (inZipfilenameExtFilter.accept(dir, filename)) {
+                            if (inZipFileNameExtFilter.accept(dir, filename)) {
                                 counterRoms++;
                                 InputStream is = zip.getInputStream(ze);
                                 String checksum = Utils.getMD5Checksum(is);
@@ -208,11 +191,9 @@ public class RomsFinder extends Thread {
                         }
 
                         if (counterEntry > 20 && counterRoms == 0) {
-                            listener.onRomsFinderFoundZipEntry(zipFile.getName() +
-                                            "\n" + ze.getName(),
+                            listener.onRomsFinderFoundZipEntry(zipFile.getName() + "\n" + ze.getName(),
                                     max - 20 - 1);
-                            NLog.i(TAG,
-                                    "Predcasne ukonceni prohledavani zipu. V prvnich 20 zaznamech v zipu neni ani jeden rom");
+                            NLog.i(TAG, "Predcasne ukonceni prohledavani zipu. V prvnich 20 zaznamech v zipu neni ani jeden rom");
                             break;
                         } else {
                             String name = ze.getName();
@@ -223,15 +204,12 @@ public class RomsFinder extends Thread {
                             if (name.length() > 20) {
                                 name = name.substring(0, 20);
                             }
-                            listener.onRomsFinderFoundZipEntry(
-                                    zipFile.getName() + "\n" + name, 0);
+                            listener.onRomsFinderFoundZipEntry(zipFile.getName() + "\n" + name, 0);
                         }
                     }
                     if (running.get()) {
                         dbHelper.insertObjToDb(zipRomFile);
                     }
-                } catch (FileNotFoundException e) {
-                    NLog.e(TAG, "", e);
                 } catch (Exception e) {
                     NLog.e(TAG, "", e);
                 } finally {
@@ -244,19 +222,17 @@ public class RomsFinder extends Thread {
                 }
             } else {
                 games.addAll(zipRomFile.games);
-                listener.onRomsFinderFoundZipEntry(zipFile.getName(),
-                        zipRomFile.games.size());
+                listener.onRomsFinderFoundZipEntry(zipFile.getName(), zipRomFile.games.size());
                 NLog.i(TAG, "found zip in cache " + zipRomFile.games.size());
             }
         } else {
             NLog.e(TAG, "external cache dir is null");
-            activity.showSDcardFailed();
+            activity.showSDCardFailed();
         }
     }
 
-    @SuppressLint("DefaultLocale")
     private void startFileSystemMode(ArrayList<GameDescription> oldRoms) {
-        HashSet<File> roots = new HashSet<File>();
+        HashSet<File> roots = new HashSet<>();
 
         if (selectedFolder == null) {
             roots = SDCardUtil.getAllStorageLocations();
@@ -264,10 +240,10 @@ public class RomsFinder extends Thread {
             roots.add(selectedFolder);
         }
 
-        ArrayList<File> result = new ArrayList<File>();
+        ArrayList<File> result = new ArrayList<>();
         long startTime = System.currentTimeMillis();
         NLog.i(TAG, "start searching in file system");
-        HashSet<String> usedPaths = new HashSet<String>();
+        HashSet<String> usedPaths = new HashSet<>();
 
         for (File root : roots) {
             NLog.i(TAG, "exploring " + root.getAbsolutePath());
@@ -277,7 +253,7 @@ public class RomsFinder extends Thread {
         NLog.i(TAG, "found " + result.size() + " files");
         NLog.i(TAG, "compute checksum");
         int zipEntriesCount = 0;
-        ArrayList<File> zips = new ArrayList<File>();
+        ArrayList<File> zips = new ArrayList<>();
 
         for (File file : result) {
             String path = file.getAbsolutePath();
@@ -288,14 +264,12 @@ public class RomsFinder extends Thread {
                     try {
                         ZipFile zzFile = new ZipFile(file);
                         zipEntriesCount += zzFile.size();
-                    } catch (ZipException e) {
-                        NLog.e(TAG, "", e);
                     } catch (Exception e) {
                         NLog.e(TAG, "", e);
                     }
                     continue;
                 }
-                GameDescription game = null;
+                GameDescription game;
                 if (oldGames.containsKey(path)) {
                     game = oldGames.get(path);
                 } else {
@@ -344,12 +318,10 @@ public class RomsFinder extends Thread {
         NLog.i(TAG, "cancel search");
     }
 
-    private ArrayList<GameDescription> removeNonExistRoms(
-            ArrayList<GameDescription> roms) {
-        HashSet<String> hashs = new HashSet<String>();
-        ArrayList<GameDescription> newRoms = new ArrayList<GameDescription>(
-                roms.size());
-        HashMap<Long, ZipRomFile> zipsMap = new HashMap<Long, ZipRomFile>();
+    private ArrayList<GameDescription> removeNonExistRoms(ArrayList<GameDescription> roms) {
+        HashSet<String> hashs = new HashSet<>();
+        ArrayList<GameDescription> newRoms = new ArrayList<>(roms.size());
+        Map<Long, ZipRomFile> zipsMap = new HashMap<>();
 
         for (ZipRomFile zip : dbHelper.selectObjsFromDb(ZipRomFile.class,
                 false, null, null)) {
@@ -360,8 +332,7 @@ public class RomsFinder extends Thread {
 
             } else {
                 dbHelper.deleteObjFromDb(zip);
-                dbHelper.deleteObjsFromDb(GameDescription.class,
-                        "where zipfile_id=" + zip._id);
+                dbHelper.deleteObjsFromDb(GameDescription.class, "where zipfile_id=" + zip._id);
             }
         }
 
@@ -390,36 +361,26 @@ public class RomsFinder extends Thread {
                 }
             }
         }
-
         return newRoms;
     }
 
     public interface OnRomsFinderListener {
 
+        void onRomsFinderStart(boolean searchNew);
 
-        public void onRomsFinderStart(boolean searchNew);
+        void onRomsFinderFoundGamesInCache(ArrayList<GameDescription> oldRoms);
 
+        void onRomsFinderFoundFile(String name);
 
-        public void onRomsFinderFoundGamesInCache(
-                ArrayList<GameDescription> oldRoms);
+        void onRomsFinderZipPartStart(int countEntries);
 
+        void onRomsFinderFoundZipEntry(String message, int skipEntries);
 
-        public void onRomsFinderFoundFile(String name);
+        void onRomsFinderNewGames(ArrayList<GameDescription> roms);
 
+        void onRomsFinderEnd(boolean searchNew);
 
-        public void onRomsFinderZipPartStart(int countEntries);
-
-
-        public void onRomsFinderFoundZipEntry(String message, int skipEntries);
-
-
-        public void onRomsFinderNewGames(ArrayList<GameDescription> roms);
-
-
-        public void onRomsFinderEnd(boolean searchNew);
-
-
-        public void onRomsFinderCancel(boolean searchNew);
+        void onRomsFinderCancel(boolean searchNew);
     }
 
     private class DirInfo {

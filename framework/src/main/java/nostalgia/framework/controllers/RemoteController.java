@@ -35,15 +35,14 @@ public class RemoteController implements EmulatorController {
     private int port;
     private ControllerEventSource server;
     private Emulator emulator;
-    private Map<Integer, Integer> mapping;
+    private SparseIntArray mapping;
     private SparseIntArray systemKeyMapping;
     private boolean zapperWarningShow = false;
     private HashSet<Integer> specialKeys = new HashSet<Integer>();
 
     public RemoteController(EmulatorActivity activity) {
         start();
-        inputConnection = new BaseInputConnection(activity.getWindow()
-                .getDecorView(), false);
+        inputConnection = new BaseInputConnection(activity.getWindow().getDecorView(), false);
         systemKeyMapping = new SparseIntArray();
         systemKeyMapping.put(RemoteController.KEY_MENU, KeyEvent.KEYCODE_MENU);
         systemKeyMapping.put(RemoteController.KEY_BACK, KeyEvent.KEYCODE_BACK);

@@ -32,7 +32,7 @@ public class OpenGLTestView extends GLSurfaceView {
     }
 
     public interface Callback {
-        public void onDetected(int i);
+        void onDetected(int i);
     }
 
     private static class Renderer implements GLSurfaceView.Renderer {
@@ -46,6 +46,7 @@ public class OpenGLTestView extends GLSurfaceView {
                 + "   gl_Position =  uMVPMatrix  * a_position; 				 "
                 + "   v_texCoord = a_texCoord;  							 "
                 + "}                            							 ";
+
         private static String fragmentShaderCode = "precision mediump float;                                  "
                 + "uniform sampler2D s_texture;                              "
                 + "uniform sampler2D s_palette;                              "
@@ -56,8 +57,8 @@ public class OpenGLTestView extends GLSurfaceView {
                 + " float x = a - c * 0.001953;                               "
                 + " vec2 curPt = vec2(x, 0);                                  "
                 + " gl_FragColor.rgb = texture2D(s_palette, curPt).rgb;"
-
                 + "}                            							 ";
+
         private final short[] drawOrder = {0, 1, 2, 0, 2, 3};
         int[] textureIds = new int[2];
         int paletteTextureId;
@@ -90,12 +91,9 @@ public class OpenGLTestView extends GLSurfaceView {
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
             GLES20.glEnableVertexAttribArray(positionHandle);
             GLES20.glEnableVertexAttribArray(texCoordHandle);
-            GLES20.glVertexAttribPointer(positionHandle, 3, GLES20.GL_FLOAT,
-                    false, 3 * 4, vertexBuffer);
-            GLES20.glVertexAttribPointer(texCoordHandle, 2, GLES20.GL_FLOAT,
-                    false, 2 * 4, textureBuffer);
-            mvpMatrixHandle = GLES20
-                    .glGetUniformLocation(program, "uMVPMatrix");
+            GLES20.glVertexAttribPointer(positionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, vertexBuffer);
+            GLES20.glVertexAttribPointer(texCoordHandle, 2, GLES20.GL_FLOAT, false, 2 * 4, textureBuffer);
+            mvpMatrixHandle = GLES20.glGetUniformLocation(program, "uMVPMatrix");
             GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, projMatrix, 0);
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mainTextureId);
@@ -108,27 +106,23 @@ public class OpenGLTestView extends GLSurfaceView {
                     GLES20.GL_ALPHA, GLES20.GL_UNSIGNED_BYTE, testBuffer);
             GLES20.glDrawElements(GLES20.GL_TRIANGLES, drawOrder.length,
                     GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
-            ByteBuffer pixels = ByteBuffer.allocate(4).order(
-                    ByteOrder.nativeOrder());
+            ByteBuffer pixels = ByteBuffer.allocate(4).order(ByteOrder.nativeOrder());
             GLES20.glReadPixels(screenHeight / 2, screenWidth / 2, 1, 1,
                     GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, pixels);
 
             if (!detected) {
                 IntBuffer intBuf = pixels.asIntBuffer();
-                int[] array = new int[1 * 1];
+                int[] array = new int[1];
                 intBuf.get(array);
                 int value = intBuf.get(0) & 0x000000ff;
                 NLog.i("pix", "pix: " + Integer.toHexString(value));
                 detected = true;
-
                 if (value == 0) {
                     NLog.i("pix", "on detect: 0");
                     callback.onDetected(0);
-
                 } else if (value == 0xff) {
                     callback.onDetected(1);
                     NLog.i("pix", "on detect: 1");
-
                 } else {
                     callback.onDetected(2);
                     NLog.i("pix", "on detect: 2");
@@ -141,8 +135,7 @@ public class OpenGLTestView extends GLSurfaceView {
 
         @Override
         public void onSurfaceChanged(GL10 gl, int width, int height) {
-            Matrix.orthoM(projMatrix, 0, -width / 2, +width / 2, -height / 2,
-                    +height / 2, -2f, 2f);
+            Matrix.orthoM(projMatrix, 0, -width / 2, +width / 2, -height / 2, +height / 2, -2f, 2f);
             screenWidth = width;
             screenHeight = height;
             GLES20.glViewport(0, 0, width, height);
@@ -159,10 +152,8 @@ public class OpenGLTestView extends GLSurfaceView {
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
             GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-            int vertexShader = OpenGLView.Renderer.loadShader(
-                    GLES20.GL_VERTEX_SHADER, vertexShaderCode);
-            int fragmentShader = OpenGLView.Renderer.loadShader(
-                    GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
+            int vertexShader = OpenGLView.Renderer.loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
+            int fragmentShader = OpenGLView.Renderer.loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
             program = GLES20.glCreateProgram();
             GLES20.glAttachShader(program, vertexShader);
             GLES20.glAttachShader(program, fragmentShader);
@@ -174,22 +165,21 @@ public class OpenGLTestView extends GLSurfaceView {
             viewPort = new ViewPort();
             viewPort.height = height;
             viewPort.width = width;
-            quadCoords = new float[]{-width / 2f, -height / 2f, 0,
+            quadCoords = new float[]{
+                    -width / 2f, -height / 2f, 0,
                     -width / 2f, height / 2f, 0,
                     width / 2f, height / 2f, 0,
                     width / 2f, -height / 2f, 0
             };
-            textureCoords = new float[]{0, 1,
-
+            textureCoords = new float[]{
+                    0, 1,
                     0, 0,
                     1, 0,
                     1, 1,
-
             };
             ByteBuffer bb0 = ByteBuffer.allocateDirect(256 * 256);
             bb0.order(ByteOrder.nativeOrder());
             byte[] pixels = new byte[256 * 256];
-
             for (int i = 0; i < 256 * 256; i++) {
                 pixels[i] = (byte) 132;
             }
@@ -202,8 +192,7 @@ public class OpenGLTestView extends GLSurfaceView {
             vertexBuffer = bb1.asFloatBuffer();
             vertexBuffer.put(quadCoords);
             vertexBuffer.position(0);
-            ByteBuffer bb2 = ByteBuffer
-                    .allocateDirect(textureCoords.length * 4);
+            ByteBuffer bb2 = ByteBuffer.allocateDirect(textureCoords.length * 4);
             bb2.order(ByteOrder.nativeOrder());
             textureBuffer = bb2.asFloatBuffer();
             textureBuffer.put(textureCoords);
@@ -241,8 +230,7 @@ public class OpenGLTestView extends GLSurfaceView {
 
             GLES20.glPixelStorei(GLES20.GL_PACK_ALIGNMENT, 1);
             GLES20.glPixelStorei(GLES20.GL_UNPACK_ALIGNMENT, 1);
-            Bitmap paletteBmp = Bitmap.createBitmap(paletteSize, paletteSize,
-                    Config.ARGB_8888);
+            Bitmap paletteBmp = Bitmap.createBitmap(paletteSize, paletteSize, Config.ARGB_8888);
             paletteBmp.setPixels(palette, 0, paletteSize, 0, 0, paletteSize, 1);
             GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, paletteBmp, 0);
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,
@@ -260,7 +248,6 @@ public class OpenGLTestView extends GLSurfaceView {
         public ViewPort getViewPort() {
             return viewPort;
         }
-
     }
 
 }

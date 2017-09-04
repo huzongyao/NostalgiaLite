@@ -12,6 +12,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,16 +24,17 @@ import nostalgia.framework.utils.annotations.ObjectFromOtherTable;
 import nostalgia.framework.utils.annotations.Table;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final String TAG = "utils.DatabaseHelper";
+
+    private static final String TAG = "DatabaseHelper";
     private static int DB_VERSION_CODE = 21;
-    Class<?>[] classes = new Class<?>[]{GameDescription.class,
+    private Class<?>[] classes = new Class<?>[]{
+            GameDescription.class,
             ZipRomFile.class
     };
-    HashMap<Class<?>, ClassItem> classItems = new HashMap<Class<?>, ClassItem>();
+    private HashMap<Class<?>, ClassItem> classItems = new HashMap<>();
 
     public DatabaseHelper(Context context) {
         super(context, "db", null, DB_VERSION_CODE);
-
         for (Class<?> cls : classes) {
             classItems.put(cls, new ClassItem(cls));
         }
@@ -65,11 +67,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private String getCreateSql(Class<?> cls) {
         ClassItem classItem = classItems.get(cls);
         String tableName = classItem.tableName;
-        StringBuffer sql = new StringBuffer();
-        sql.append("CREATE TABLE " + tableName + " (");
+        StringBuilder sql = new StringBuilder();
+        sql.append("CREATE TABLE ").append(tableName).append(" (");
 
         for (Field field : cls.getDeclaredFields()) {
-            Column column = (Column) field.getAnnotation(Column.class);
+            Column column = field.getAnnotation(Column.class);
 
             if (column != null) {
                 String cName = column.columnName();
@@ -95,7 +97,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 }
 
                 if (supported) {
-                    sql.append(cName + " " + dbType + " ");
+                    sql.append(cName).append(" ").append(dbType).append(" ");
 
                     if (column.isPrimaryKey()) {
                         sql.append("PRIMARY KEY ");
@@ -113,8 +115,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 }
             }
 
-            ObjectFromOtherTable objectFromOtherTable = (ObjectFromOtherTable) field
-                    .getAnnotation(ObjectFromOtherTable.class);
+            ObjectFromOtherTable objectFromOtherTable = field.getAnnotation(ObjectFromOtherTable.class);
 
             if (objectFromOtherTable != null) {
                 Type fieldClass = field.getType();
@@ -124,21 +125,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     Class<?> classType = getCollectionGenericClass(field);
 
                     if (classType != null)
-                        table2 = (Table) classType.getAnnotation(Table.class);
+                        table2 = classType.getAnnotation(Table.class);
 
                 } else {
-                    table2 = (Table) field.getClass()
-                            .getAnnotation(Table.class);
+                    table2 = field.getClass().getAnnotation(Table.class);
                 }
 
                 if (table2 == null) {
-                    throw new RuntimeException(
-                            "Field "
-                                    + cls.getSimpleName()
-                                    + "."
-                                    + field.getName()
-                                    + " must refered to class with Table annotation"
-                                    + " or Collection with generic type with Table annotation");
+                    throw new RuntimeException("Field " + cls.getSimpleName() + "." + field.getName()
+                            + " must refered to class with Table annotation"
+                            + " or Collection with generic type with Table annotation");
                 }
             }
         }
@@ -163,29 +159,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private void removeTablesDB(SQLiteDatabase db) {
         for (Class<?> cls : classes) {
-            Table table = (Table) cls.getAnnotation(Table.class);
+            Table table = cls.getAnnotation(Table.class);
 
             if (table != null) {
                 String tableName = table.tableName();
-                tableName = tableName.equals("") ? cls.getSimpleName()
-                        : tableName;
+                tableName = tableName.equals("") ? cls.getSimpleName() : tableName;
                 db.execSQL("DROP TABLE IF EXISTS " + tableName);
                 NLog.i(TAG, "delete table " + tableName);
 
             } else {
-                throw new RuntimeException("class " + cls.getName()
-                        + " has not @Table annotation");
+                throw new RuntimeException("class " + cls.getName() + " has not @Table annotation");
             }
         }
     }
 
     private void clearTablesDB(SQLiteDatabase db) {
         for (Class<?> cls : classes) {
-            Table table = (Table) cls.getAnnotation(Table.class);
+            Table table = cls.getAnnotation(Table.class);
 
             if (table == null) {
-                throw new RuntimeException("class " + cls.getName()
-                        + " has not @Table annotation");
+                throw new RuntimeException("class " + cls.getName() + " has not @Table annotation");
             }
 
             String tableName = table.tableName();
@@ -284,8 +277,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return resultList;
     }
 
-    public <T> ArrayList<T> selectObjsFromDb(Class<T> cls, boolean deep,
-                                             String groupBy, String orderBy) {
+    public <T> ArrayList<T> selectObjsFromDb(Class<T> cls, boolean deep, String groupBy, String orderBy) {
         ArrayList<T> resultList = null;
         SQLiteDatabase db = getReadableDatabase();
 
@@ -334,22 +326,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private void updateObjToDb(Object obj, SQLiteDatabase db, String[] fields) {
         Class<?> cls = obj.getClass();
-        HashSet<String> fieldsSet = new HashSet<String>();
+        HashSet<String> fieldsSet = new HashSet<>();
 
         if (fields != null)
-            for (String f : fields)
-                fieldsSet.add(f);
+            Collections.addAll(fieldsSet, fields);
 
         ClassItem classItem = classItems.get(cls);
 
         if (classItem != null) {
             String tableName = classItem.tableName;
-            StringBuffer sql = new StringBuffer();
-            sql.append("UPDATE " + tableName + " SET ");
-            StringBuffer wherePart = new StringBuffer();
+            StringBuilder sql = new StringBuilder();
+            sql.append("UPDATE ").append(tableName).append(" SET ");
+            StringBuilder wherePart = new StringBuilder();
 
             for (Field field : cls.getDeclaredFields()) {
-                Column column = (Column) field.getAnnotation(Column.class);
+                Column column = field.getAnnotation(Column.class);
                 field.setAccessible(true);
 
                 if (column != null) {
@@ -361,10 +352,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         value = field.get(obj);
 
                         if (column.isPrimaryKey()) {
-                            wherePart.append(cName + "=");
+                            wherePart.append(cName).append("=");
 
                             if (value instanceof String) {
-                                wherePart.append("\"" + value + "\"");
+                                wherePart.append("\"").append(value).append("\"");
 
                             } else {
                                 wherePart.append(value);
@@ -377,18 +368,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                 }
                             }
 
-                            sql.append(cName + "=");
-
-                            if (value instanceof String
-                                    || value.getClass().isEnum()) {
-                                sql.append("\"" + value + "\",");
+                            sql.append(cName).append("=");
+                            if (value instanceof String || value.getClass().isEnum()) {
+                                sql.append("\"").append(value).append("\",");
 
                             } else if (value instanceof Boolean) {
                                 sql.append(value.equals(Boolean.TRUE) ? 1 : 0);
                                 sql.append(",");
 
                             } else {
-                                sql.append(value + ",");
+                                sql.append(value).append(",");
                             }
                         }
 
@@ -400,8 +389,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     }
                 }
 
-                ObjectFromOtherTable objectFromOtherTable = (ObjectFromOtherTable) field
-                        .getAnnotation(ObjectFromOtherTable.class);
+                ObjectFromOtherTable objectFromOtherTable = field.getAnnotation(ObjectFromOtherTable.class);
 
                 if (objectFromOtherTable != null) {
                     Type fieldClass = field.getType();
@@ -413,13 +401,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     }
 
                     try {
-                        if (Collection.class
-                                .isAssignableFrom((Class<?>) fieldClass)) {
+                        if (Collection.class.isAssignableFrom((Class<?>) fieldClass)) {
                             Class<?> classType = getCollectionGenericClass(field);
 
                             if (classType != null) {
-                                Collection<?> objs = (Collection<?>) field
-                                        .get(obj);
+                                Collection<?> objs = (Collection<?>) field.get(obj);
 
                                 if (objs != null) {
                                     for (Object o : objs) {
@@ -427,7 +413,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                     }
                                 }
                             }
-
                         } else {
                             updateObjToDb(field.get(obj), db, null);
                         }
@@ -442,52 +427,44 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
 
             sql.delete(sql.length() - 1, sql.length());
-            sql.append(" WHERE " + wherePart.toString() + ";");
+            sql.append(" WHERE ").append(wherePart.toString()).append(";");
             NLog.i(TAG, "sql:" + sql.toString());
             db.execSQL(sql.toString());
-
         } else {
-            throw new RuntimeException(
-                    "Wrong obj class (class must have annotation Table)");
+            throw new RuntimeException("Wrong obj class (class must have annotation Table)");
         }
     }
 
     private int countObjsInDb(Class<?> cls, SQLiteDatabase db, String where) {
         ClassItem classItem = classItems.get(cls);
         int count = -1;
-
         if (classItem != null) {
             String tableName = classItem.tableName;
-            String query = "select count(*) from " + tableName + " " + where
-                    + ";";
+            String query = "select count(*) from " + tableName + " " + where + ";";
             Cursor c = null;
-
             try {
                 c = db.rawQuery(query, null);
                 c.moveToFirst();
                 count = c.getInt(0);
-
             } finally {
-                c.close();
+                if (c != null) {
+                    c.close();
+                }
             }
-
             return count;
-
         } else {
-            throw new RuntimeException(
-                    "Wrong obj class (class must have annotation Table)");
+            throw new RuntimeException("Wrong obj class (class must have annotation Table)");
         }
     }
 
-    private void insertObjToDb(Object obj, SQLiteDatabase db,
-                               Pair<String, Long> idMapping) {
+    private void insertObjToDb(Object obj, SQLiteDatabase db, Pair<String, Long> idMapping) {
         Class<?> cls = obj.getClass();
         ClassItem classItem = classItems.get(cls);
 
         if (classItem != null) {
             String tableName = classItem.tableName;
             ContentValues cv = new ContentValues();
-            ArrayList<Pair<ObjectFromOtherTable, Field>> foregeinFields = new ArrayList<Pair<ObjectFromOtherTable, Field>>();
+            ArrayList<Pair<ObjectFromOtherTable, Field>> foregeinFields = new ArrayList<>();
             Field primaryKeyField = null;
 
             for (int i = 0; i < classItem.fields.length; i++) {
@@ -498,61 +475,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     if (!column.isPrimaryKey()) {
                         String cName = classItem.names[i];
                         Object value;
-
                         try {
                             value = field.get(obj);
                             Class<?> valueCls = value.getClass();
-
-                            if (idMapping != null
-                                    && idMapping.first.equals(cName)) {
+                            if (idMapping != null && idMapping.first.equals(cName)) {
                                 value = idMapping.second;
                                 field.setLong(obj, idMapping.second);
                             }
-
-                            if (value instanceof String
-                                    || value.getClass().isEnum()) {
+                            if (value instanceof String || value.getClass().isEnum()) {
                                 cv.put(cName, (String) value);
 
-                            } else if (valueCls == Boolean.class
-                                    || valueCls == boolean.class) {
-                                cv.put(cName, value.equals(Boolean.TRUE) ? 1
-                                        : 0);
+                            } else if (valueCls == Boolean.class || valueCls == boolean.class) {
+                                cv.put(cName, value.equals(Boolean.TRUE) ? 1 : 0);
 
-                            } else if (valueCls == Integer.class
-                                    || valueCls == int.class) {
+                            } else if (valueCls == Integer.class || valueCls == int.class) {
                                 cv.put(cName, (Integer) value);
 
-                            } else if (valueCls == Long.class
-                                    || valueCls == long.class) {
+                            } else if (valueCls == Long.class || valueCls == long.class) {
                                 cv.put(cName, (Long) value);
 
-                            } else if (valueCls == Byte.class
-                                    || valueCls == byte.class) {
+                            } else if (valueCls == Byte.class || valueCls == byte.class) {
                                 cv.put(cName, (Byte) value);
-
                             } else {
-                                throw new RuntimeException(value.getClass()
-                                        + " is not supported datatype");
+                                throw new RuntimeException(value.getClass() + " is not supported datatype");
                             }
-
-                        } catch (IllegalArgumentException e) {
-                            NLog.e(TAG, "", e);
-
-                        } catch (IllegalAccessException e) {
+                        } catch (Exception e) {
                             NLog.e(TAG, "", e);
                         }
-
                     } else {
                         primaryKeyField = field;
                     }
                 }
 
-                ObjectFromOtherTable objectFromOtherTable = (ObjectFromOtherTable) field
-                        .getAnnotation(ObjectFromOtherTable.class);
-
+                ObjectFromOtherTable objectFromOtherTable = field.getAnnotation(ObjectFromOtherTable.class);
                 if (objectFromOtherTable != null) {
-                    foregeinFields.add(new Pair<ObjectFromOtherTable, Field>(
-                            objectFromOtherTable, field));
+                    foregeinFields.add(new Pair<>(objectFromOtherTable, field));
                 }
             }
 
@@ -565,79 +522,55 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (primaryKeyField != null) {
                 try {
                     primaryKeyField.set(obj, lastId);
-
-                } catch (IllegalArgumentException e) {
-                    NLog.e(TAG, "", e);
-
-                } catch (IllegalAccessException e) {
+                } catch (Exception e) {
                     NLog.e(TAG, "", e);
                 }
             }
-
             for (Pair<ObjectFromOtherTable, Field> item : foregeinFields) {
                 ObjectFromOtherTable objectFromOtherTable = item.first;
                 Field field = item.second;
-
                 if (objectFromOtherTable != null) {
                     Type fieldClass = field.getType();
-
                     try {
-                        if (Collection.class
-                                .isAssignableFrom((Class<?>) fieldClass)) {
-                            Pair<String, Long> idMap = new Pair<String, Long>(
-                                    objectFromOtherTable.columnName(), lastId);
+                        if (Collection.class.isAssignableFrom((Class<?>) fieldClass)) {
+                            Pair<String, Long> idMap = new Pair<>(objectFromOtherTable.columnName(), lastId);
                             Class<?> classType = getCollectionGenericClass(field);
-
                             if (classType != null) {
-                                Collection<?> objs = (Collection<?>) field
-                                        .get(obj);
-
+                                Collection<?> objs = (Collection<?>) field.get(obj);
                                 if (objs != null) {
                                     for (Object o : objs) {
                                         insertObjToDb(o, db, idMap);
                                     }
                                 }
                             }
-
                         } else {
                             insertObjToDb(field.get(obj));
                         }
-
-                    } catch (IllegalArgumentException e) {
-                        NLog.e(TAG, "", e);
-
-                    } catch (IllegalAccessException e) {
+                    } catch (Exception e) {
                         NLog.e(TAG, "", e);
                     }
                 }
             }
-
         } else {
-            throw new RuntimeException(
-                    "Wrong obj class (class must have annotation Table)");
+            throw new RuntimeException("Wrong obj class (class must have annotation Table)");
         }
     }
 
     public void deleteObjsFromDb(Class<?> cls, String where) {
         ClassItem classItem = classItems.get(cls);
-
         if (classItem != null) {
             String tableName = classItem.tableName;
-            StringBuffer sql = new StringBuffer();
-            sql.append("DELETE FROM " + tableName + " " + where + ";");
+            StringBuilder sql = new StringBuilder();
+            sql.append("DELETE FROM ").append(tableName).append(" ").append(where).append(";");
             NLog.i(TAG, "sql:" + sql.toString());
             SQLiteDatabase db = getWritableDatabase();
-
             try {
                 db.execSQL(sql.toString());
-
             } finally {
                 db.close();
             }
-
         } else {
-            throw new RuntimeException(
-                    "Wrong obj class (class must have annotation Table)");
+            throw new RuntimeException("Wrong obj class (class must have annotation Table)");
         }
     }
 
@@ -647,75 +580,56 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (classItem != null) {
             String tableName = classItem.tableName;
-            StringBuffer sql = new StringBuffer();
-            sql.append("DELETE FROM " + tableName + " WHERE ");
-
+            StringBuilder sql = new StringBuilder();
+            sql.append("DELETE FROM ").append(tableName).append(" WHERE ");
             for (Field field : cls.getDeclaredFields()) {
-                Column column = (Column) field.getAnnotation(Column.class);
+                Column column = field.getAnnotation(Column.class);
                 field.setAccessible(true);
-
                 if (column != null && column.isPrimaryKey()) {
                     String cName = column.columnName();
                     cName = cName.equals("") ? field.getName() : cName;
-                    sql.append(cName + "=");
+                    sql.append(cName).append("=");
                     Object value;
-
                     try {
                         value = field.get(obj);
-
                         if (value instanceof String) {
-                            sql.append("\"" + value + "\"");
-
+                            sql.append("\"").append(value).append("\"");
                         } else {
                             sql.append(value);
                         }
-
-                    } catch (IllegalArgumentException e) {
-                        NLog.e(TAG, "", e);
-
-                    } catch (IllegalAccessException e) {
+                    } catch (Exception e) {
                         NLog.e(TAG, "", e);
                     }
                 }
             }
-
             sql.append(";");
             NLog.i(TAG, "sql:" + sql.toString());
             SQLiteDatabase db = getWritableDatabase();
-
             try {
                 db.execSQL(sql.toString());
-
             } finally {
                 db.close();
             }
-
         } else {
-            throw new RuntimeException(
-                    "Wrong obj class (class must have annotation Table)");
+            throw new RuntimeException("Wrong obj class (class must have annotation Table)");
         }
     }
 
-    private <T> ArrayList<T> selectObjsFromDb(Class<T> cls, SQLiteDatabase db,
-                                              String where, String groupby, String orderBy, boolean deep) {
+    private <T> ArrayList<T> selectObjsFromDb(Class<T> cls, SQLiteDatabase db, String where,
+                                              String groupby, String orderBy, boolean deep) {
         ClassItem classItem = classItems.get(cls);
-
         if (classItem != null) {
-            ArrayList<T> result = new ArrayList<T>();
+            ArrayList<T> result = new ArrayList<>();
             String tableName = classItem.tableName;
-            StringBuffer sql = new StringBuffer();
+            StringBuilder sql = new StringBuilder();
             long time = System.currentTimeMillis();
-            sql.append("SELECT * FROM " + tableName);
-
+            sql.append("SELECT * FROM ").append(tableName);
             if (where != null)
-                sql.append(" " + where);
-
+                sql.append(" ").append(where);
             if (groupby != null)
-                sql.append(" " + groupby);
-
+                sql.append(" ").append(groupby);
             if (orderBy != null)
-                sql.append(" " + orderBy);
-
+                sql.append(" ").append(orderBy);
             sql.append(";");
             Cursor cursor = db.rawQuery(sql.toString(), null);
 
@@ -725,9 +639,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     int i = 0;
                     String id = null;
                     ArrayList<Pair<ObjectFromOtherTable, Field>> objsFromOtherTable = null;
-
                     if (deep) {
-                        objsFromOtherTable = new ArrayList<Pair<ObjectFromOtherTable, Field>>();
+                        objsFromOtherTable = new ArrayList<>();
                     }
 
                     for (int index = 0; index < classItem.fields.length; index++) {
@@ -736,7 +649,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                         if (column != null) {
                             Class<?> cl = classItem.classes[index];
-
                             if (cl == String.class) {
                                 field.set(obj, cursor.getString(i));
 
@@ -745,8 +657,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                             } else if (cl.isEnum()) {
                                 @SuppressWarnings({"unchecked", "rawtypes"})
-                                Enum enu = Enum.valueOf((Class<Enum>) cl,
-                                        cursor.getString(i));
+                                Enum enu = Enum.valueOf((Class<Enum>) cl, cursor.getString(i));
                                 field.set(obj, enu);
 
                                 if (index == classItem.primaryKeyIdx)
@@ -754,87 +665,60 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                             } else if (cl == int.class || cl == Integer.class) {
                                 field.set(obj, cursor.getInt(i));
-
                                 if (index == classItem.primaryKeyIdx)
                                     id = cursor.getInt(i) + "";
 
                             } else if (cl == long.class || cl == Long.class) {
                                 field.set(obj, cursor.getLong(i));
-
                                 if (index == classItem.primaryKeyIdx)
                                     id = cursor.getLong(i) + "";
 
-                            } else if (cl == boolean.class
-                                    || cl == Boolean.class) {
+                            } else if (cl == boolean.class || cl == Boolean.class) {
                                 field.set(obj, cursor.getInt(i) == 1);
 
                             } else if (cl == float.class || cl == Float.class) {
                                 field.set(obj, cursor.getFloat(i));
                             }
-
                             i++;
                         }
 
                         if (deep) {
                             ObjectFromOtherTable objectFromOtherTable = classItem.objsFromObjectFromOtherTable[index];
-
                             if (objectFromOtherTable != null) {
-                                objsFromOtherTable
-                                        .add(new Pair<ObjectFromOtherTable, Field>(
-                                                objectFromOtherTable, field));
+                                objsFromOtherTable.add(new Pair<>(objectFromOtherTable, field));
                             }
                         }
                     }
-
                     if (deep) {
                         for (Pair<ObjectFromOtherTable, Field> item : objsFromOtherTable) {
                             Type fieldClass = item.second.getType();
-
                             try {
-                                if (Collection.class
-                                        .isAssignableFrom((Class<?>) fieldClass)) {
+                                if (Collection.class.isAssignableFrom((Class<?>) fieldClass)) {
                                     Class<?> classType = getCollectionGenericClass(item.second);
-
                                     if (classType != null) {
-                                        String whereS = "WHERE "
-                                                + item.first.columnName() + "="
-                                                + id;
-                                        Collection<?> items = selectObjsFromDb(
-                                                classType, db, whereS, groupby,
-                                                orderBy, deep);
+                                        String whereS = "WHERE " + item.first.columnName() + "=" + id;
+                                        Collection<?> items = selectObjsFromDb(classType, db,
+                                                whereS, groupby, orderBy, deep);
                                         item.second.set(obj, items);
                                     }
-
                                 } else {
                                     NLog.e(TAG, "Not Implemented yet");
                                 }
-
-                            } catch (IllegalArgumentException e) {
-                                NLog.e(TAG, "", e);
-
-                            } catch (IllegalAccessException e) {
+                            } catch (Exception e) {
                                 NLog.e(TAG, "", e);
                             }
                         }
                     }
-
                     result.add(obj);
-
-                } catch (InstantiationException e) {
-                    NLog.e(TAG, "", e);
-
-                } catch (IllegalAccessException e) {
+                } catch (Exception e) {
                     NLog.e(TAG, "", e);
                 }
             }
-
             cursor.close();
             NLog.i(TAG, "total time:" + (System.currentTimeMillis() - time));
             return result;
-
         } else {
-            throw new RuntimeException(
-                    "Wrong obj class (class must have annotation Table)");
+            throw new RuntimeException("Wrong obj class (class must have annotation Table)");
         }
     }
 
@@ -854,29 +738,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             objsFromObjectFromOtherTable = new ObjectFromOtherTable[fields.length];
             classes = new Class<?>[fields.length];
             names = new String[fields.length];
-            table = (Table) cls.getAnnotation(Table.class);
+            table = cls.getAnnotation(Table.class);
             tableName = table.tableName();
             tableName = tableName.equals("") ? cls.getSimpleName() : tableName;
 
             for (int i = 0; i < fields.length; i++) {
                 Field f = fields[i];
                 f.setAccessible(true);
-                Column column = columns[i] = (Column) f
-                        .getAnnotation(Column.class);
-
+                Column column = columns[i] = f.getAnnotation(Column.class);
                 if (column != null) {
                     classes[i] = f.getType();
                     names[i] = column.columnName();
                     names[i] = names[i].equals("") ? f.getName() : names[i];
-
                     if (column.isPrimaryKey()) {
                         primaryKeyIdx = i;
                     }
                 }
-
-                ObjectFromOtherTable objectFromOtherTable = (ObjectFromOtherTable) f
-                        .getAnnotation(ObjectFromOtherTable.class);
-
+                ObjectFromOtherTable objectFromOtherTable = f.getAnnotation(ObjectFromOtherTable.class);
                 if (objectFromOtherTable != null) {
                     objsFromObjectFromOtherTable[i] = objectFromOtherTable;
                 }

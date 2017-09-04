@@ -225,13 +225,11 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity implements
             reloadGames(true, null);
         } else if (item.getId() == R.string.gallery_menu_wifi_on) {
             PreferenceUtil.setWifiServerEnable(this, false);
-            Toast.makeText(this, R.string.gallery_stop_wifi_control_server,
-                    Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.gallery_stop_wifi_control_server, Toast.LENGTH_LONG).show();
             stopWifiListening();
         } else if (item.getId() == R.string.gallery_menu_wifi_off) {
             PreferenceUtil.setWifiServerEnable(this, true);
-            Toast.makeText(this, String.format(
-                    getString(R.string.gallery_start_wifi_control_server),
+            Toast.makeText(this, getString(R.string.gallery_start_wifi_control_server,
                     Utils.getIpAddr(this)), Toast.LENGTH_LONG).show();
             startWifiListening();
         } else if (item.getId() == R.string.game_menu_cheats) {
@@ -248,11 +246,9 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity implements
         if (game.isInArchive()) {
             gameFile = new File(getExternalCacheDir(), game.checksum);
             game.path = gameFile.getAbsolutePath();
-            ZipRomFile zipRomFile = dbHelper
-                    .selectObjFromDb(ZipRomFile.class, "WHERE _id="
-                            + game.zipfile_id, false);
+            ZipRomFile zipRomFile = dbHelper.selectObjFromDb(ZipRomFile.class,
+                    "WHERE _id=" + game.zipfile_id, false);
             File zipFile = new File(zipRomFile.path);
-
             if (!gameFile.exists()) {
                 try {
                     Utils.extractFile(zipFile, game.name, gameFile);
@@ -265,18 +261,12 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity implements
         if (gameFile.exists()) {
             game.lastGameTime = System.currentTimeMillis();
             game.runCount++;
-            dbHelper.updateObjToDb(game, new String[]{"lastGameTime",
-                    "runCount"
-            });
+            dbHelper.updateObjToDb(game, new String[]{"lastGameTime", "runCount"});
             onGameSelected(game, 0);
-
         } else {
-            NLog.w(TAG, "rom file:" + gameFile.getAbsolutePath()
-                    + " does not exist");
-            AlertDialog.Builder builder = new AlertDialog.Builder(
-                    GalleryActivity.this);
-            AlertDialog dialog = builder
-                    .setMessage(getString(R.string.gallery_rom_not_found))
+            NLog.w(TAG, "rom file:" + gameFile.getAbsolutePath() + " does not exist");
+            AlertDialog.Builder builder = new AlertDialog.Builder(GalleryActivity.this);
+            AlertDialog dialog = builder.setMessage(getString(R.string.gallery_rom_not_found))
                     .setTitle(R.string.error)
                     .setPositiveButton(R.string.gallery_rom_not_found_reload,
                             new DialogInterface.OnClickListener() {
@@ -322,8 +312,7 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity implements
     private void showSearchProgressDialog(boolean zipMode) {
         searchDialog = new ProgressDialog(this);
         searchDialog.setMessage(getString(zipMode ?
-                R.string.gallery_zip_search_label
-                : R.string.gallery_sdcard_search_label));
+                R.string.gallery_zip_search_label : R.string.gallery_sdcard_search_label));
         searchDialog.setMax(100);
         searchDialog.setCancelable(false);
         searchDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -413,8 +402,7 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity implements
                 public void run() {
                     if (searchDialog != null) {
                         searchDialog.setMessage(message);
-                        searchDialog.setProgress(searchDialog.getProgress() + 1
-                                + skipEntries);
+                        searchDialog.setProgress(searchDialog.getProgress() + 1 + skipEntries);
                     }
                 }
             });

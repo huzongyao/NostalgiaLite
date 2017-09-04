@@ -19,12 +19,12 @@ public class VirtualDPad implements OnControllerEventListener {
     private static final String TAG = "remote.VirtualDPad";
     private static VirtualDPad instance = new VirtualDPad();
     public long downTime;
-    Timer timer;
+    private Timer timer;
     @SuppressLint("UseSparseArrays")
-    HashMap<Integer, TimerTask> longPresHandlers = new HashMap<Integer, TimerTask>();
+    private HashMap<Integer, TimerTask> longPresHandlers = new HashMap<>();
     private InputConnection connection;
     private ControllerEventSource server;
-    private HashSet<OnVirtualDPEventsListener> textListeners = new HashSet<OnVirtualDPEventsListener>();
+    private HashSet<OnVirtualDPEventsListener> textListeners = new HashSet<>();
 
     private VirtualDPad() {
     }
@@ -43,7 +43,6 @@ public class VirtualDPad implements OnControllerEventListener {
         if (timer != null) {
             timer.cancel();
         }
-
         setInputConnection(null);
     }
 
@@ -54,11 +53,9 @@ public class VirtualDPad implements OnControllerEventListener {
 
     public void onResume() {
         server.onResume();
-
         if (timer != null) {
             timer.cancel();
         }
-
         timer = new Timer();
     }
 
@@ -103,14 +100,13 @@ public class VirtualDPad implements OnControllerEventListener {
                 return;
         }
 
-        int action = event.action == EmulatorController.ACTION_DOWN ? KeyEvent.ACTION_DOWN
-                : KeyEvent.ACTION_UP;
+        int action = event.action == EmulatorController.ACTION_DOWN ?
+                KeyEvent.ACTION_DOWN : KeyEvent.ACTION_UP;
         final KeyEvent keyEvent = new KeyEvent(action, kc);
 
         if (action == EmulatorController.ACTION_DOWN) {
             if (!pressJustOnce) {
                 TimerTask task = longPresHandlers.get(event.keyCode);
-
                 if (task == null) {
                     task = new TimerTask() {
                         @Override
@@ -122,15 +118,12 @@ public class VirtualDPad implements OnControllerEventListener {
                     timer.schedule(task, 800, 100);
                 }
             }
-
             sendKeyEvent(keyEvent);
-
         } else {
             if (!pressJustOnce) {
                 longPresHandlers.get(event.keyCode).cancel();
                 longPresHandlers.put(event.keyCode, null);
             }
-
             sendKeyEvent(keyEvent);
         }
     }

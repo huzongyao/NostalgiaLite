@@ -1,14 +1,14 @@
 package nostalgia.framework.controllers;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
+import android.os.Message;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 
-import java.util.Map;
+import java.lang.ref.WeakReference;
 
 import nostalgia.framework.Emulator;
 import nostalgia.framework.EmulatorController;
@@ -24,27 +24,20 @@ import nostalgia.framework.ui.multitouchbutton.OnMultitouchEventListener;
 import nostalgia.framework.ui.preferences.PreferenceUtil;
 import nostalgia.framework.utils.Utils;
 
-public class TouchController implements EmulatorController,
-        OnMultitouchEventListener {
+public class TouchController implements EmulatorController, OnMultitouchEventListener {
 
     private static final String TAG = "controllers.TouchController";
-    Emulator emulator;
-    EmulatorActivity emulatorActivity;
-    int port;
-    Map<Integer, Integer> mapping;
-    SparseIntArray resIdMapping = new SparseIntArray();
-    MultitouchLayer multitouchLayer;
-    ImageView remoteIc, zapperIc, palIc, ntscIc, muteIc;
-    View view;
-    MultitouchImageButton aTurbo, bTurbo, abButton, fastForward;
-    @SuppressLint("HandlerLeak")
-    Handler keyHandler = new Handler() {
-        public void handleMessage(android.os.Message msg) {
-            emulator.setKeyPressed(port, msg.what, false);
-        }
-    };
+    private Emulator emulator;
+    private EmulatorActivity emulatorActivity;
+    private int port;
+    private SparseIntArray mapping;
+    private SparseIntArray resIdMapping = new SparseIntArray();
+    private MultitouchLayer multitouchLayer;
+    private ImageView remoteIc, zapperIc, palIc, ntscIc, muteIc;
+    private View view;
+    private MultitouchImageButton aTurbo, bTurbo, abButton, fastForward;
     private boolean hidden = false;
-
+    private KeyHandler keyHandler = new KeyHandler(this);
 
     public TouchController(EmulatorActivity emulatorActivity) {
         this.emulatorActivity = emulatorActivity;
@@ -52,16 +45,12 @@ public class TouchController implements EmulatorController,
 
     public void onResume() {
         if (multitouchLayer != null) {
-            multitouchLayer.setVibrationDuration(PreferenceUtil
-                    .getVibrationDuration(emulatorActivity));
+            multitouchLayer.setVibrationDuration(PreferenceUtil.getVibrationDuration(emulatorActivity));
         }
-
         emulator.resetKeys();
         multitouchLayer.reloadTouchProfile();
-        multitouchLayer.setOpacity(PreferenceUtil
-                .getControlsOpacity(emulatorActivity));
-        multitouchLayer.setEnableStaticDPAD(!PreferenceUtil
-                .isDynamicDPADEnable(emulatorActivity));
+        multitouchLayer.setOpacity(PreferenceUtil.getControlsOpacity(emulatorActivity));
+        multitouchLayer.setEnableStaticDPAD(!PreferenceUtil.isDynamicDPADEnable(emulatorActivity));
     }
 
     public void onPause() {
@@ -88,67 +77,48 @@ public class TouchController implements EmulatorController,
     }
 
     private View createView() {
-        LayoutInflater inflater = (LayoutInflater) emulatorActivity
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater)
+                emulatorActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View layout = inflater.inflate(R.layout.controler_layout, null);
-        multitouchLayer = (MultitouchLayer) layout
-                .findViewById(R.id.touch_layer);
-        MultitouchImageButton up = (MultitouchImageButton) multitouchLayer
-                .findViewById(R.id.button_up);
+        multitouchLayer = (MultitouchLayer) layout.findViewById(R.id.touch_layer);
+        MultitouchImageButton up = (MultitouchImageButton) multitouchLayer.findViewById(R.id.button_up);
         up.setOnMultitouchEventlistener(this);
         resIdMapping.put(R.id.button_up, mapping.get(EmulatorController.KEY_UP));
-        MultitouchImageButton down = (MultitouchImageButton) multitouchLayer
-                .findViewById(R.id.button_down);
+        MultitouchImageButton down = (MultitouchImageButton) multitouchLayer.findViewById(R.id.button_down);
         down.setOnMultitouchEventlistener(this);
-        resIdMapping.put(R.id.button_down,
-                mapping.get(EmulatorController.KEY_DOWN));
-        MultitouchImageButton left = (MultitouchImageButton) multitouchLayer
-                .findViewById(R.id.button_left);
+        resIdMapping.put(R.id.button_down, mapping.get(EmulatorController.KEY_DOWN));
+        MultitouchImageButton left = (MultitouchImageButton) multitouchLayer.findViewById(R.id.button_left);
         left.setOnMultitouchEventlistener(this);
-        resIdMapping.put(R.id.button_left,
-                mapping.get(EmulatorController.KEY_LEFT));
-        MultitouchImageButton right = (MultitouchImageButton) multitouchLayer
-                .findViewById(R.id.button_right);
+        resIdMapping.put(R.id.button_left, mapping.get(EmulatorController.KEY_LEFT));
+        MultitouchImageButton right = (MultitouchImageButton) multitouchLayer.findViewById(R.id.button_right);
         right.setOnMultitouchEventlistener(this);
-        resIdMapping.put(R.id.button_right,
-                mapping.get(EmulatorController.KEY_RIGHT));
-        MultitouchImageButton a = (MultitouchImageButton) multitouchLayer
-                .findViewById(R.id.button_a);
+        resIdMapping.put(R.id.button_right, mapping.get(EmulatorController.KEY_RIGHT));
+        MultitouchImageButton a = (MultitouchImageButton) multitouchLayer.findViewById(R.id.button_a);
         a.setOnMultitouchEventlistener(this);
         resIdMapping.put(R.id.button_a, mapping.get(EmulatorController.KEY_A));
-        MultitouchImageButton b = (MultitouchImageButton) multitouchLayer
-                .findViewById(R.id.button_b);
+        MultitouchImageButton b = (MultitouchImageButton) multitouchLayer.findViewById(R.id.button_b);
         b.setOnMultitouchEventlistener(this);
         resIdMapping.put(R.id.button_b, mapping.get(EmulatorController.KEY_B));
-        aTurbo = (MultitouchImageButton) multitouchLayer
-                .findViewById(R.id.button_a_turbo);
+        aTurbo = (MultitouchImageButton) multitouchLayer.findViewById(R.id.button_a_turbo);
         aTurbo.setOnMultitouchEventlistener(this);
-        resIdMapping.put(R.id.button_a_turbo,
-                mapping.get(EmulatorController.KEY_A_TURBO));
-        bTurbo = (MultitouchImageButton) multitouchLayer
-                .findViewById(R.id.button_b_turbo);
+        resIdMapping.put(R.id.button_a_turbo, mapping.get(EmulatorController.KEY_A_TURBO));
+        bTurbo = (MultitouchImageButton) multitouchLayer.findViewById(R.id.button_b_turbo);
         bTurbo.setOnMultitouchEventlistener(this);
-        resIdMapping.put(R.id.button_b_turbo,
-                mapping.get(EmulatorController.KEY_B_TURBO));
-        abButton = (MultitouchImageButton) multitouchLayer
-                .findViewById(R.id.button_ab);
-        fastForward = (MultitouchImageButton) multitouchLayer
-                .findViewById(R.id.button_fast_forward);
-        fastForward
-                .setOnMultitouchEventlistener(new OnMultitouchEventListener() {
-                    @Override
-                    public void onMultitouchExit(MultitouchBtnInterface btn) {
-                        emulatorActivity.onFastForwardUp();
-                    }
+        resIdMapping.put(R.id.button_b_turbo, mapping.get(EmulatorController.KEY_B_TURBO));
+        abButton = (MultitouchImageButton) multitouchLayer.findViewById(R.id.button_ab);
+        fastForward = (MultitouchImageButton) multitouchLayer.findViewById(R.id.button_fast_forward);
+        fastForward.setOnMultitouchEventlistener(new OnMultitouchEventListener() {
+            @Override
+            public void onMultitouchExit(MultitouchBtnInterface btn) {
+                emulatorActivity.onFastForwardUp();
+            }
 
-                    @Override
-                    public void onMultitouchEnter(MultitouchBtnInterface btn) {
-                        emulatorActivity.onFastForwardDown();
-                    }
-                });
-        MultitouchButton select = (MultitouchButton) layout
-                .findViewById(R.id.button_select);
-
+            @Override
+            public void onMultitouchEnter(MultitouchBtnInterface btn) {
+                emulatorActivity.onFastForwardDown();
+            }
+        });
+        MultitouchButton select = (MultitouchButton) layout.findViewById(R.id.button_select);
         if (select != null) {
             select.setOnMultitouchEventlistener(new OnMultitouchEventListener() {
                 @Override
@@ -162,8 +132,7 @@ public class TouchController implements EmulatorController,
             });
         }
 
-        MultitouchButton start = (MultitouchButton) layout
-                .findViewById(R.id.button_start);
+        MultitouchButton start = (MultitouchButton) layout.findViewById(R.id.button_start);
         start.setOnMultitouchEventlistener(new OnMultitouchEventListener() {
             @Override
             public void onMultitouchExit(MultitouchBtnInterface btn) {
@@ -174,8 +143,7 @@ public class TouchController implements EmulatorController,
                 sendKey(EmulatorController.KEY_START);
             }
         });
-        MultitouchImageButton menu = (MultitouchImageButton) layout
-                .findViewById(R.id.button_menu);
+        MultitouchImageButton menu = (MultitouchImageButton) layout.findViewById(R.id.button_menu);
         menu.setOnMultitouchEventlistener(new OnMultitouchEventListener() {
             @Override
             public void onMultitouchExit(MultitouchBtnInterface btn) {
@@ -187,10 +155,7 @@ public class TouchController implements EmulatorController,
             }
         });
         View center = layout.findViewById(R.id.button_center);
-        View[] views = new View[]{menu, select, start, up, down, right, left,
-                a, b, center
-        };
-
+        View[] views = new View[]{menu, select, start, up, down, right, left, a, b, center};
         for (View view : views) {
             if (view != null) {
                 view.setFocusable(false);
@@ -210,7 +175,6 @@ public class TouchController implements EmulatorController,
         if (view == null) {
             view = createView();
         }
-
         return view;
     }
 
@@ -226,6 +190,10 @@ public class TouchController implements EmulatorController,
         keyHandler.sendEmptyMessageDelayed(cc, 200);
     }
 
+    public void handleKey(int cc) {
+        emulator.setKeyPressed(port, cc, false);
+    }
+
     @Override
     public void onMultitouchEnter(MultitouchBtnInterface btn) {
         emulator.setKeyPressed(port, resIdMapping.get(btn.getId()), true);
@@ -239,18 +207,13 @@ public class TouchController implements EmulatorController,
     @Override
     public void onGameStarted(GameDescription game) {
         GfxProfile gfxProfile = emulator.getActiveGfxProfile();
-        zapperIc.setVisibility(PreferenceUtil.isZapperEnabled(emulatorActivity,
-                game.checksum) ? View.VISIBLE : View.GONE);
-        palIc.setVisibility(gfxProfile.name.equals("PAL") ? View.VISIBLE
-                : View.GONE);
-        ntscIc.setVisibility(gfxProfile.name.equals("NTSC") ? View.VISIBLE
-                : View.GONE);
-        boolean remoteVisible = PreferenceUtil
-                .isWifiServerEnable(emulatorActivity)
+        zapperIc.setVisibility(PreferenceUtil.isZapperEnabled(emulatorActivity, game.checksum) ? View.VISIBLE : View.GONE);
+        palIc.setVisibility(gfxProfile.name.equals("PAL") ? View.VISIBLE : View.GONE);
+        ntscIc.setVisibility(gfxProfile.name.equals("NTSC") ? View.VISIBLE : View.GONE);
+        boolean remoteVisible = PreferenceUtil.isWifiServerEnable(emulatorActivity)
                 && Utils.isWifiAvailable(emulatorActivity);
         remoteIc.setVisibility(remoteVisible ? View.VISIBLE : View.INVISIBLE);
-        muteIc.setVisibility(PreferenceUtil.isSoundEnabled(emulatorActivity) ? View.GONE
-                : View.VISIBLE);
+        muteIc.setVisibility(PreferenceUtil.isSoundEnabled(emulatorActivity) ? View.GONE : View.VISIBLE);
 
         if (PreferenceUtil.isTurboEnabled(emulatorActivity)) {
             aTurbo.setVisibility(View.VISIBLE);
@@ -274,11 +237,8 @@ public class TouchController implements EmulatorController,
             fastForward.setEnabled(false);
         }
 
-        abButton.setVisibility(PreferenceUtil
-                .isABButtonEnabled(emulatorActivity) ? View.VISIBLE
-                : View.INVISIBLE);
-        abButton.setEnabled(PreferenceUtil.isABButtonEnabled(emulatorActivity) ? true
-                : false);
+        abButton.setVisibility(PreferenceUtil.isABButtonEnabled(emulatorActivity) ? View.VISIBLE : View.INVISIBLE);
+        abButton.setEnabled(PreferenceUtil.isABButtonEnabled(emulatorActivity));
         multitouchLayer.invalidate();
     }
 
@@ -307,6 +267,23 @@ public class TouchController implements EmulatorController,
                 }
             });
             hidden = false;
+        }
+    }
+
+    private static class KeyHandler extends Handler {
+
+        WeakReference<TouchController> weakController;
+
+        KeyHandler(TouchController controller) {
+            weakController = new WeakReference<>(controller);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            TouchController controller = weakController.get();
+            if (controller != null) {
+                controller.handleKey(msg.what);
+            }
         }
     }
 }

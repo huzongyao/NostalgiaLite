@@ -25,21 +25,23 @@
         <activity android:name=".ui.gamegallery.SlotSelectionActivity" />
 
         <activity
-            android:name="nostalgia.framework.ui.preferences.GamePreferenceActivity"
+            android:name=".ui.preferences.GamePreferenceActivity"
             android:label="@string/game_pref"
             android:theme="@style/PrefTheme" />
 
         <activity
-            android:name="nostalgia.framework.ui.cheats.CheatsActivity"
+            android:name=".ui.cheats.CheatsActivity"
             android:label="Cheats" />
 
-        <activity android:name="nostalgia.framework.base.OpenGLTestActivity" />
+        <activity android:name=".base.OpenGLTestActivity" />
+
         <activity
-            android:name="nostalgia.framework.base.RestarterActivity"
+            android:name=".base.RestarterActivity"
             android:configChanges="orientation|screenSize"
             android:process=":restarter" />
+
         <activity
-            android:name="nostalgia.framework.ui.remotecontroller.RemoteControllerActivity"
+            android:name=".ui.remotecontroller.RemoteControllerActivity"
             android:screenOrientation="landscape" />
     </application>
 

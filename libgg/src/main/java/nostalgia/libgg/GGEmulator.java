@@ -1,9 +1,9 @@
 package nostalgia.libgg;
 
+import android.util.SparseIntArray;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import nostalgia.framework.BasicEmulatorInfo;
 import nostalgia.framework.EmulatorController;
@@ -13,7 +13,6 @@ import nostalgia.framework.GfxProfile;
 import nostalgia.framework.KeyboardProfile;
 import nostalgia.framework.SfxProfile;
 import nostalgia.framework.SfxProfile.SoundEncoding;
-import nostalgia.framework.base.EmulatorHolder;
 import nostalgia.framework.base.JniBridge;
 import nostalgia.framework.base.JniEmulator;
 import nostalgia.framework.controllers.KeyboardController;
@@ -161,8 +160,8 @@ public class GGEmulator extends JniEmulator {
         }
 
         @Override
-        public Map<Integer, Integer> getKeyMapping() {
-            HashMap<Integer, Integer> mapping = new HashMap<Integer, Integer>();
+        public SparseIntArray getKeyMapping() {
+            SparseIntArray mapping = new SparseIntArray();
             mapping.put(EmulatorController.KEY_UP, 0x01);
             mapping.put(EmulatorController.KEY_DOWN, 0x02);
             mapping.put(EmulatorController.KEY_LEFT, 0x04);
@@ -220,7 +219,6 @@ public class GGEmulator extends JniEmulator {
                     "LOAD STATE 2",
                     "SAVE STATE 3",
                     "LOAD STATE 3",
-
                     "MENU", "FAST FORWARD", "EXIT",
             };
         }

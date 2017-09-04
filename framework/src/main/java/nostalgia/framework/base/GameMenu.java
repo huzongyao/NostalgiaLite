@@ -26,7 +26,7 @@ import nostalgia.framework.utils.Utils;
 
 public class GameMenu {
 
-    ArrayList<GameMenuItem> items = new ArrayList<GameMenuItem>();
+    ArrayList<GameMenuItem> items = new ArrayList<>();
     Context context;
     OnGameMenuListener listener;
     LayoutInflater inflater;
@@ -35,8 +35,7 @@ public class GameMenu {
     public GameMenu(Context context, OnGameMenuListener listener) {
         this.context = context;
         this.listener = listener;
-        inflater = (LayoutInflater) context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         listener.onGameMenuCreate(this);
     }
 
@@ -79,11 +78,9 @@ public class GameMenu {
         if (dialog != null) {
             dialog.dismiss();
         }
-
         dialog = new Dialog(context, R.style.GameDialogTheme);
         listener.onGameMenuPrepare(this);
-        RelativeLayout surroundContainer = (RelativeLayout) inflater.inflate(
-                R.layout.game_menu_surround, null);
+        RelativeLayout surroundContainer = (RelativeLayout) inflater.inflate(R.layout.game_menu_surround, null);
         surroundContainer.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,28 +88,24 @@ public class GameMenu {
                     dialog.cancel();
             }
         });
-        LinearLayout container = (LinearLayout) surroundContainer
-                .findViewById(R.id.game_menu_container);
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) container
-                .getLayoutParams();
-        WindowManager wm = (WindowManager) context
-                .getSystemService(Context.WINDOW_SERVICE);
+        LinearLayout container = (LinearLayout) surroundContainer.findViewById(R.id.game_menu_container);
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) container.getLayoutParams();
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
         int width = Utils.getDisplayWidth(display);
         int px = width / 10;
         params.setMargins(px, 0, px, 0);
         container.setLayoutParams(params);
         int padding = context.getResources().getDimensionPixelSize(
-                R.dimen.dialog_bck_pading);
+                R.dimen.dialog_back_padding);
         container.setPadding(padding, padding, padding, padding);
         int margin = context.getResources().getDimensionPixelSize(
-                R.dimen.dilog_button_margin);
+                R.dimen.dialog_button_margin);
         boolean landsacpe = context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
 
         for (int i = 0; i < items.size(); i++) {
             if (landsacpe) {
-                LayoutParams pp = new LayoutParams(LayoutParams.MATCH_PARENT,
-                        LayoutParams.WRAP_CONTENT, 1);
+                LayoutParams pp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, 1);
                 pp.gravity = Gravity.CENTER_VERTICAL;
                 LinearLayout menuRow = new LinearLayout(context);
                 GameMenuItem item = items.get(i);
@@ -161,14 +154,11 @@ public class GameMenu {
         listener.onGameMenuOpened(this);
     }
 
-    private View createButton(final GameMenuItem item, int margin,
-                              final Dialog dialog) {
+    private View createButton(final GameMenuItem item, int margin, final Dialog dialog) {
         View view = inflater.inflate(R.layout.game_menu_item, null);
-        TextView label = (TextView) view
-                .findViewById(R.id.game_menu_item_label);
+        TextView label = (TextView) view.findViewById(R.id.game_menu_item_label);
         label.setText(item.getTitle());
-        ImageView iconView = (ImageView) view
-                .findViewById(R.id.game_menu_item_icon);
+        ImageView iconView = (ImageView) view.findViewById(R.id.game_menu_item_icon);
         view.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

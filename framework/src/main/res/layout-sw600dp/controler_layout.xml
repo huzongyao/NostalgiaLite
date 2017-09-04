@@ -7,7 +7,7 @@
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="@dimen/top_panel_touchcontroler_height"
+        android:layout_height="@dimen/top_panel_touch_controller_height"
         android:orientation="vertical">
 
         <LinearLayout

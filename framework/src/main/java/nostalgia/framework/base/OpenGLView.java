@@ -29,8 +29,7 @@ class OpenGLView extends GLSurfaceView implements EmulatorView {
                       int paddingLeft, int paddingTop, String shader) {
         super(context);
         setEGLContextClientVersion(2);
-        renderer = new Renderer(context, emulator, paddingLeft, paddingTop,
-                shader);
+        renderer = new Renderer(context, emulator, paddingLeft, paddingTop, shader);
         renderer.setTextureSize(context.getGLTextureSize());
         setRenderer(renderer);
         setRenderMode(RENDERMODE_CONTINUOUSLY);
@@ -66,6 +65,7 @@ class OpenGLView extends GLSurfaceView implements EmulatorView {
     static class Renderer implements GLSurfaceView.Renderer {
         static final int COORDS_PER_VERTEX = 3;
         static final int COORDS_PER_TEXTURE = 2;
+
         private static String vertexShaderCode = "attribute vec4 a_position; "
                 + "attribute vec2 a_texCoord;  								 "
                 + "uniform mat4 uMVPMatrix;   								 "
@@ -75,6 +75,7 @@ class OpenGLView extends GLSurfaceView implements EmulatorView {
                 + "   gl_Position =  uMVPMatrix  * a_position; 				 "
                 + "   v_texCoord = a_texCoord;  							 "
                 + "}                            							 ";
+
         private static String fragmentShaderCode;
         public final int VERTEX_STRIDE = COORDS_PER_VERTEX * 4;
         public final int TEXTURE_STRIDE = COORDS_PER_TEXTURE * 4;
@@ -120,7 +121,6 @@ class OpenGLView extends GLSurfaceView implements EmulatorView {
 
         private static void checkGlError(String glOperation) {
             int error;
-
             while ((error = GLES20.glGetError()) != GLES20.GL_NO_ERROR) {
                 NLog.e(TAG, glOperation + ": glError " + error);
                 throw new RuntimeException(glOperation + ": glError " + error);
@@ -136,8 +136,7 @@ class OpenGLView extends GLSurfaceView implements EmulatorView {
 
             if (compiled[0] == 0) {
                 String log = GLES20.glGetShaderInfoLog(shader);
-                throw new RuntimeException("glCompileShader failed. t: " + type
-                        + " " + log + "#");
+                throw new RuntimeException("glCompileShader failed. t: " + type + " " + log + "#");
             }
 
             return shader;
@@ -159,7 +158,6 @@ class OpenGLView extends GLSurfaceView implements EmulatorView {
             if (delay > 0) {
                 try {
                     Thread.sleep(delay);
-
                 } catch (InterruptedException e) {
                 }
             }
@@ -187,8 +185,7 @@ class OpenGLView extends GLSurfaceView implements EmulatorView {
             textureHandle = GLES20.glGetUniformLocation(program, "s_texture");
 
             if (hasPalette) {
-                paletteHandle = GLES20.glGetUniformLocation(program,
-                        "s_palette");
+                paletteHandle = GLES20.glGetUniformLocation(program, "s_palette");
             }
 
             texCoordHandle = GLES20.glGetAttribLocation(program, "a_texCoord");
@@ -198,10 +195,8 @@ class OpenGLView extends GLSurfaceView implements EmulatorView {
         @Override
         public void onSurfaceCreated(GL10 unused, EGLConfig config) {
             GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-            int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER,
-                    vertexShaderCode);
-            int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER,
-                    fragmentShaderCode);
+            int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
+            int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
             program = GLES20.glCreateProgram();
             GLES20.glAttachShader(program, vertexShader);
             GLES20.glAttachShader(program, fragmentShader);
@@ -230,8 +225,7 @@ class OpenGLView extends GLSurfaceView implements EmulatorView {
                     GLES20.GL_FLOAT, false, VERTEX_STRIDE, vertexBuffer);
             GLES20.glVertexAttribPointer(texCoordHandle, COORDS_PER_TEXTURE,
                     GLES20.GL_FLOAT, false, TEXTURE_STRIDE, textureBuffer);
-            mvpMatrixHandle = GLES20
-                    .glGetUniformLocation(program, "uMVPMatrix");
+            mvpMatrixHandle = GLES20.glGetUniformLocation(program, "uMVPMatrix");
             GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, projMatrix, 0);
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mainTextureId);
@@ -254,8 +248,7 @@ class OpenGLView extends GLSurfaceView implements EmulatorView {
             checkGlError("disable vertex arrays");
         }
 
-        private void initQuadCoordinates(Emulator emulator, int width,
-                                         int height) {
+        private void initQuadCoordinates(Emulator emulator, int width, int height) {
             int maxTexX;
             int maxTexY;
 
@@ -263,36 +256,33 @@ class OpenGLView extends GLSurfaceView implements EmulatorView {
                 GfxProfile gfx = emulator.getActiveGfxProfile();
                 maxTexX = gfx.originalScreenWidth;
                 maxTexY = gfx.originalScreenHeight;
-
             } else {
                 maxTexX = textureBounds[0];
                 maxTexY = textureBounds[1];
             }
 
             int textureSize = getTextureSize();
-            quadCoords = new float[]{-width / 2f, -height / 2f, 0,
+            quadCoords = new float[]{
+                    -width / 2f, -height / 2f, 0,
                     -width / 2f, height / 2f, 0,
                     width / 2f, height / 2f, 0,
                     width / 2f, -height / 2f, 0
             };
             textureCoords = new float[]{0,
                     maxTexY / (float) textureSize,
-
                     0,
                     0,
                     maxTexX / (float) textureSize,
                     0,
                     maxTexX / (float) textureSize,
                     maxTexY / (float) textureSize,
-
             };
             ByteBuffer bb1 = ByteBuffer.allocateDirect(quadCoords.length * 4);
             bb1.order(ByteOrder.nativeOrder());
             vertexBuffer = bb1.asFloatBuffer();
             vertexBuffer.put(quadCoords);
             vertexBuffer.position(0);
-            ByteBuffer bb2 = ByteBuffer
-                    .allocateDirect(textureCoords.length * 4);
+            ByteBuffer bb2 = ByteBuffer.allocateDirect(textureCoords.length * 4);
             bb2.order(ByteOrder.nativeOrder());
             textureBuffer = bb2.asFloatBuffer();
             textureBuffer.put(textureCoords);
@@ -320,9 +310,8 @@ class OpenGLView extends GLSurfaceView implements EmulatorView {
             int paletteSize = 256;
             GLES20.glGenTextures(numTextures, textureIds, 0);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureIds[0]);
-            GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_ALPHA,
-                    textureWidth, textureHeight, 0, GLES20.GL_ALPHA,
-                    GLES20.GL_UNSIGNED_BYTE, null);
+            GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_ALPHA, textureWidth,
+                    textureHeight, 0, GLES20.GL_ALPHA, GLES20.GL_UNSIGNED_BYTE, null);
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,
                     GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,
@@ -349,10 +338,8 @@ class OpenGLView extends GLSurfaceView implements EmulatorView {
 
                 GLES20.glPixelStorei(GLES20.GL_PACK_ALIGNMENT, 1);
                 GLES20.glPixelStorei(GLES20.GL_UNPACK_ALIGNMENT, 1);
-                Bitmap paletteBmp = Bitmap.createBitmap(paletteSize,
-                        paletteSize, Config.ARGB_8888);
-                paletteBmp.setPixels(palette, 0, paletteSize, 0, 0,
-                        paletteSize, 1);
+                Bitmap paletteBmp = Bitmap.createBitmap(paletteSize, paletteSize, Config.ARGB_8888);
+                paletteBmp.setPixels(palette, 0, paletteSize, 0, 0, paletteSize, 1);
                 GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, paletteBmp, 0);
                 GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,
                         GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);

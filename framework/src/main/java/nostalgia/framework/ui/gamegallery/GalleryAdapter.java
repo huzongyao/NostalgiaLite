@@ -1,6 +1,5 @@
 package nostalgia.framework.ui.gamegallery;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -21,7 +20,6 @@ import java.util.Set;
 
 import nostalgia.framework.R;
 
-@SuppressLint("DefaultLocale")
 public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
 
     public static final int SORT_BY_NAME = 0;
@@ -29,14 +27,14 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
     public static final int SORT_BY_MOST_PLAYED = 2;
     public static final int SORT_BY_LAST_PLAYED = 3;
 
-    private HashMap<Character, Integer> alphaIndexer = new HashMap<Character, Integer>();
-    String filter = "";
-    Character[] sections;
+    private HashMap<Character, Integer> alphaIndexer = new HashMap<>();
+    private String filter = "";
+    private Character[] sections;
     private LayoutInflater inflater;
     private Context context;
     private int mainColor;
-    private ArrayList<GameDescription> games = new ArrayList<GameDescription>();
-    private ArrayList<RowItem> filterGames = new ArrayList<RowItem>();
+    private ArrayList<GameDescription> games = new ArrayList<>();
+    private ArrayList<RowItem> filterGames = new ArrayList<>();
     private int sumRuns = 0;
     private int sortType = SORT_BY_NAME;
 
@@ -56,13 +54,10 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
         @Override
         public int compare(GameDescription lhs, GameDescription rhs) {
             long dif = lhs.lastGameTime - rhs.lastGameTime;
-
             if (dif == 0) {
                 return 0;
-
             } else if (dif < 0) {
                 return 1;
-
             } else {
                 return -1;
             }
@@ -99,28 +94,21 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         RowItem item = filterGames.get(position);
-
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.row_game_list, null);
         }
-
         GameDescription game = item.game;
         TextView name = (TextView) convertView.findViewById(R.id.row_game_item_name);
         ImageView arrowIcon = (ImageView) convertView.findViewById(R.id.game_item_arrow);
         ImageView bck = (ImageView) convertView.findViewById(R.id.game_item_bck);
-        ProgressBar runIndicator = (ProgressBar)
-                convertView.findViewById(R.id.row_game_item_progressBar);
+        ProgressBar runIndicator = (ProgressBar) convertView.findViewById(R.id.row_game_item_progressBar);
         runIndicator.setMax(sumRuns);
-
         name.setText(game.getCleanName());
-
         arrowIcon.setImageResource(R.drawable.ic_next_arrow);
         arrowIcon.clearAnimation();
         name.setTextColor(mainColor);
         name.setGravity(Gravity.CENTER_VERTICAL);
-
         bck.setImageResource(R.drawable.game_item_small_bck);
-
         return convertView;
     }
 
@@ -160,23 +148,16 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
                 Collections.sort(games, lastPlayedDateComparator);
                 break;
         }
-
         String containsFilter = " " + filter;
         sumRuns = 0;
-
         for (GameDescription game : games) {
             sumRuns = game.runCount > sumRuns ? game.runCount : sumRuns;
-
             String name = game.getCleanName().toLowerCase();
             boolean secondCondition = true;
-
-            if (sortType == SORT_BY_LAST_PLAYED
-                    || sortType == SORT_BY_MOST_PLAYED) {
+            if (sortType == SORT_BY_LAST_PLAYED || sortType == SORT_BY_MOST_PLAYED) {
                 secondCondition = game.lastGameTime != 0;
             }
-
-            if ((name.startsWith(filter) || name.contains(containsFilter))
-                    & secondCondition) {
+            if ((name.startsWith(filter) || name.contains(containsFilter)) & secondCondition) {
                 RowItem item = new RowItem();
                 item.game = game;
                 item.firstLetter = name.charAt(0);
@@ -185,18 +166,15 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
         }
 
         alphaIndexer.clear();
-
         if (sortType == SORT_BY_NAME) {
             for (int i = 0; i < filterGames.size(); i++) {
                 RowItem item = filterGames.get(i);
                 char ch = item.firstLetter;
-
                 if (!alphaIndexer.containsKey(ch)) {
                     alphaIndexer.put(ch, i);
                 }
             }
         }
-
         super.notifyDataSetChanged();
     }
 

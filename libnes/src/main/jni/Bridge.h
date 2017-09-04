@@ -4,11 +4,12 @@
 
 
 #include "jni.h"
+
 namespace emudroid {
-class Bridge {
-public:
-    Bridge(Emulator *emu);
-};
+    class Bridge {
+    public:
+        Bridge(Emulator *emu);
+    };
 
 }
 #endif

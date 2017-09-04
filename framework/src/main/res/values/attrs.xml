@@ -1,23 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <declare-styleable name="de.madvertise.android.sdk.MadvertiseView">
-        <attr name="secondsToRefresh" format="integer" />
-        <attr name="backgroundColor" format="color" />
-        <attr name="textSize" format="integer" />
-        <attr name="textColor" format="color" />
-        <attr name="isTestMode" format="boolean" />
-        <attr name="bannerType" format="string" />
-        <attr name="deliverOnlyText" format="boolean" />
-        <attr name="animation" format="string" />
-        <attr name="placement_type" format="string" />
-        <attr name="mraid" format="boolean" />
-    </declare-styleable>
     <declare-styleable name="MultitouchTwoButtonArea">
         <attr name="first_button" format="reference" />
         <attr name="second_button" format="reference" />
-    </declare-styleable>
-    <declare-styleable name="sbp">
-        <attr name="showText" format="boolean" />
     </declare-styleable>
 </resources>

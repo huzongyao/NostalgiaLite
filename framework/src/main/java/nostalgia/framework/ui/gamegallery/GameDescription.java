@@ -1,6 +1,6 @@
 package nostalgia.framework.ui.gamegallery;
 
-import android.annotation.SuppressLint;
+import android.support.annotation.NonNull;
 
 import java.io.File;
 import java.io.Serializable;
@@ -48,7 +48,6 @@ public class GameDescription implements Serializable, Comparable<GameDescription
         checksum = Utils.getMD5Checksum(file);
     }
 
-
     public GameDescription(File file, String checksum) {
         name = file.getName();
         path = file.getAbsolutePath();
@@ -74,29 +73,24 @@ public class GameDescription implements Serializable, Comparable<GameDescription
         if (cleanNameCache == null) {
             String name = Utils.removeExt(this.name);
             int idx = name.lastIndexOf('/');
-
             if (idx != -1) {
                 cleanNameCache = name.substring(idx + 1);
-
             } else {
                 cleanNameCache = name;
             }
         }
-
         return cleanNameCache;
     }
 
-    @SuppressLint("DefaultLocale")
     public String getSortName() {
         if (sortNameCache == null) {
             sortNameCache = getCleanName().toLowerCase();
         }
-
         return sortNameCache;
     }
 
     @Override
-    public int compareTo(GameDescription another) {
+    public int compareTo(@NonNull GameDescription another) {
         return checksum.compareTo(another.checksum);
     }
 
@@ -104,10 +98,9 @@ public class GameDescription implements Serializable, Comparable<GameDescription
     public boolean equals(Object o) {
         if (o == null || !(o instanceof GameDescription)) {
             return false;
-
         } else {
             GameDescription gd = (GameDescription) o;
-            return gd.checksum == null ? false : checksum.equals(gd.checksum);
+            return gd.checksum != null && checksum.equals(gd.checksum);
         }
     }
 

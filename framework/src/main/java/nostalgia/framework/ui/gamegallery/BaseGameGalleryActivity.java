@@ -1,6 +1,5 @@
 package nostalgia.framework.ui.gamegallery;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -27,7 +26,6 @@ import nostalgia.framework.utils.DialogUtils;
 import nostalgia.framework.utils.FileUtils;
 import nostalgia.framework.utils.NLog;
 
-@SuppressLint({"HandlerLeak"})
 abstract public class BaseGameGalleryActivity extends ControllableActivity
         implements OnRomsFinderListener {
 
@@ -43,11 +41,10 @@ abstract public class BaseGameGalleryActivity extends ControllableActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        HashSet<String> exts = new HashSet<String>(getRomExtensions());
+        HashSet<String> exts = new HashSet<>(getRomExtensions());
         exts.addAll(getArchiveExtensions());
         dbHelper = new DatabaseHelper(this);
-        SharedPreferences pref = getSharedPreferences("android50comp",
-                Context.MODE_PRIVATE);
+        SharedPreferences pref = getSharedPreferences("android50comp", Context.MODE_PRIVATE);
         String androidVersion = Build.VERSION.RELEASE;
 
         if (!pref.getString("androidVersion", "").equals(androidVersion)) {
@@ -72,7 +69,7 @@ abstract public class BaseGameGalleryActivity extends ControllableActivity
         super.onResume();
 
         if (!FileUtils.isSDCardRWMounted()) {
-            showSDcardFailed();
+            showSDCardFailed();
         }
     }
 
@@ -99,8 +96,7 @@ abstract public class BaseGameGalleryActivity extends ControllableActivity
         if (romsFinder == null) {
             reloadGames = false;
             reloading = searchNew;
-            romsFinder = new RomsFinder(exts, inZipExts, this, this, searchNew,
-                    selectedFolder);
+            romsFinder = new RomsFinder(exts, inZipExts, this, this, searchNew, selectedFolder);
             romsFinder.start();
         }
     }
@@ -133,7 +129,7 @@ abstract public class BaseGameGalleryActivity extends ControllableActivity
         }
     }
 
-    public void showSDcardFailed() {
+    public void showSDCardFailed() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -157,7 +153,6 @@ abstract public class BaseGameGalleryActivity extends ControllableActivity
         });
     }
 
-
     public abstract Class<? extends EmulatorActivity> getEmulatorActivityClass();
 
     abstract public void setLastGames(ArrayList<GameDescription> games);
@@ -169,7 +164,7 @@ abstract public class BaseGameGalleryActivity extends ControllableActivity
     public abstract Emulator getEmulatorInstance();
 
     protected Set<String> getArchiveExtensions() {
-        HashSet<String> set = new HashSet<String>();
+        HashSet<String> set = new HashSet<>();
         set.add("zip");
         return set;
     }

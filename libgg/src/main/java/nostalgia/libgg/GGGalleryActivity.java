@@ -21,10 +21,8 @@ public class GGGalleryActivity extends GalleryActivity {
 
     @Override
     protected Set<String> getRomExtensions() {
-        HashSet<String> set = new HashSet<String>();
+        HashSet<String> set = new HashSet<>();
         set.add("gg");
         return set;
     }
-
-
 }

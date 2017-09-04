@@ -8,8 +8,6 @@ public class GbcEmulatorActivity extends EmulatorActivity {
     private static String shader = "precision mediump float;"
             + "varying vec2 v_texCoord;                     "
             + "uniform sampler2D s_texture;                 "
-
-
             + "void main()                                  "
             + "{                                             "
             + "	vec2 p1 = v_texCoord;                        "

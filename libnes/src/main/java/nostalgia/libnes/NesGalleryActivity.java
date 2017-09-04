@@ -9,7 +9,6 @@ import java.util.Set;
 import nostalgia.framework.Emulator;
 import nostalgia.framework.base.EmulatorActivity;
 import nostalgia.framework.base.OpenGLTestActivity;
-import nostalgia.framework.remote.wifi.WifiControllerServer;
 import nostalgia.framework.ui.gamegallery.GalleryActivity;
 import nostalgia.framework.ui.preferences.PreferenceUtil;
 import nostalgia.framework.utils.NLog;
@@ -17,9 +16,7 @@ import nostalgia.framework.utils.Utils;
 
 public class NesGalleryActivity extends GalleryActivity {
 
-
     private static final int REQUEST_CHECK_OPENGL = 200;
-    WifiControllerServer wifiControllerServer;
 
     @Override
     public Emulator getEmulatorInstance() {
@@ -33,7 +30,7 @@ public class NesGalleryActivity extends GalleryActivity {
 
     @Override
     protected Set<String> getRomExtensions() {
-        HashSet<String> set = new HashSet<String>();
+        HashSet<String> set = new HashSet<>();
         set.add("nes");
         set.add("fds");
         return set;
@@ -43,9 +40,7 @@ public class NesGalleryActivity extends GalleryActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (PreferenceUtil.getFragmentShader(this) == -1
-                && Utils.checkGL20Support(this)) {
+        if (PreferenceUtil.getFragmentShader(this) == -1 && Utils.checkGL20Support(this)) {
             Intent intent = new Intent(this, OpenGLTestActivity.class);
             startActivityForResult(intent, REQUEST_CHECK_OPENGL);
         }
@@ -54,7 +49,6 @@ public class NesGalleryActivity extends GalleryActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == REQUEST_CHECK_OPENGL) {
             NLog.e("opengl", "opengl: " + resultCode);
             PreferenceUtil.setFragmentShader(this, resultCode);

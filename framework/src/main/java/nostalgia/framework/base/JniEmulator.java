@@ -32,19 +32,18 @@ public abstract class JniEmulator implements Emulator {
     private static final String TAG = "base.JniEmulator";
     private static final int SIZE = 32768 * 2;
     private static Map<String, String> md5s = new HashMap<String, String>();
-    AtomicBoolean ready = new AtomicBoolean();
-    Object readyLock = new Object();
-    AtomicInteger totalWritten = new AtomicInteger();
-    long startTime = -1;
+    private AtomicBoolean ready = new AtomicBoolean();
+    private final Object readyLock = new Object();
+    private AtomicInteger totalWritten = new AtomicInteger();
     private String baseDir;
     private boolean loadFailed = false;
-    private Object loadLock = new Object();
+    private final Object loadLock = new Object();
     private int cur = 0;
     private int[] lenX = new int[2];
     private boolean fastForward;
     private int numFastForwardFrames;
-    private short[][] testX = new short[2][SIZE];
-    private Object sfxLock = new Object();
+    private final short[][] testX = new short[2][SIZE];
+    private final Object sfxLock = new Object();
     private int minSize;
     private boolean useOpenGL;
     private GameInfo gameInfo;
@@ -56,7 +55,7 @@ public abstract class JniEmulator implements Emulator {
     private JniBridge jni;
     private int keys;
     private int turbos = ~0;
-    private Object viewPortLock = new Object();
+    private final Object viewPortLock = new Object();
     private int viewPortWidth;
     private int viewPortHeight;
 
@@ -64,8 +63,7 @@ public abstract class JniEmulator implements Emulator {
         EmulatorInfo info = getInfo();
         KeyboardProfile.BUTTON_NAMES = info.getDeviceKeyboardNames();
         KeyboardProfile.BUTTON_KEY_EVENT_CODES = info.getDeviceKeyboardCodes();
-        KeyboardProfile.BUTTON_DESCRIPTIONS = info
-                .getDeviceKeyboardDescriptions();
+        KeyboardProfile.BUTTON_DESCRIPTIONS = info.getDeviceKeyboardDescriptions();
         this.jni = getBridge();
     }
 
@@ -188,15 +186,12 @@ public abstract class JniEmulator implements Emulator {
         Bitmap screen = null;
 
         try {
-            screen = Bitmap.createBitmap(gfx.originalScreenWidth,
-                    gfx.originalScreenHeight, Config.ARGB_8888);
-
-        } catch (OutOfMemoryError wtf) {
+            screen = Bitmap.createBitmap(gfx.originalScreenWidth, gfx.originalScreenHeight, Config.ARGB_8888);
+        } catch (OutOfMemoryError ignored) {
         }
 
         if (screen != null) {
-            if (!jni.renderVP(screen, gfx.originalScreenWidth,
-                    gfx.originalScreenHeight)) {
+            if (!jni.renderVP(screen, gfx.originalScreenWidth, gfx.originalScreenHeight)) {
                 throw new EmulatorException(R.string.act_game_screenshot_failed);
             }
         }
@@ -206,14 +201,11 @@ public abstract class JniEmulator implements Emulator {
         }
 
         if (screen != null) {
-            String pngFileName = SlotUtils.getScreenshotPath(baseDir,
-                    getMD5(null), slot);
+            String pngFileName = SlotUtils.getScreenshotPath(baseDir, getMD5(null), slot);
             FileOutputStream out = null;
-
             try {
                 out = new FileOutputStream(pngFileName);
                 screen.compress(CompressFormat.PNG, 60, out);
-
             } catch (Exception e) {
                 throw new EmulatorException(R.string.act_game_screenshot_failed);
 
@@ -251,8 +243,7 @@ public abstract class JniEmulator implements Emulator {
     }
 
     @Override
-    public void loadGame(String fileName, String batteryDir,
-                         String batterySaveFullPath) {
+    public void loadGame(String fileName, String batteryDir, String batterySaveFullPath) {
         if (!jni.loadGame(fileName, batteryDir, batterySaveFullPath)) {
             synchronized (loadLock) {
                 loadFailed = true;
@@ -331,7 +322,6 @@ public abstract class JniEmulator implements Emulator {
         if (!jni.setViewPortSize(w, h)) {
             throw new EmulatorException("set view port size failed");
         }
-
         synchronized (viewPortLock) {
             viewPortWidth = w;
             viewPortHeight = h;
@@ -422,11 +412,9 @@ public abstract class JniEmulator implements Emulator {
         if (useOpenGL) {
             throw new IllegalStateException();
         }
-
         if (bitmap == null || bitmap.isRecycled()) {
             return;
         }
-
         canvas.drawBitmap(bitmap, x, y, null);
     }
 
@@ -454,13 +442,10 @@ public abstract class JniEmulator implements Emulator {
         synchronized (testX) {
             back = cur;
             slen = lenX[back];
-
             if (length > 0) {
                 if (slen + length < SIZE) {
-                    System.arraycopy(sfxBuffer, 0, testX[back], 0,
-                            length);
+                    System.arraycopy(sfxBuffer, 0, testX[back], 0, length);
                     lenX[back] = length;
-
                 } else {
                     lenX[back] = 0;
                 }
@@ -520,19 +505,16 @@ public abstract class JniEmulator implements Emulator {
         if (bitmap != null) {
             bitmap.recycle();
         }
-
         bitmap = Bitmap.createBitmap(w, h, Config.ARGB_8888);
     }
 
     private void initSound(SfxProfile sfx) {
-        int format = sfx.isStereo ? AudioFormat.CHANNEL_OUT_STEREO
-                : AudioFormat.CHANNEL_OUT_MONO;
-        int encoding = sfx.encoding == SfxProfile.SoundEncoding.PCM8 ? AudioFormat.ENCODING_PCM_8BIT
-                : AudioFormat.ENCODING_PCM_16BIT;
+        int format = sfx.isStereo ? AudioFormat.CHANNEL_OUT_STEREO : AudioFormat.CHANNEL_OUT_MONO;
+        int encoding = sfx.encoding == SfxProfile.SoundEncoding.PCM8 ?
+                AudioFormat.ENCODING_PCM_8BIT : AudioFormat.ENCODING_PCM_16BIT;
         minSize = AudioTrack.getMinBufferSize(sfx.rate, format, encoding);
         track = new AudioTrack(AudioManager.STREAM_MUSIC, sfx.rate, format,
                 encoding, minSize, AudioTrack.MODE_STREAM);
-
         try {
             track.play();
             resetTrack();

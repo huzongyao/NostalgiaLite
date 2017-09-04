@@ -1,14 +1,8 @@
 
 #include "Emulator.h"
-#include <android/log.h>
 #include <android/bitmap.h>
 #include <stdio.h>
 #include <GLES/gl.h>
-#include <GLES/glext.h>
-#include <string.h>
-#include <vector>
-
-#include "settings.h"
 
 using namespace emudroid;
 

@@ -1,7 +1,8 @@
 package nostalgia.framework;
 
+import android.util.SparseIntArray;
+
 import java.util.List;
-import java.util.Map;
 
 public interface EmulatorInfo {
 
@@ -23,7 +24,7 @@ public interface EmulatorInfo {
 
     List<SfxProfile> getAvailableSfxProfiles();
 
-    Map<Integer, Integer> getKeyMapping();
+    SparseIntArray getKeyMapping();
 
     int getNumQualityLevels();
 

@@ -3,8 +3,7 @@ package nostalgia.framework.base;
 import android.app.Activity;
 import android.os.Bundle;
 
-public class OpenGLTestActivity extends Activity implements
-        OpenGLTestView.Callback {
+public class OpenGLTestActivity extends Activity implements OpenGLTestView.Callback {
 
     OpenGLTestView view;
 

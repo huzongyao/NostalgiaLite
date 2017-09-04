@@ -257,17 +257,13 @@ public class RemoteControllerActivity extends Activity {
         final Dialog dialog = new Dialog(this, R.style.DialogTheme);
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View content = inflater.inflate(R.layout.dialog_select_server, null);
-        final ListView listView = (ListView) content
-                .findViewById(R.id.dialog_select_server_list);
+        final ListView listView = (ListView) content.findViewById(R.id.dialog_select_server_list);
         final ArrayList<DetectionResult> values = new ArrayList<DetectionResult>();
-        final ServerSelectAdapter listAdapter = new ServerSelectAdapter(this,
-                values);
+        final ServerSelectAdapter listAdapter = new ServerSelectAdapter(this, values);
         listView.setAdapter(listAdapter);
         dialog.setContentView(content);
-        TextView title = (TextView) content
-                .findViewById(R.id.dialog_select_server_title);
-        Button cancel = (Button) content
-                .findViewById(R.id.dialog_select_server_btn_cancel);
+        TextView title = (TextView) content.findViewById(R.id.dialog_select_server_title);
+        Button cancel = (Button) content.findViewById(R.id.dialog_select_server_btn_cancel);
         cancel.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -276,8 +272,7 @@ public class RemoteControllerActivity extends Activity {
                 finish();
             }
         });
-        Button manually = (Button) content
-                .findViewById(R.id.dialog_select_server_btn_manually);
+        Button manually = (Button) content.findViewById(R.id.dialog_select_server_btn_manually);
         manually.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -330,19 +325,13 @@ public class RemoteControllerActivity extends Activity {
     private void openSelectIpDialog() {
         final Dialog dialog = new Dialog(this, R.style.DialogTheme);
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View content = inflater.inflate(R.layout.dialog_manually_set_server,
-                null);
+        View content = inflater.inflate(R.layout.dialog_manually_set_server, null);
         dialog.setContentView(content);
-        final TextView prefix = (TextView) content
-                .findViewById(R.id.dialog_manually_server_set_ip_prefix);
-        final EditText input = (EditText) content
-                .findViewById(R.id.dialog_manually_server_set);
-        final Button okBtn = (Button) content
-                .findViewById(R.id.dialog_select_server_btn_ok);
-        final Button cancel = (Button) content
-                .findViewById(R.id.dialog_select_server_btn_cancel);
-        TextView title = (TextView) content
-                .findViewById(R.id.dialog_select_server_title);
+        final TextView prefix = (TextView) content.findViewById(R.id.dialog_manually_server_set_ip_prefix);
+        final EditText input = (EditText) content.findViewById(R.id.dialog_manually_server_set);
+        final Button okBtn = (Button) content.findViewById(R.id.dialog_select_server_btn_ok);
+        final Button cancel = (Button) content.findViewById(R.id.dialog_select_server_btn_cancel);
+        TextView title = (TextView) content.findViewById(R.id.dialog_select_server_title);
         String prefixS = Utils.getNetPrefix(this) + ".";
         prefix.setText(prefixS);
         String iptxt = ip;
@@ -423,8 +412,7 @@ public class RemoteControllerActivity extends Activity {
             LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View content = inflater.inflate(R.layout.dialog_select_port, null);
             dialog.setContentView(content);
-            TextView title = (TextView) content
-                    .findViewById(R.id.dialog_select_server_title);
+            TextView title = (TextView) content.findViewById(R.id.dialog_select_server_title);
             dialog.setOnCancelListener(new OnCancelListener() {
                 @Override
                 public void onCancel(DialogInterface dialog) {
@@ -474,7 +462,6 @@ public class RemoteControllerActivity extends Activity {
 
     private void setPort(int port) {
         this.port = port;
-
         if (client != null) {
         }
     }

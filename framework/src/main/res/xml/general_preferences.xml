@@ -32,13 +32,13 @@
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="general_pref_quicksave"
-            android:summary="Double tap to quick-save (right half of screen) or quick-load (left half of screen)"
-            android:title="Quick Save/Load" />
+            android:summary="@string/general_pref_quick_save_desc"
+            android:title="@string/general_pref_quick_save" />
 
     </PreferenceCategory>
 
 
-    <PreferenceCategory android:title="Layout">
+    <PreferenceCategory android:title="@string/pref_setting_layout">
         <Preference
             android:key="general_pref_touch_layout"
             android:summary="@string/pref_touch_desc"
@@ -58,7 +58,7 @@
     </PreferenceCategory>
 
 
-    <PreferenceCategory android:title="Display Settings">
+    <PreferenceCategory android:title="@string/pref_setting_display">
 
         <nostalgia.framework.ui.preferences.ControllableListPreference
             android:defaultValue="0"
@@ -78,7 +78,7 @@
     <PreferenceCategory
         android:icon="@drawable/ic_about"
         android:key="pref_general_touch_cat"
-        android:title="Touch Controller Settings">
+        android:title="@string/pref_setting_touch_ctrl">
 
         <CheckBoxPreference
             android:defaultValue="false"
@@ -144,12 +144,12 @@
             android:key="general_pref_ff_speed"
             android:max="5"
             android:text="[hack]"
-            android:title="Fast Forward Speed" />
+            android:title="@string/general_pref_fastforward_speed" />
 
 
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="SAV File Settings">
+    <PreferenceCategory android:title="@string/general_pref_save_file">
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="general_pref_load_sav_files"

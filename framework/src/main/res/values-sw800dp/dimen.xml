@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <dimen name="dilog_button_margin">10dp</dimen>
-    <dimen name="dialog_bck_pading">19dp</dimen>
+    <dimen name="dialog_button_margin">10dp</dimen>
+    <dimen name="dialog_back_padding">19dp</dimen>
     <dimen name="top_panel_touchcontroler_height">50dp</dimen>
     <dimen name="top_panel_button_height">50dp</dimen>
     <dimen name="slot_item_size">270dp</dimen>

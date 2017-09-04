@@ -41,27 +41,22 @@ public class GeneralPreferenceActivity extends PreferenceActivity {
     }
 
     static void initInputMethodPreference(Preference imPreference, final Activity activity) {
-        imPreference
-                .setOnPreferenceClickListener(new OnPreferenceClickListener() {
-                    @Override
-                    public boolean onPreferenceClick(Preference preference) {
-                        InputMethodManager imeManager = (InputMethodManager) activity
-                                .getApplicationContext().getSystemService(
-                                        INPUT_METHOD_SERVICE);
+        imPreference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                InputMethodManager imeManager = (InputMethodManager)
+                        activity.getApplicationContext().getSystemService(INPUT_METHOD_SERVICE);
 
-                        if (imeManager != null) {
-                            imeManager.showInputMethodPicker();
+                if (imeManager != null) {
+                    imeManager.showInputMethodPicker();
 
-                        } else {
-                            Toast.makeText(
-                                    activity,
-                                    R.string.pref_keyboard_cannot_change_input_method,
-                                    Toast.LENGTH_LONG).show();
-                        }
+                } else {
+                    Toast.makeText(activity, R.string.pref_keyboard_cannot_change_input_method, Toast.LENGTH_LONG).show();
+                }
 
-                        return false;
-                    }
-                });
+                return false;
+            }
+        });
     }
 
     static void initFastForward(CheckBoxPreference ff, final Activity activity) {
@@ -73,17 +68,15 @@ public class GeneralPreferenceActivity extends PreferenceActivity {
         }
     }
 
-    public static void setNewProfile(ListPreference listProfile,
-                                     Preference editProfile, String name) {
+    public static void setNewProfile(ListPreference listProfile, Preference editProfile, String name) {
         listProfile.setSummary(name);
         editProfile.setSummary(name);
         editProfile.setTitle(R.string.key_profile_edit);
-        editProfile.getIntent().putExtra(
-                KeyboardSettingsActivity.EXTRA_PROFILE_NAME, name);
+        editProfile.getIntent().putExtra(KeyboardSettingsActivity.EXTRA_PROFILE_NAME, name);
     }
 
-    public static void initProfiles(final Activity context,
-                                    final ListPreference selectProfile, final Preference editProfile) {
+    public static void initProfiles(final Activity context, final ListPreference selectProfile,
+                                    final Preference editProfile) {
         selProfile = selectProfile;
         edProfile = editProfile;
         selectProfile.setEntries(keyboardProfileNames);
@@ -94,29 +87,23 @@ public class GeneralPreferenceActivity extends PreferenceActivity {
             selectProfile.setValue("default");
         }
 
-        selectProfile
-                .setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-                    @Override
-                    public boolean onPreferenceChange(Preference preference,
-                                                      Object newValue) {
-                        if (newValue.equals(NEW_PROFILE)) {
-                            Intent i = new Intent(context,
-                                    KeyboardSettingsActivity.class);
-                            i.putExtra(
-                                    KeyboardSettingsActivity.EXTRA_PROFILE_NAME,
-                                    "default");
-                            i.putExtra(KeyboardSettingsActivity.EXTRA_NEW_BOOL,
-                                    true);
-                            context.startActivityForResult(i, 0);
-                            return false;
+        selectProfile.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference,
+                                              Object newValue) {
+                if (newValue.equals(NEW_PROFILE)) {
+                    Intent i = new Intent(context, KeyboardSettingsActivity.class);
+                    i.putExtra(KeyboardSettingsActivity.EXTRA_PROFILE_NAME, "default");
+                    i.putExtra(KeyboardSettingsActivity.EXTRA_NEW_BOOL, true);
+                    context.startActivityForResult(i, 0);
+                    return false;
 
-                        } else {
-                            setNewProfile(selectProfile, editProfile,
-                                    (String) newValue);
-                            return true;
-                        }
-                    }
-                });
+                } else {
+                    setNewProfile(selectProfile, editProfile, (String) newValue);
+                    return true;
+                }
+            }
+        });
     }
 
     @Override
@@ -124,7 +111,6 @@ public class GeneralPreferenceActivity extends PreferenceActivity {
         return true;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -153,11 +139,10 @@ public class GeneralPreferenceActivity extends PreferenceActivity {
         }
 
         if (!found) {
-            SharedPreferences pref = PreferenceManager
-                    .getDefaultSharedPreferences(this);
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
             Editor edit = pref.edit();
             edit.putString("pref_game_keyboard_profile", "default");
-            edit.commit();
+            edit.apply();
             setNewProfile(selProfile, edProfile, "default");
             selProfile.setValue("default");
             selProfile.setEntries(keyboardProfileNames);
@@ -179,26 +164,20 @@ public class GeneralPreferenceActivity extends PreferenceActivity {
         for (String name : names) {
             keyboardProfileNames[i++] = name;
         }
-
         keyboardProfileNames[names.size()] = NEW_PROFILE;
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != KeyboardSettingsActivity.RESULT_NAME_CANCEL) {
-            ArrayList<String> profileNames = KeyboardProfile
-                    .getProfilesNames(this);
+            ArrayList<String> profileNames = KeyboardProfile.getProfilesNames(this);
             keyboardProfileNames = new String[profileNames.size() + 1];
             int i = 0;
-
             for (String name : profileNames) {
                 keyboardProfileNames[i++] = name;
             }
-
             keyboardProfileNames[profileNames.size()] = NEW_PROFILE;
-            String name = null;
-            name = data
-                    .getStringExtra(KeyboardSettingsActivity.EXTRA_PROFILE_NAME);
+            String name = data.getStringExtra(KeyboardSettingsActivity.EXTRA_PROFILE_NAME);
             selProfile.setValue(name);
             setNewProfile(selProfile, edProfile, name);
             initProfiles(this, selProfile, edProfile);

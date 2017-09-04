@@ -1,5 +1,7 @@
 package nostalgia.libnes;
 
+import android.util.SparseIntArray;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -161,8 +163,8 @@ public class NesEmulator extends JniEmulator {
         }
 
         @Override
-        public Map<Integer, Integer> getKeyMapping() {
-            HashMap<Integer, Integer> mapping = new HashMap<Integer, Integer>();
+        public SparseIntArray getKeyMapping() {
+            SparseIntArray mapping = new SparseIntArray();
             mapping.put(EmulatorController.KEY_A, 0x01);
             mapping.put(EmulatorController.KEY_B, 0x02);
             mapping.put(EmulatorController.KEY_SELECT, 0x04);

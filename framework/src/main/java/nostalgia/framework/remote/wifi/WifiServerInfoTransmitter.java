@@ -15,7 +15,7 @@ import nostalgia.framework.utils.Utils;
 public class WifiServerInfoTransmitter extends Thread {
     public static final int BROADCAST_PORT = 64313;
     public static final String MESSAGE_PREFIX = "EMUDROID";
-    private static final String TAG = "remote.wifi.BroadcastThread";
+    private static final String TAG = "WifiServerInfoTransmitter";
     private static final int SLEEP_TIME = 3000;
     private static final int SLEEP_TIME_AFTER_EXCEPTION = 15000;
     protected volatile boolean running = false;
@@ -31,13 +31,11 @@ public class WifiServerInfoTransmitter extends Thread {
     }
 
     public boolean startSending() {
-        if (PreferenceUtil.isWifiServerEnable(context)
-                && Utils.isWifiAvailable(context)) {
+        if (PreferenceUtil.isWifiServerEnable(context) && Utils.isWifiAvailable(context)) {
             stopSending();
             running = true;
             start();
             return true;
-
         } else {
             return false;
         }
@@ -45,7 +43,6 @@ public class WifiServerInfoTransmitter extends Thread {
 
     public void stopSending() {
         running = false;
-
         if (serverSocket != null) {
             serverSocket.close();
         }
@@ -65,35 +62,26 @@ public class WifiServerInfoTransmitter extends Thread {
             int counter = 0;
 
             while (running) {
-                NLog.i(TAG, "send broadcast " + (counter++) + " to "
-                        + broadcastAddress);
-
+                NLog.i(TAG, "send broadcast " + (counter++) + " to " + broadcastAddress);
                 try {
-                    DatagramPacket sendPacket = new DatagramPacket(sendData,
-                            sendData.length, broadcastAddress, BROADCAST_PORT);
+                    DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length,
+                            broadcastAddress, BROADCAST_PORT);
                     serverSocket.send(sendPacket);
-
                 } catch (Exception e) {
                     try {
                         Thread.sleep(SLEEP_TIME_AFTER_EXCEPTION);
-
                     } catch (InterruptedException ie) {
                     }
                 }
-
                 try {
                     Thread.sleep(SLEEP_TIME);
-
                 } catch (InterruptedException e) {
                     NLog.e(TAG, "wtf", e);
                 }
             }
-
             NLog.i(TAG, "Stop sending");
-
         } catch (Exception e) {
             NLog.e(TAG, "", e);
-
         } finally {
             if (serverSocket != null) {
                 serverSocket.close();

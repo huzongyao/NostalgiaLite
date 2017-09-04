@@ -13,6 +13,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".NesEmulatorActivity"
             android:theme="@style/AppTheme.FullScreen" />
@@ -38,6 +39,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
         <activity
             android:name="nostalgia.framework.ui.preferences.TouchControllerSettingsActivity"
             android:label="@string/game_pref"
@@ -48,6 +50,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
         <activity
             android:name="nostalgia.framework.ui.preferences.ScreenViewPortSettingsActivity"
             android:label="@string/game_pref"

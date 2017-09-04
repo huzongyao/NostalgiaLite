@@ -29,8 +29,7 @@ public interface Emulator {
 
     void setBaseDir(String baseDir);
 
-    void loadGame(String fileName, String batterySaveDir,
-                  String batterySaveFullPath);
+    void loadGame(String fileName, String batterySaveDir, String batterySaveFullPath);
 
     void onEmulationResumed();
 

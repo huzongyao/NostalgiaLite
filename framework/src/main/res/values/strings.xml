@@ -117,18 +117,25 @@
     <string name="time_travel">Rewind</string>
 
     <!-- Preference item itentn action -->
-    <string name="action_general_pref">nostalgia.framework.GENERALPREF</string>
-    <string name="action_keyboard_pref">nostalgia.framework.KEYBOARDPREF</string>
-    <string name="action_touch_pref">nostalgia.framework.TOUCHPREF</string>
-    <string name="action_screen_pref">nostalgia.framework.SCREENPREF</string>
+    <string name="action_general_pref" translatable="false">nostalgia.framework.GENERALPREF</string>
+    <string name="action_keyboard_pref" translatable="false">nostalgia.framework.KEYBOARDPREF</string>
+    <string name="action_touch_pref" translatable="false">nostalgia.framework.TOUCHPREF</string>
+    <string name="action_screen_pref" translatable="false">nostalgia.framework.SCREENPREF</string>
 
     <string name="export_lite_ok">Data from the Lite version successfully imported.</string>
     <string name="export_lite_error">An error has occurred while importing data from the Lite version.</string>
-    <string name="export_action">.EXPORT</string>
+    <string name="export_action" translatable="false">.EXPORT</string>
     <string name="game_pref_ui_opacity">Opacity</string>
     <string name="game_pref_ui_auto_hide">Auto-Hide</string>
     <string name="general_pref_fastforward_settings">Fast Forward Settings</string>
     <string name="game_pref_ui_vibration_desc">Strength of vibrations</string>
     <string name="game_pref_ui_opacity_desc">Opacity of on-screen controls</string>
     <string name="game_pref_ui_auto_hide_desc">Hide on-screen controls when using gamepad/keyboard/remote controller</string>
+    <string name="general_pref_quick_save">Quick Save/Load</string>
+    <string name="general_pref_quick_save_desc">Double tap to quick-save (right half of screen) or quick-load (left half of screen)</string>
+    <string name="pref_setting_layout">Layout</string>
+    <string name="pref_setting_display">Display Settings</string>
+    <string name="pref_setting_touch_ctrl">Touch Controller Settings</string>
+    <string name="general_pref_fastforward_speed">Fast Forward Speed</string>
+    <string name="general_pref_save_file">SAV File Settings</string>
 </resources>

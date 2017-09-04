@@ -8,11 +8,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Vibrator;
 import android.util.DisplayMetrics;
+import android.util.SparseIntArray;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
-
-import java.util.Map;
 
 import nostalgia.framework.Emulator;
 import nostalgia.framework.EmulatorController;
@@ -26,7 +25,7 @@ public class DynamicDPad implements EmulatorController {
     private int rightMapped;
     private int upMapped;
     private int downMapped;
-    private Map<Integer, Integer> mapping;
+    private SparseIntArray mapping;
     private int port;
     private Emulator emulator;
     private View view;
@@ -40,8 +39,7 @@ public class DynamicDPad implements EmulatorController {
     private int minDistY = -1;
     private Paint paint = new Paint();
 
-    public DynamicDPad(Context context, Display display,
-                       TouchController touchController) {
+    public DynamicDPad(Context context, Display display, TouchController touchController) {
         this.context = context;
         this.touchController = touchController;
         DisplayMetrics dm = new DisplayMetrics();
@@ -122,27 +120,18 @@ public class DynamicDPad implements EmulatorController {
             super(context);
             paint.setColor(Color.WHITE);
             paint.setStrokeWidth(3);
-            vibrator = (Vibrator) getContext().getSystemService(
-                    Context.VIBRATOR_SERVICE);
+            vibrator = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
             vibrationDuration = PreferenceUtil.getVibrationDuration(context);
-            direction[0] = BitmapFactory.decodeResource(getResources(),
-                    R.drawable.dynamic_dpad_right);
+            direction[0] = BitmapFactory.decodeResource(getResources(), R.drawable.dynamic_dpad_right);
             btnW = direction[0].getWidth();
             btnH = direction[0].getHeight();
-            direction[1] = BitmapFactory.decodeResource(getResources(),
-                    R.drawable.dynamic_dpad_right_up);
-            direction[2] = BitmapFactory.decodeResource(getResources(),
-                    R.drawable.dynamic_dpad_up);
-            direction[3] = BitmapFactory.decodeResource(getResources(),
-                    R.drawable.dynamic_dpad_left_up);
-            direction[4] = BitmapFactory.decodeResource(getResources(),
-                    R.drawable.dynamic_dpad_left);
-            direction[5] = BitmapFactory.decodeResource(getResources(),
-                    R.drawable.dynamic_dpad_left_down);
-            direction[6] = BitmapFactory.decodeResource(getResources(),
-                    R.drawable.dynamic_dpad_down);
-            direction[7] = BitmapFactory.decodeResource(getResources(),
-                    R.drawable.dynamic_dpad_right_down);
+            direction[1] = BitmapFactory.decodeResource(getResources(), R.drawable.dynamic_dpad_right_up);
+            direction[2] = BitmapFactory.decodeResource(getResources(), R.drawable.dynamic_dpad_up);
+            direction[3] = BitmapFactory.decodeResource(getResources(), R.drawable.dynamic_dpad_left_up);
+            direction[4] = BitmapFactory.decodeResource(getResources(), R.drawable.dynamic_dpad_left);
+            direction[5] = BitmapFactory.decodeResource(getResources(), R.drawable.dynamic_dpad_left_down);
+            direction[6] = BitmapFactory.decodeResource(getResources(), R.drawable.dynamic_dpad_down);
+            direction[7] = BitmapFactory.decodeResource(getResources(), R.drawable.dynamic_dpad_right_down);
         }
 
         @Override
@@ -152,10 +141,8 @@ public class DynamicDPad implements EmulatorController {
             if (dpadCenterX != -1 && currentX != -1) {
                 int bitmapOffsetX = (int) (dpadCenterX - btnW / 2);
                 int bitmapOffsetY = (int) (dpadCenterY - btnH / 2);
-
                 if (directionIdx != -1) {
-                    canvas.drawBitmap(direction[directionIdx], bitmapOffsetX,
-                            bitmapOffsetY, paint);
+                    canvas.drawBitmap(direction[directionIdx], bitmapOffsetX, bitmapOffsetY, paint);
                 }
             }
         }
@@ -180,31 +167,25 @@ public class DynamicDPad implements EmulatorController {
 
             if (actionMasked == MotionEvent.ACTION_MOVE) {
                 optimizationCounter++;
-
                 if (optimizationCounter < 5) {
                     return true;
-
                 } else {
                     optimizationCounter = 0;
                 }
             }
 
-            if (actionMasked == MotionEvent.ACTION_DOWN
-                    || actionMasked == MotionEvent.ACTION_POINTER_DOWN) {
+            if (actionMasked == MotionEvent.ACTION_DOWN || actionMasked == MotionEvent.ACTION_POINTER_DOWN) {
                 if (activePointerId == -1) {
-                    activePointerId = event
-                            .getPointerId(event.getActionIndex());
+                    activePointerId = event.getPointerId(event.getActionIndex());
 
                     if (!touchController.isPointerHandled(activePointerId)) {
-                        int pointerIndex = event
-                                .findPointerIndex(activePointerId);
+                        int pointerIndex = event.findPointerIndex(activePointerId);
                         dpadCenterX = event.getX(pointerIndex);
                         dpadCenterY = event.getY(pointerIndex);
 
                         if (vibrationDuration > 0) {
                             vibrator.vibrate(vibrationDuration);
                         }
-
                         return true;
 
                     } else {
@@ -217,8 +198,7 @@ public class DynamicDPad implements EmulatorController {
                 if (dpadCenterX != -1) {
                     for (int i = 0; i < event.getPointerCount(); i++) {
                         if (event.getPointerId(i) == activePointerId) {
-                            if (!touchController
-                                    .isPointerHandled(activePointerId)) {
+                            if (!touchController.isPointerHandled(activePointerId)) {
                                 float x = event.getX(i);
                                 float y = event.getY(i);
                                 currentX = x;
@@ -297,11 +277,9 @@ public class DynamicDPad implements EmulatorController {
                 }
             }
 
-            if (actionMasked == MotionEvent.ACTION_UP
-                    || actionMasked == MotionEvent.ACTION_CANCEL
+            if (actionMasked == MotionEvent.ACTION_UP || actionMasked == MotionEvent.ACTION_CANCEL
                     || actionMasked == MotionEvent.ACTION_POINTER_UP) {
-                if (activePointerId != -1
-                        && event.getPointerId(event.getActionIndex()) == activePointerId) {
+                if (activePointerId != -1 && event.getPointerId(event.getActionIndex()) == activePointerId) {
                     release();
                 }
             }

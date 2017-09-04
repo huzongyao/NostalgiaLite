@@ -21,15 +21,12 @@ public class GalleryPagerAdapter extends PagerAdapter {
     public static final String EXTRA_POSITIONS = "EXTRA_POSITIONS";
     private final static int[] SORT_TYPES = new int[]{
             GalleryAdapter.SORT_BY_NAME,
-            GalleryAdapter.SORT_BY_LAST_PLAYED
+            GalleryAdapter.SORT_BY_LAST_PLAYED,
     };
     private final String[] mTabTitles;
-
     private int[] yOffsets = new int[SORT_TYPES.length];
     private ListView[] lists = new ListView[SORT_TYPES.length];
-
     private GalleryAdapter[] listAdapters = new GalleryAdapter[SORT_TYPES.length];
-
     private Activity activity;
     private OnItemClickListener listener;
 
@@ -37,7 +34,6 @@ public class GalleryPagerAdapter extends PagerAdapter {
         this.activity = activity;
         this.listener = listener;
         mTabTitles = activity.getResources().getStringArray(R.array.gallery_page_tab_names);
-
         for (int i = 0; i < SORT_TYPES.length; i++) {
             GalleryAdapter adapter = listAdapters[i] = new GalleryAdapter(activity);
             adapter.setSortType(SORT_TYPES[i]);

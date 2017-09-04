@@ -14,11 +14,9 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.net.ConnectivityManager;
-import android.net.DhcpInfo;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.view.Display;
 
 import java.io.File;
@@ -107,21 +105,15 @@ public class Utils {
             if (totalCount >= MD5_BYTES_COUNT) {
                 byte[] digest = md.digest();
                 String result = "";
-
-                for (int i = 0; i < digest.length; i++) {
-                    result += Integer.toString((digest[i] & 0xff) + 0x100, 16)
-                            .substring(1);
+                for (byte aDigest : digest) {
+                    result += Integer.toString((aDigest & 0xff) + 0x100, 16).substring(1);
                 }
-
                 return result;
-
             } else {
                 return "small file";
             }
-
         } catch (NoSuchAlgorithmException e) {
             NLog.e(TAG, "", e);
-
         } catch (IOException e) {
             NLog.e(TAG, "", e);
         }
@@ -135,7 +127,6 @@ public class Utils {
             ZipEntry ze = zf.getEntry(entry);
             long crc = ze.getCrc();
             return crc;
-
         } catch (Exception e) {
             return -1;
         }
@@ -147,7 +138,8 @@ public class Utils {
         int[] version = new int[2];
         egl.eglInitialize(display, version);
         int EGL_OPENGL_ES2_BIT = 4;
-        int[] configAttribs = {EGL10.EGL_RED_SIZE, 4, EGL10.EGL_GREEN_SIZE, 4,
+        int[] configAttribs = {
+                EGL10.EGL_RED_SIZE, 4, EGL10.EGL_GREEN_SIZE, 4,
                 EGL10.EGL_BLUE_SIZE, 4, EGL10.EGL_RENDERABLE_TYPE,
                 EGL_OPENGL_ES2_BIT, EGL10.EGL_NONE
         };
@@ -160,8 +152,8 @@ public class Utils {
 
     public static void extractFile(File zipFile, String entryName, File outputFile)
             throws ZipException, IOException {
-        NLog.i(TAG, "extract " + entryName + " from " + zipFile.getAbsolutePath()
-                + " to " + outputFile.getAbsolutePath());
+        NLog.i(TAG, "extract " + entryName + " from " + zipFile.getAbsolutePath() + " to "
+                + outputFile.getAbsolutePath());
         ZipFile zipFile2 = new ZipFile(zipFile);
         ZipEntry ze = zipFile2.getEntry(entryName);
 
@@ -174,7 +166,6 @@ public class Utils {
             while ((count = zis.read(buffer)) != -1) {
                 fos.write(buffer, 0, count);
             }
-
             zis.close();
             zipFile2.close();
             fos.close();
@@ -231,18 +222,17 @@ public class Utils {
     }
 
     public static boolean isNetworkAvailable(Context context) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager
-                .getActiveNetworkInfo();
+        ConnectivityManager connectivityManager = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     public static boolean isWifiAvailable(Context context) {
-        WifiManager wifii = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifii = (WifiManager)
+                context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInfo = wifii.getConnectionInfo();
-        return (wifii.getWifiState() == WifiManager.WIFI_STATE_ENABLED)
-                & (wifiInfo.getIpAddress() != 0);
+        return (wifii.getWifiState() == WifiManager.WIFI_STATE_ENABLED) & (wifiInfo.getIpAddress() != 0);
     }
 
     public static InetAddress getBroadcastAddress(Context context) {
@@ -290,40 +280,17 @@ public class Utils {
     }
 
     public static String getNetPrefix(Context context) {
-        if (Build.VERSION.SDK_INT < 9) {
-            WifiManager wifii = (WifiManager) context
-                    .getSystemService(Context.WIFI_SERVICE);
-            DhcpInfo d = wifii.getDhcpInfo();
-            int prefix = d.netmask & d.ipAddress;
-            return (prefix & 0xff) + "." + ((prefix >> 8) & 0xff) + "."
-                    + ((prefix >> 16) & 0xff);
-
-        } else {
-            IpInfo info = getIP();
-            int prefix = info.address & info.netmask;
-            return ((prefix >> 24) & 0xff) + "." + ((prefix >> 16) & 0xff)
-                    + "." + ((prefix >> 8) & 0xff);
-        }
+        IpInfo info = getIP();
+        int prefix = info.address & info.netmask;
+        return ((prefix >> 24) & 0xff) + "." + ((prefix >> 16) & 0xff) + "." + ((prefix >> 8) & 0xff);
     }
 
     public static String getIpAddr(Context context) {
-        if (Build.VERSION.SDK_INT < 9) {
-            WifiManager wifiManager = (WifiManager) context
-                    .getSystemService(Context.WIFI_SERVICE);
-            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-            int ip = wifiInfo.getIpAddress();
-            String ipString = String.format("%d.%d.%d.%d", (ip & 0xff),
-                    (ip >> 8 & 0xff), (ip >> 16 & 0xff), (ip >> 24 & 0xff));
-            return ipString;
-
-        } else {
-            return getIP().sAddress;
-        }
+        return getIP().sAddress;
     }
 
     public static Bitmap createScreenshotBitmap(Context context, GameDescription game) {
-        String path = SlotUtils.getScreenshotPath(
-                EmulatorUtils.getBaseDir(context), game.checksum, 0);
+        String path = SlotUtils.getScreenshotPath(EmulatorUtils.getBaseDir(context), game.checksum, 0);
         Bitmap bitmap = BitmapFactory.decodeFile(path);
         int w = bitmap.getWidth();
         int h = bitmap.getHeight();
@@ -361,7 +328,6 @@ public class Utils {
         public void setPrefixLen(int len) {
             netmask = 0;
             int n = 31;
-
             for (int i = 0; i < len; i++) {
                 netmask |= ((int) 1) << (n);
                 n--;

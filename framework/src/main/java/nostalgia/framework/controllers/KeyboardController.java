@@ -1,10 +1,9 @@
 package nostalgia.framework.controllers;
 
 import android.content.Context;
+import android.util.SparseIntArray;
 import android.view.KeyEvent;
 import android.view.View;
-
-import java.util.Map;
 
 import nostalgia.framework.Emulator;
 import nostalgia.framework.EmulatorController;
@@ -27,26 +26,23 @@ public class KeyboardController implements EmulatorController {
     public static final int KEY_LOAD_SLOT_1 = 907;
     public static final int KEY_SAVE_SLOT_2 = 908;
     public static final int KEY_LOAD_SLOT_2 = 909;
+
     private static final String TAG = "controller.KeyboardController";
-    public static int KEYS_RIGHT_AND_UP = keysToMultiCode(
-            EmulatorController.KEY_RIGHT, EmulatorController.KEY_UP);
-    public static int KEYS_RIGHT_AND_DOWN = keysToMultiCode(
-            EmulatorController.KEY_RIGHT, EmulatorController.KEY_DOWN);
-    public static int KEYS_LEFT_AND_DOWN = keysToMultiCode(
-            EmulatorController.KEY_LEFT, EmulatorController.KEY_DOWN);
-    public static int KEYS_LEFT_AND_UP = keysToMultiCode(
-            EmulatorController.KEY_LEFT, EmulatorController.KEY_UP);
+    public static int KEYS_RIGHT_AND_UP = keysToMultiCode(EmulatorController.KEY_RIGHT, EmulatorController.KEY_UP);
+    public static int KEYS_RIGHT_AND_DOWN = keysToMultiCode(EmulatorController.KEY_RIGHT, EmulatorController.KEY_DOWN);
+    public static int KEYS_LEFT_AND_DOWN = keysToMultiCode(EmulatorController.KEY_LEFT, EmulatorController.KEY_DOWN);
+    public static int KEYS_LEFT_AND_UP = keysToMultiCode(EmulatorController.KEY_LEFT, EmulatorController.KEY_UP);
+
     String gameHash;
     private int[] tmpKeys = new int[2];
     private boolean[] loadingOrSaving = new boolean[4];
     private EmulatorActivity emulatorActivity;
     private KeyboardProfile profile;
     private Emulator emulator;
-    private Map<Integer, Integer> keyMapping;
+    private SparseIntArray keyMapping;
     private Context context;
 
-    public KeyboardController(Emulator emulator, Context context,
-                              String gameHash, EmulatorActivity activity) {
+    public KeyboardController(Emulator emulator, Context context, String gameHash, EmulatorActivity activity) {
         this.context = context;
         this.gameHash = gameHash;
         this.emulatorActivity = activity;
@@ -66,7 +62,6 @@ public class KeyboardController implements EmulatorController {
     public void onResume() {
         profile = KeyboardProfile.getSelectedProfile(gameHash, context);
         emulator.resetKeys();
-
         for (int i = 0; i < loadingOrSaving.length; i++) {
             loadingOrSaving[i] = false;
         }
@@ -108,18 +103,14 @@ public class KeyboardController implements EmulatorController {
             @Override
             public boolean onKeyDown(int keyCode, KeyEvent event) {
                 int mapValue;
-
                 if (keyCode == KeyEvent.KEYCODE_BACK) {
                     if (event.isAltPressed()) {
                         keyCode = KEY_XPERIA_CIRCLE;
                     }
                 }
-
-                if (profile != null
-                        && (mapValue = profile.keyMap.get(keyCode, -1)) != -1) {
+                if (profile != null && (mapValue = profile.keyMap.get(keyCode, -1)) != -1) {
                     processKey(mapValue, true);
                     return true;
-
                 } else {
                     return super.onKeyDown(keyCode, event);
                 }
@@ -134,13 +125,10 @@ public class KeyboardController implements EmulatorController {
                         keyCode = KEY_XPERIA_CIRCLE;
                     }
                 }
-
-                if (profile != null
-                        && (mapValue = profile.keyMap.get(keyCode, -1)) != -1) {
+                if (profile != null && (mapValue = profile.keyMap.get(keyCode, -1)) != -1) {
                     processKey(mapValue, false);
                     emulatorActivity.hideTouchController();
                     return true;
-
                 } else {
                     return super.onKeyUp(keyCode, event);
                 }
@@ -161,7 +149,6 @@ public class KeyboardController implements EmulatorController {
             if (pressed) {
                 emulatorActivity.finish();
             }
-
         } else if (mapValue == KEY_SAVE_SLOT_0) {
             save(1, pressed);
 

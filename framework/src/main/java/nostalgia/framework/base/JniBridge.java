@@ -41,10 +41,6 @@ public class JniBridge {
 
     public native boolean stop();
 
-    public native boolean setHistoryEnabled(boolean enable);
-
-    public native boolean setHistorySize(int size);
-
     public native int getHistoryItemCount();
 
     public native boolean loadHistoryState(int pos);

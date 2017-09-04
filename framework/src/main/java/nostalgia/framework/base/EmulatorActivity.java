@@ -67,9 +67,9 @@ import nostalgia.framework.utils.NLog;
 import nostalgia.framework.utils.Utils;
 
 
-@SuppressWarnings("deprecation")
 public abstract class EmulatorActivity extends Activity implements
         OnGameMenuListener, EmulatorRunner.OnNotRespondingListener {
+
     public static final String EXTRA_GAME = "game";
     public static final String EXTRA_SLOT = "slot";
     public static final String EXTRA_FROM_GALLERY = "fromGallery";
@@ -83,8 +83,6 @@ public abstract class EmulatorActivity extends Activity implements
     public static String sd;
     private static int oldConfig;
     private final int maxPRC = 10;
-    SparseArray<Pair<Long, Integer>> keyEventHistory = new SparseArray<Pair<Long, Integer>>();
-    SparseArray<Pair<Long, Integer>> keyEventWAMap = new SparseArray<Pair<Long, Integer>>();
     boolean isRestarting;
     boolean canRestart;
     boolean runTimeMachine = false;
@@ -92,7 +90,6 @@ public abstract class EmulatorActivity extends Activity implements
     private GameMenu gameMenu = null;
     private GameDescription game = null;
     private WifiServerInfoTransmitter infoTransmitter = null;
-    private KeyguardLock locker;
     private DynamicDPad dynamic;
     private TouchController touchController = null;
     private boolean autoHide;
@@ -106,6 +103,7 @@ public abstract class EmulatorActivity extends Activity implements
     private List<EmulatorController> controllers;
     private Manager manager;
     private EmulatorView emulatorView;
+
     private BenchmarkCallback benchmarkCallback = new BenchmarkCallback() {
         private int numTests = 0;
         private int numOk = 0;
@@ -115,31 +113,24 @@ public abstract class EmulatorActivity extends Activity implements
         }
 
         @Override
-        public void onBenchmarkEnded(Benchmark benchmark, int steps,
-                                     long totalTime) {
+        public void onBenchmarkEnded(Benchmark benchmark, int steps, long totalTime) {
             float millisPerFrame = totalTime / (float) steps;
             numTests++;
-
             if (benchmark.getName().equals(OPEN_GL_BENCHMARK)) {
                 if (millisPerFrame < 17) {
                     numOk++;
                 }
             }
-
             if (benchmark.getName().equals(EMULATION_BENCHMARK)) {
                 if (millisPerFrame < 17) {
                     numOk++;
                 }
             }
-
             if (numTests == 2) {
                 PreferenceUtil.setBenchmarked(EmulatorActivity.this, true);
-
                 if (numOk == 2) {
                     emulatorView.setQuality(2);
-                    PreferenceUtil
-                            .setEmulationQuality(EmulatorActivity.this, 2);
-
+                    PreferenceUtil.setEmulationQuality(EmulatorActivity.this, 2);
                 } else {
                 }
             }
@@ -182,14 +173,13 @@ public abstract class EmulatorActivity extends Activity implements
 
         try {
             baseDir = EmulatorUtils.getBaseDir(this);
-
         } catch (EmulatorException e) {
             handleException(e);
             exceptionOccurred = true;
             return;
         }
-        NLog.d(TAG, "onCreate - baseActivity");
-        boolean hasOpenGL20 = nostalgia.framework.utils.Utils.checkGL20Support(getApplicationContext());
+        NLog.d(TAG, "onCreate - BaseActivity");
+        boolean hasOpenGL20 = Utils.checkGL20Support(getApplicationContext());
         gameMenu = new GameMenu(this, this);
         game = (GameDescription) getIntent().getSerializableExtra(EXTRA_GAME);
         slotToRun = -1;
@@ -214,23 +204,19 @@ public abstract class EmulatorActivity extends Activity implements
         boolean needsBenchmark = quality != 2 && !alreadyBenchmarked;
 
         if (hasOpenGL20) {
-            openGLView = new OpenGLView(this, emulator, paddingLeft,
-                    paddingTop, shader);
-
+            openGLView = new OpenGLView(this, emulator, paddingLeft, paddingTop, shader);
             if (needsBenchmark) {
-                openGLView.setBenchmark(new Benchmark(OPEN_GL_BENCHMARK, 200,
-                        benchmarkCallback));
+                openGLView.setBenchmark(new Benchmark(OPEN_GL_BENCHMARK, 200, benchmarkCallback));
             }
         }
 
-        emulatorView = openGLView != null ? openGLView : new UnacceleratedView(
-                this, emulator, paddingLeft, paddingTop);
-        controllers = new ArrayList<EmulatorController>();
+        emulatorView = openGLView != null ?
+                openGLView : new UnacceleratedView(this, emulator, paddingLeft, paddingTop);
+        controllers = new ArrayList<>();
         touchController = new TouchController(this);
         controllers.add(touchController);
         touchController.connectToEmulator(0, emulator);
-        dynamic = new DynamicDPad(this, getWindowManager().getDefaultDisplay(),
-                touchController);
+        dynamic = new DynamicDPad(this, getWindowManager().getDefaultDisplay(), touchController);
         controllers.add(dynamic);
         dynamic.connectToEmulator(0, emulator);
         QuickSaveController qsc = new QuickSaveController(this, touchController);
@@ -266,7 +252,7 @@ public abstract class EmulatorActivity extends Activity implements
         LayoutParams params = new LayoutParams(w, h);
         group.setLayoutParams(params);
         group.addView(emulatorView.asView());
-        controllerViews = new ArrayList<View>();
+        controllerViews = new ArrayList<>();
         for (EmulatorController controller : controllers) {
             View controllerView = controller.getView();
             if (controllerView != null) {
@@ -310,8 +296,7 @@ public abstract class EmulatorActivity extends Activity implements
 
         runOnUiThread(new Runnable() {
             public void run() {
-                AlertDialog.Builder builder = new AlertDialog.Builder(
-                        EmulatorActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(EmulatorActivity.this);
                 AlertDialog dialog = builder.setMessage(
                         EmulatorActivity.this.getResources().getString(
                                 R.string.too_slow)).create();
@@ -377,8 +362,7 @@ public abstract class EmulatorActivity extends Activity implements
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                AlertDialog.Builder builder = new AlertDialog.Builder(
-                        EmulatorActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(EmulatorActivity.this);
                 AlertDialog dialog = builder
                         .setMessage(getString(R.string.game_zapper_collision))
                         .setTitle(R.string.warning).create();
@@ -439,7 +423,6 @@ public abstract class EmulatorActivity extends Activity implements
             return;
         }
         pm = null;
-
         if (gameMenu != null && gameMenu.isOpen()) {
             gameMenu.dismiss();
         }
@@ -457,7 +440,6 @@ public abstract class EmulatorActivity extends Activity implements
             handleException(e);
         } finally {
             emulatorView.onPause();
-
             if (infoTransmitter != null) {
                 infoTransmitter.stopSending();
             }
@@ -480,7 +462,6 @@ public abstract class EmulatorActivity extends Activity implements
         if (!isToggleFF) {
             manager.setFastForwardEnabled(false);
         }
-
         isFFPressed = false;
     }
 
@@ -577,15 +558,13 @@ public abstract class EmulatorActivity extends Activity implements
                 break;
         }
 
-        manager.setFastForwardFrameCount(PreferenceUtil
-                .getFastForwardFrameCount(this));
+        manager.setFastForwardFrameCount(PreferenceUtil.getFastForwardFrameCount(this));
 
         if (PreferenceUtil.isDynamicDPADEnable(this)) {
             if (!controllers.contains(dynamic)) {
                 controllers.add(dynamic);
                 controllerViews.add(dynamic.getView());
             }
-
             PreferenceUtil.setDynamicDPADUsed(this, true);
 
         } else {
@@ -649,11 +628,6 @@ public abstract class EmulatorActivity extends Activity implements
             enableCheats();
             infoTransmitter = new WifiServerInfoTransmitter(this, game.name);
             infoTransmitter.startSending();
-
-            if (Build.VERSION.SDK_INT < 13) {
-                locker.reenableKeyguard();
-            }
-
         } catch (EmulatorException e) {
             handleException(e);
         }

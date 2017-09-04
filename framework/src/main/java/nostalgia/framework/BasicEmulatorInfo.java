@@ -74,23 +74,14 @@ abstract public class BasicEmulatorInfo implements EmulatorInfo {
                 "LOAD STATE 2",
                 "SAVE STATE 3",
                 "LOAD STATE 3",
-
                 "MENU", "FAST FORWARD", "EXIT",
         };
 
         if (isMultiPlayerSupported()) {
             String[] res = new String[base.length * 2];
-
-            for (int i = 0; i < base.length; i++) {
-                res[i] = base[i];
-            }
-
-            for (int i = 0; i < base.length; i++) {
-                res[i + base.length] = base[i];
-            }
-
+            System.arraycopy(base, 0, res, 0, base.length);
+            System.arraycopy(base, 0, res, base.length, base.length);
             return res;
-
         } else {
             return base;
         }
@@ -104,16 +95,13 @@ abstract public class BasicEmulatorInfo implements EmulatorInfo {
         for (int i = 0; i < len; i++) {
             if (isMultiPlayerSupported()) {
                 descs[i] = "Player 1";
-
             } else {
                 descs[i] = "";
             }
-
             if (isMultiPlayerSupported() && i >= len / 2) {
                 descs[i] = "Player 2";
             }
         }
-
         return descs;
     }
 

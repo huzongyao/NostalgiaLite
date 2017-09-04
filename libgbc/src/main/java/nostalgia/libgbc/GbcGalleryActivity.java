@@ -16,10 +16,10 @@ public class GbcGalleryActivity extends GalleryActivity {
 
     @Override
     protected Set<String> getRomExtensions() {
-        HashSet<String> exts = new HashSet<String>();
-        exts.add("gb");
-        exts.add("gbc");
-        return exts;
+        HashSet<String> set = new HashSet<>();
+        set.add("gb");
+        set.add("gbc");
+        return set;
     }
 
     @Override
