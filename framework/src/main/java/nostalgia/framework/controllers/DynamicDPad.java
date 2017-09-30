@@ -277,13 +277,15 @@ public class DynamicDPad implements EmulatorController {
                 }
             }
 
-            if (actionMasked == MotionEvent.ACTION_UP || actionMasked == MotionEvent.ACTION_CANCEL
-                    || actionMasked == MotionEvent.ACTION_POINTER_UP) {
-                if (activePointerId != -1 && event.getPointerId(event.getActionIndex()) == activePointerId) {
-                    release();
-                }
+            switch (actionMasked) {
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                case MotionEvent.ACTION_POINTER_UP:
+                    if (activePointerId != -1 && event.getPointerId(event.getActionIndex()) == activePointerId) {
+                        release();
+                    }
+                    break;
             }
-
             return true;
         }
     }

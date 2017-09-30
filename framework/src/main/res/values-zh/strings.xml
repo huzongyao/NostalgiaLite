@@ -77,7 +77,7 @@
     <string name="act_emulator_save_state_failed">无法保存状态</string>
     <string name="act_emulator_load_state_failed">无法加载状态</string>
     <string name="act_emulator_load_game_failed">无法加载游戏</string>
-    <string name="act_game_screenshot_saved">截图保存到：％s</string>
+    <string name="act_game_screenshot_saved">截图保存到：%s</string>
     <string name="act_slot_popup_menu_send">分享状态</string>
     <string name="empty_desc">该组件没有文本描述</string>
     <string name="act_emulator_invalid_cheat">无效的金手指：\'％s\'</string>

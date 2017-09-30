@@ -10,7 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/select_bck_color"
-        app:tabIndicatorColor="@color/colorPrimary" />
+        app:tabIndicatorColor="@color/colorAccent"
+        app:tabMode="scrollable" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/game_gallery_pager"

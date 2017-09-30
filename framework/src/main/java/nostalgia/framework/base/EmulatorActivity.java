@@ -3,7 +3,6 @@ package nostalgia.framework.base;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.KeyguardManager.KeyguardLock;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
@@ -12,13 +11,10 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap.CompressFormat;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
-import android.util.Pair;
-import android.util.SparseArray;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -168,9 +164,7 @@ public abstract class EmulatorActivity extends Activity implements
             setShouldPauseOnResume(false);
             getIntent().removeExtra(EXTRA_FROM_GALLERY);
         }
-
         canRestart = true;
-
         try {
             baseDir = EmulatorUtils.getBaseDir(this);
         } catch (EmulatorException e) {
@@ -193,8 +187,7 @@ public abstract class EmulatorActivity extends Activity implements
         int paddingTop = 0;
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paddingTop = getResources().getDimensionPixelSize(
-                    R.dimen.top_panel_touchcontroler_height);
+            paddingTop = getResources().getDimensionPixelSize(R.dimen.top_panel_touchcontroler_height);
         }
 
         String shader = getFragmentShader();
@@ -221,8 +214,7 @@ public abstract class EmulatorActivity extends Activity implements
         dynamic.connectToEmulator(0, emulator);
         QuickSaveController qsc = new QuickSaveController(this, touchController);
         controllers.add(qsc);
-        KeyboardController kc = new KeyboardController(emulator,
-                getApplicationContext(), game.checksum, this);
+        KeyboardController kc = new KeyboardController(emulator, getApplicationContext(), game.checksum, this);
         RemoteController rc1 = new RemoteController(this);
         RemoteController rc2 = new RemoteController(this);
         RemoteController rc3 = new RemoteController(this);
@@ -642,29 +634,24 @@ public abstract class EmulatorActivity extends Activity implements
         } catch (final EmulatorException e) {
             runOnUiThread(new Runnable() {
                 public void run() {
-                    Toast.makeText(EmulatorActivity.this,
-                            e.getMessage(EmulatorActivity.this),
+                    Toast.makeText(EmulatorActivity.this, e.getMessage(EmulatorActivity.this),
                             Toast.LENGTH_SHORT).show();
                 }
             });
         }
 
         if (numCheats > 0) {
-            Toast.makeText(
-                    this,
-                    String.format(getText(R.string.toast_cheats_enabled)
-                            .toString(), numCheats), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.toast_cheats_enabled, numCheats),
+                    Toast.LENGTH_LONG).show();
         }
     }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-
         if (exceptionOccurred) {
             return;
         }
-
         for (EmulatorController controller : controllers) {
             controller.onGameStarted(game);
         }
@@ -703,7 +690,6 @@ public abstract class EmulatorActivity extends Activity implements
             if (!runTimeMachine) {
                 if (!menu.isOpen()) {
                     manager.resumeEmulation();
-
                     for (EmulatorController controller : controllers) {
                         controller.onGameStarted(game);
                         controller.onResume();
@@ -796,12 +782,9 @@ public abstract class EmulatorActivity extends Activity implements
                 freeStartActivity(this, i);
             } else if (item.id == R.string.game_menu_settings) {
                 Intent i = new Intent(this, GamePreferenceActivity.class);
-
-                if (Build.VERSION.SDK_INT >= 11) {
-                    i.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
-                    i.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
-                            GamePreferenceFragment.class.getName());
-                }
+                i.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
+                i.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
+                        GamePreferenceFragment.class.getName());
                 i.putExtra(GamePreferenceActivity.EXTRA_GAME, game);
                 startActivity(i);
             } else if (item.id == R.string.gallery_menu_pref) {
@@ -830,23 +813,16 @@ public abstract class EmulatorActivity extends Activity implements
                     FileOutputStream fos = new FileOutputStream(to);
                     Utils.createScreenshotBitmap(this, game).compress(CompressFormat.PNG, 90, fos);
                     fos.close();
-                    Toast.makeText(this,
-                            String.format(
-                                    res(R.string.act_game_screenshot_saved),
-                                    to.getAbsolutePath()), Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.act_game_screenshot_saved,
+                            to.getAbsolutePath()), Toast.LENGTH_LONG).show();
                 } catch (IOException e) {
                     NLog.e(TAG, "", e);
-                    throw new EmulatorException(
-                            res(R.string.act_game_screenshot_failed));
+                    throw new EmulatorException(getString(R.string.act_game_screenshot_failed));
                 }
             }
         } catch (EmulatorException e) {
             handleException(e);
         }
-    }
-
-    private String res(int id) {
-        return getResources().getString(id);
     }
 
     @Override
@@ -857,11 +833,9 @@ public abstract class EmulatorActivity extends Activity implements
             case KeyEvent.KEYCODE_MENU:
                 return true;
             case KeyEvent.KEYCODE_BACK:
-
                 if (event.isAltPressed()) {
                     return true;
                 }
-
             case KeyEvent.KEYCODE_HOME:
             case KeyEvent.KEYCODE_VOLUME_DOWN:
             case KeyEvent.KEYCODE_VOLUME_UP:
@@ -883,11 +857,9 @@ public abstract class EmulatorActivity extends Activity implements
                 openGameMenu();
                 return true;
             case KeyEvent.KEYCODE_BACK:
-
                 if (event.isAltPressed()) {
                     return true;
                 }
-
             case KeyEvent.KEYCODE_HOME:
             case KeyEvent.KEYCODE_VOLUME_DOWN:
             case KeyEvent.KEYCODE_VOLUME_UP:

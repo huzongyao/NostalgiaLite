@@ -156,13 +156,11 @@ public class Utils {
                 + outputFile.getAbsolutePath());
         ZipFile zipFile2 = new ZipFile(zipFile);
         ZipEntry ze = zipFile2.getEntry(entryName);
-
         if (ze != null) {
             InputStream zis = zipFile2.getInputStream(ze);
             FileOutputStream fos = new FileOutputStream(outputFile);
-            byte[] buffer = new byte[2048];
-            int count = 0;
-
+            byte[] buffer = new byte[20480];
+            int count;
             while ((count = zis.read(buffer)) != -1) {
                 fos.write(buffer, 0, count);
             }
@@ -229,10 +227,11 @@ public class Utils {
     }
 
     public static boolean isWifiAvailable(Context context) {
-        WifiManager wifii = (WifiManager)
-                context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        WifiInfo wifiInfo = wifii.getConnectionInfo();
-        return (wifii.getWifiState() == WifiManager.WIFI_STATE_ENABLED) & (wifiInfo.getIpAddress() != 0);
+        WifiManager manager = (WifiManager) context.getApplicationContext()
+                .getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wifiInfo = manager.getConnectionInfo();
+        return (manager.getWifiState() == WifiManager.WIFI_STATE_ENABLED)
+                & (wifiInfo.getIpAddress() != 0);
     }
 
     public static InetAddress getBroadcastAddress(Context context) {

@@ -1,32 +1,17 @@
 package nostalgia.framework.base;
 
-import android.app.Activity;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
-import android.net.Uri;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import nostalgia.framework.EmulatorApplication;
 import nostalgia.framework.SlotInfo;
-import nostalgia.framework.ui.gamegallery.GameDescription;
-import nostalgia.framework.utils.FileUtils;
 import nostalgia.framework.utils.NLog;
 
 public class SlotUtils {

@@ -10,7 +10,6 @@ import android.view.inputmethod.InputConnection;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 import nostalgia.framework.Emulator;
 import nostalgia.framework.EmulatorController;

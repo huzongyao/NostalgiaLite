@@ -1226,7 +1226,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                         resetEditElement("");
                     } else {
                         NLog.i(TAG, "Podarilo se najit vhodnou pozici " + ff_bb + " "
-                                        + boundingBoxs[btnIdMap.indexOf(R.id.button_fast_forward)]);
+                                + boundingBoxs[btnIdMap.indexOf(R.id.button_fast_forward)]);
                         for (EditElement elem : editElements) {
                             elem.computeBoundingBox();
                             elem.computeOffsets();

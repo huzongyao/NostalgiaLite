@@ -97,8 +97,7 @@ public class RestarterActivity extends Activity {
                 if (!killed) {
                     try {
                         Thread.sleep(30);
-
-                    } catch (Exception e) {
+                    } catch (Exception ignored) {
                     }
                 }
             }

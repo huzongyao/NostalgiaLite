@@ -1,5 +1,8 @@
 package nostalgia.framework;
 
+/**
+ * Graphic effect
+ */
 public abstract class GfxProfile {
     public String name;
 

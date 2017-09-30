@@ -42,8 +42,8 @@ import nostalgia.framework.utils.NLog;
 import nostalgia.framework.utils.Utils;
 import nostalgia.framework.utils.Utils.ServerType;
 
-public abstract class GalleryActivity extends BaseGameGalleryActivity implements
-        OnItemClickListener, OnGameMenuListener {
+public abstract class GalleryActivity extends BaseGameGalleryActivity
+        implements OnItemClickListener, OnGameMenuListener {
 
     public static final int COMMAND_SEARCHMODE = 1;
     public static final String EXTRA_TABS_IDX = "EXTRA_TABS_IDX";
@@ -126,8 +126,7 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity implements
         switch (requestCode) {
             case REQUEST_IMPORT: {
                 if (resultCode == RESULT_OK) {
-                    SharedPreferences pref = getSharedPreferences(importPref,
-                            MODE_PRIVATE);
+                    SharedPreferences pref = getSharedPreferences(importPref, MODE_PRIVATE);
                     String sSource = data.getStringExtra("PATH");
                     NLog.e(TAG, "PATH:" + sSource);
                     try {

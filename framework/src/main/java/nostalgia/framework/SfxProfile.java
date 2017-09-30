@@ -1,9 +1,11 @@
 package nostalgia.framework;
 
+/**
+ * Sound effect
+ */
 public abstract class SfxProfile {
 
     public String name;
-
     public boolean isStereo;
     public int rate;
     public int bufferSize;

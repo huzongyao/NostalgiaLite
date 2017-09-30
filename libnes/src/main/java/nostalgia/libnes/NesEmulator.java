@@ -4,9 +4,7 @@ import android.util.SparseIntArray;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import nostalgia.framework.BasicEmulatorInfo;
 import nostalgia.framework.EmulatorController;
@@ -14,7 +12,6 @@ import nostalgia.framework.EmulatorInfo;
 import nostalgia.framework.GfxProfile;
 import nostalgia.framework.SfxProfile;
 import nostalgia.framework.SfxProfile.SoundEncoding;
-import nostalgia.framework.base.EmulatorHolder;
 import nostalgia.framework.base.JniBridge;
 import nostalgia.framework.base.JniEmulator;
 import nostalgia.framework.ui.gamegallery.GameDescription;
@@ -114,24 +111,26 @@ public class NesEmulator extends JniEmulator {
     }
 
     private static class Info extends BasicEmulatorInfo {
-        private static List<SfxProfile> sfxProfiles = new ArrayList<SfxProfile>();
-        private static List<GfxProfile> gfxProfiles = new ArrayList<GfxProfile>();
+        private static List<SfxProfile> sfxProfiles = new ArrayList<>();
+        private static List<GfxProfile> gfxProfiles = new ArrayList<>();
         private static GfxProfile pal;
         private static GfxProfile ntsc;
 
         static {
-            pal = new NesGfxProfile();
-            pal.fps = 50;
-            pal.name = "PAL";
-            pal.originalScreenWidth = 256;
-            pal.originalScreenHeight = 240;
             ntsc = new NesGfxProfile();
             ntsc.fps = 60;
             ntsc.name = "NTSC";
             ntsc.originalScreenWidth = 256;
             ntsc.originalScreenHeight = 224;
             gfxProfiles.add(ntsc);
+
+            pal = new NesGfxProfile();
+            pal.fps = 50;
+            pal.name = "PAL";
+            pal.originalScreenWidth = 256;
+            pal.originalScreenHeight = 240;
             gfxProfiles.add(pal);
+
             SfxProfile low = new NesSfxProfile();
             low.name = "low";
             low.bufferSize = 2048 * 8 * 2;
@@ -140,6 +139,7 @@ public class NesEmulator extends JniEmulator {
             low.rate = 11025;
             low.quality = 0;
             sfxProfiles.add(low);
+
             SfxProfile medium = new NesSfxProfile();
             medium.name = "medium";
             medium.bufferSize = 2048 * 8 * 2;
@@ -148,6 +148,7 @@ public class NesEmulator extends JniEmulator {
             medium.rate = 22050;
             medium.quality = 1;
             sfxProfiles.add(medium);
+
             SfxProfile high = new NesSfxProfile();
             high.name = "high";
             high.bufferSize = 2048 * 8 * 2;
