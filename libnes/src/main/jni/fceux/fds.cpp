@@ -18,10 +18,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "types.h"
 #include "x6502.h"
 #include "fceu.h"
@@ -37,10 +33,14 @@
 #include "driver.h"
 #include "movie.h"
 
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+
 //	TODO:  Add code to put a delay in between the time a disk is inserted
 //	and the when it can be successfully read/written to.  This should
 //	prevent writes to wrong places OR add code to prevent disk ejects
-//	when the virtual motor is on(mmm...virtual motor).
+//	when the virtual motor is on (mmm...virtual motor).
 extern int disableBatteryLoading;
 
 bool isFDS = false; //flag for determining if a FDS game is loaded, movie.cpp needs this
@@ -143,20 +143,26 @@ static void FDSInit(void) {
 	SelectDisk = 0;
 }
 
-void FCEU_FDSInsert(void) {
-	if (FCEUI_EmulationPaused()) EmulationPaused |= 2;
+void FCEU_FDSInsert(void)
+{
+	if (TotalSides == 0)
+	{
+		FCEU_DispMessage("Not FDS; can't eject disk.", 0);
+		return;
+	}
+
+	if (FCEUI_EmulationPaused())
+		EmulationPaused |= EMULATIONPAUSED_FA;
 
 	if (FCEUMOV_Mode(MOVIEMODE_RECORD))
 		FCEUMOV_AddCommand(FCEUNPCMD_FDSINSERT);
 
-	if (TotalSides == 0) {
-		FCEU_DispMessage("Not FDS; can't eject disk.", 0);
-		return;
-	}
-	if (InDisk == 255) {
+	if (InDisk == 255)
+	{
 		FCEU_DispMessage("Disk %d Side %s Inserted", 0, SelectDisk >> 1, (SelectDisk & 1) ? "B" : "A");
 		InDisk = SelectDisk;
-	} else {
+	} else
+	{
 		FCEU_DispMessage("Disk %d Side %s Ejected", 0, SelectDisk >> 1, (SelectDisk & 1) ? "B" : "A");
 		InDisk = 255;
 	}
@@ -167,20 +173,25 @@ void FCEU_FDSEject(void)
 InDisk=255;
 }
 */
-void FCEU_FDSSelect(void) {
-	if (FCEUI_EmulationPaused()) EmulationPaused |= 2;
+void FCEU_FDSSelect(void)
+{
+	if (TotalSides == 0)
+	{
+		FCEU_DispMessage("Not FDS; can't select disk.", 0);
+		return;
+	}
+	if (InDisk != 255)
+	{
+		FCEU_DispMessage("Eject disk before selecting.", 0);
+		return;
+	}
+
+	if (FCEUI_EmulationPaused())
+		EmulationPaused |= EMULATIONPAUSED_FA;
 
 	if (FCEUMOV_Mode(MOVIEMODE_RECORD))
 		FCEUMOV_AddCommand(FCEUNPCMD_FDSSELECT);
 
-	if (TotalSides == 0) {
-		FCEU_DispMessage("Not FDS; can't select disk.", 0);
-		return;
-	}
-	if (InDisk != 255) {
-		FCEU_DispMessage("Eject disk before selecting.", 0);
-		return;
-	}
 	SelectDisk = ((SelectDisk + 1) % TotalSides) & 3;
 	FCEU_DispMessage("Disk %d Side %c Selected", 0, SelectDisk >> 1, (SelectDisk & 1) ? 'B' : 'A');
 }

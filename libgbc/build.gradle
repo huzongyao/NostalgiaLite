@@ -13,7 +13,7 @@ model {
         }
 
         ndk {
-            moduleName "nostalgia"
+            moduleName "gbc"
             abiFilters.addAll(['armeabi', 'armeabi-v7a', 'x86'])
             platformVersion 18
             stl = "gnustl_static"

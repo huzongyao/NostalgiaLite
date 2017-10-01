@@ -18,33 +18,25 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <android/log.h>
-#define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE,"NOSTALIGIA.NES", __VA_ARGS__)
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG  ,"NOSTALIGIA.NES", __VA_ARGS__)
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO   ,"NOSTALIGIA.NES", __VA_ARGS__)
-#define LOGW(...) __android_log_print(ANDROID_LOG_WARN   ,"NOSTALIGIA.NES", __VA_ARGS__)
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR  ,"NOSTALIGIA.NES", __VA_ARGS__)
-
-
-#include <stdio.h>
-#include <limits.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdarg.h>
+#include <cstdio>
+#include <climits>
+#include <cstdlib>
+#include <cstring>
+#include <cstdarg>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fstream>
-
-#ifndef WIN32
-#include <zlib.h>
-#endif
 
 #include "types.h"
 #include "file.h"
 #include "utils/endian.h"
 #include "utils/memory.h"
 #include "utils/md5.h"
+#ifdef _SYSTEM_MINIZIP
+#include <minizip/unzip.h>
+#else
 #include "utils/unzip.h"
+#endif
 #include "driver.h"
 #include "types.h"
 #include "fceu.h"
@@ -53,11 +45,14 @@
 #include "driver.h"
 #include "utils/xstring.h"
 
+#ifndef WIN32
+#include <zlib.h>
+#endif
+
 using namespace std;
 
 bool bindSavestate = true;	//Toggle that determines if a savestate filename will include the movie filename
 static std::string BaseDirectory;
-
 static char FileExt[2048];	//Includes the . character, as in ".nes"
 char FileBase[2048];
 static char FileBaseDirectory[2048];
@@ -153,7 +148,7 @@ end:
 
 std::string FCEU_MakeIpsFilename(FileBaseInfo fbi) {
 	char ret[FILENAME_MAX] = "";
-	sprintf(ret,"%s"PSS"%s%s.ips",fbi.filebasedirectory.c_str(),fbi.filebase.c_str(),fbi.ext.c_str());
+	sprintf(ret,"%s" PSS "%s%s.ips",fbi.filebasedirectory.c_str(),fbi.filebase.c_str(),fbi.ext.c_str());
 	return ret;
 }
 
@@ -265,7 +260,7 @@ FCEUFILE * FCEU_fopen(const char *path, const char *ipsfn, char *mode, char *ext
 {
 	FILE *ipsfile=0;
 	FCEUFILE *fceufp=0;
-	// LOGE("fceu_open 1");
+
 	bool read = (std::string)mode == "rb";
 	bool write = (std::string)mode == "wb";
 	if((read&&write) || (!read&&!write))
@@ -273,18 +268,16 @@ FCEUFILE * FCEU_fopen(const char *path, const char *ipsfn, char *mode, char *ext
 		FCEU_PrintError("invalid file open mode specified (only wb and rb are supported)");
 		return 0;
 	}
-	//LOGE("fceu_open 2");
+
 	std::string archive,fname,fileToOpen;
 	FCEU_SplitArchiveFilename(path,archive,fname,fileToOpen);
-	//LOGE("fceu_open 3");
+
 
 	//try to setup the ips file
 	if(ipsfn && read)
 		ipsfile=FCEUD_UTF8fopen(ipsfn,"rb");
-	//LOGE("fceu_open 4");
 	if(read)
 	{
-		//LOGE("fceu_open 5");
 		ArchiveScanRecord asr = FCEUD_ScanArchive(fileToOpen);
 		asr.files.FilterByExtension(extensions);
 		if(!asr.isArchive())
@@ -308,7 +301,7 @@ FCEUFILE * FCEU_fopen(const char *path, const char *ipsfn, char *mode, char *ext
 					goto applyips;
 				}
 			}
-			//LOGE("fceu_open 6");
+
 			//try to read a gzipped file
 			{
 				uint32 magic;
@@ -344,7 +337,7 @@ FCEUFILE * FCEU_fopen(const char *path, const char *ipsfn, char *mode, char *ext
 				}
 			}
 
-			//LOGE("fceu_open 7");
+
 			//open a plain old file
 			fceufp = new FCEUFILE();
 			fceufp->filename = fileToOpen;
@@ -359,7 +352,6 @@ FCEUFILE * FCEU_fopen(const char *path, const char *ipsfn, char *mode, char *ext
 		}
 		else
 		{
-			//LOGE("fceu_open 8");
 			//open an archive file
 			if(archive == "")
 				if(index != -1)
@@ -373,18 +365,14 @@ FCEUFILE * FCEU_fopen(const char *path, const char *ipsfn, char *mode, char *ext
 
 			FileBaseInfo fbi = DetermineFileBase(fileToOpen);
 			fceufp->logicalPath = fbi.filebasedirectory + fceufp->filename;
-			//LOGE("fceu_open 9");
 			goto applyips;
-
 		}
 
 	applyips:
-		//LOGE("fceu_open 10");
 		//try to open the ips file
 		if(!ipsfile && !ipsfn)
 			ipsfile=FCEUD_UTF8fopen(FCEU_MakeIpsFilename(DetermineFileBase(fceufp->logicalPath.c_str())),"rb");
 		ApplyIPS(ipsfile,fceufp);
-		//LOGE("fceu_open 11");
 		return fceufp;
 	}
 	return 0;
@@ -618,9 +606,9 @@ std::string FCEU_MakeFName(int type, int id1, const char *cd1)
 			struct stat fileInfo;
 			do {
 				if(odirs[FCEUIOD_MOVIES])
-					sprintf(ret,"%s"PSS"%s-%d.fm2",odirs[FCEUIOD_MOVIES],FileBase, id1);
+					sprintf(ret,"%s" PSS "%s-%d.fm2",odirs[FCEUIOD_MOVIES],FileBase, id1);
 				else
-					sprintf(ret,"%s"PSS"movies"PSS"%s-%d.fm2",BaseDirectory.c_str(),FileBase, id1);
+					sprintf(ret,"%s" PSS "movies" PSS "%s-%d.fm2",BaseDirectory.c_str(),FileBase, id1);
 				id1++;
 			} while (stat(ret, &fileInfo) == 0);
 			break;
@@ -644,19 +632,19 @@ std::string FCEU_MakeFName(int type, int id1, const char *cd1)
 
 				if(odirs[FCEUIOD_STATES])
 				{
-					sprintf(ret,"%s"PSS"%s%s.fc%d",odirs[FCEUIOD_STATES],FileBase,mfn,id1);
+					sprintf(ret,"%s" PSS "%s%s.fc%d",odirs[FCEUIOD_STATES],FileBase,mfn,id1);
 				} else
 				{
-					sprintf(ret,"%s"PSS"fcs"PSS"%s%s.fc%d",BaseDirectory.c_str(),FileBase,mfn,id1);
+					sprintf(ret,"%s" PSS "fcs" PSS "%s%s.fc%d",BaseDirectory.c_str(),FileBase,mfn,id1);
 				}
 				if(stat(ret,&tmpstat)==-1)
 				{
 					if(odirs[FCEUIOD_STATES])
 					{
-						sprintf(ret,"%s"PSS"%s%s.fc%d",odirs[FCEUIOD_STATES],FileBase,mfn,id1);
+						sprintf(ret,"%s" PSS "%s%s.fc%d",odirs[FCEUIOD_STATES],FileBase,mfn,id1);
 					} else
 					{
-						sprintf(ret,"%s"PSS"fcs"PSS"%s%s.fc%d",BaseDirectory.c_str(),FileBase,mfn,id1);
+						sprintf(ret,"%s" PSS "fcs" PSS "%s%s.fc%d",BaseDirectory.c_str(),FileBase,mfn,id1);
 					}
 				}
 			}
@@ -665,49 +653,47 @@ std::string FCEU_MakeFName(int type, int id1, const char *cd1)
 			{
 				if(odirs[FCEUIOD_STATES])
 				{
-					sprintf(ret,"%s"PSS"%s-resume.fcs",odirs[FCEUIOD_STATES],FileBase);
+					sprintf(ret,"%s" PSS "%s-resume.fcs",odirs[FCEUIOD_STATES],FileBase);
 				} else
 				{
-					sprintf(ret,"%s"PSS"fcs"PSS"%s-resume.fcs",BaseDirectory.c_str(),FileBase);
+					sprintf(ret,"%s" PSS "fcs" PSS "%s-resume.fcs",BaseDirectory.c_str(),FileBase);
 				}
 				if(stat(ret,&tmpstat)==-1)
 				{
 					if(odirs[FCEUIOD_STATES])
 					{
-						sprintf(ret,"%s"PSS"%s-resume.fcs",odirs[FCEUIOD_STATES],FileBase);
+						sprintf(ret,"%s" PSS "%s-resume.fcs",odirs[FCEUIOD_STATES],FileBase);
 					} else
 					{
-						sprintf(ret,"%s"PSS"fcs"PSS"%s-resume.fcs",BaseDirectory.c_str(),FileBase);
+						sprintf(ret,"%s" PSS "fcs" PSS "%s-resume.fcs",BaseDirectory.c_str(),FileBase);
 					}
 				}
 			}
 			break;
 		case FCEUMKF_SNAP:
 			if(odirs[FCEUIOD_SNAPS])
-				sprintf(ret,"%s"PSS"%s-%d.%s",odirs[FCEUIOD_SNAPS],FileBase,id1,cd1);
+				sprintf(ret,"%s" PSS "%s-%d.%s",odirs[FCEUIOD_SNAPS],FileBase,id1,cd1);
 			else
-				sprintf(ret,"%s"PSS"snaps"PSS"%s-%d.%s",BaseDirectory.c_str(),FileBase,id1,cd1);
+				sprintf(ret,"%s" PSS "snaps" PSS "%s-%d.%s",BaseDirectory.c_str(),FileBase,id1,cd1);
 			break;
 		case FCEUMKF_FDS:
 			if(odirs[FCEUIOD_NV])
-				sprintf(ret,"%s"PSS"%s.fds",odirs[FCEUIOD_NV],FileBase);
+				sprintf(ret,"%s" PSS "%s.fds",odirs[FCEUIOD_NV],FileBase);
 			else
-				sprintf(ret,"%s"PSS"sav"PSS"%s.fds",BaseDirectory.c_str(),FileBase);
+				sprintf(ret,"%s" PSS "sav" PSS "%s.fds",BaseDirectory.c_str(),FileBase);
 			break;
 		case FCEUMKF_SAV:
-
-			sprintf(ret,"%s/%s.%s",/*FileBaseDirectory*/BatterySaveDir.c_str(), FileBase,cd1);
-			/*if(odirs[FCEUIOD_NV])
-				sprintf(ret,"%s"PSS"%s.%s",odirs[FCEUIOD_NV],FileBase,cd1);
+			if(odirs[FCEUIOD_NV])
+				sprintf(ret,"%s" PSS "%s.%s",odirs[FCEUIOD_NV],FileBase,cd1);
 			else
-				sprintf(ret,"%s"PSS"sav"PSS"%s.%s",BaseDirectory.c_str(),FileBase,cd1);
+				sprintf(ret,"%s" PSS "sav" PSS "%s.%s",BaseDirectory.c_str(),FileBase,cd1);
 			if(stat(ret,&tmpstat)==-1)
 			{
 				if(odirs[FCEUIOD_NV])
-					sprintf(ret,"%s"PSS"%s.%s",odirs[FCEUIOD_NV],FileBase,cd1);
+					sprintf(ret,"%s" PSS "%s.%s",odirs[FCEUIOD_NV],FileBase,cd1);
 				else
-					sprintf(ret,"%s"PSS"sav"PSS"%s.%s",BaseDirectory.c_str(),FileBase,cd1);
-			}*/
+					sprintf(ret,"%s" PSS "sav" PSS "%s.%s",BaseDirectory.c_str(),FileBase,cd1);
+			}
 			break;
 		case FCEUMKF_AUTOSTATE:
 			mfnString = GetMfn();
@@ -724,52 +710,52 @@ std::string FCEU_MakeFName(int type, int id1, const char *cd1)
 
 			if(odirs[FCEUIOD_STATES])
 			{
-				sprintf(ret,"%s"PSS"%s%s-autosave%d.fcs",odirs[FCEUIOD_STATES],FileBase,mfn,id1);
+				sprintf(ret,"%s" PSS "%s%s-autosave%d.fcs",odirs[FCEUIOD_STATES],FileBase,mfn,id1);
 			} else
 			{
-				sprintf(ret,"%s"PSS"fcs"PSS"%s%s-autosave%d.fcs",BaseDirectory.c_str(),FileBase,mfn,id1);
+				sprintf(ret,"%s" PSS "fcs" PSS "%s%s-autosave%d.fcs",BaseDirectory.c_str(),FileBase,mfn,id1);
 			}
 			if(stat(ret,&tmpstat)==-1)
 			{
 				if(odirs[FCEUIOD_STATES])
 				{
-					sprintf(ret,"%s"PSS"%s%s-autosave%d.fcs",odirs[FCEUIOD_STATES],FileBase,mfn,id1);
+					sprintf(ret,"%s" PSS "%s%s-autosave%d.fcs",odirs[FCEUIOD_STATES],FileBase,mfn,id1);
 				} else
 				{
-					sprintf(ret,"%s"PSS"fcs"PSS"%s%s-autosave%d.fcs",BaseDirectory.c_str(),FileBase,mfn,id1);
+					sprintf(ret,"%s" PSS "fcs" PSS "%s%s-autosave%d.fcs",BaseDirectory.c_str(),FileBase,mfn,id1);
 				}
 			}
 			break;
 		case FCEUMKF_CHEAT:
 			if(odirs[FCEUIOD_CHEATS])
-				sprintf(ret,"%s"PSS"%s.cht",odirs[FCEUIOD_CHEATS],FileBase);
+				sprintf(ret,"%s" PSS "%s.cht",odirs[FCEUIOD_CHEATS],FileBase);
 			else
-				sprintf(ret,"%s"PSS"cheats"PSS"%s.cht",BaseDirectory.c_str(),FileBase);
+				sprintf(ret,"%s" PSS "cheats" PSS "%s.cht",BaseDirectory.c_str(),FileBase);
 			break;
 		case FCEUMKF_IPS:
 			strcpy(ret,FCEU_MakeIpsFilename(CurrentFileBase()).c_str());
 			break;
-		case FCEUMKF_GGROM:sprintf(ret,"%s"PSS"gg.rom",BaseDirectory.c_str());break;
+		case FCEUMKF_GGROM:sprintf(ret,"%s" PSS "gg.rom",BaseDirectory.c_str());break;
 		case FCEUMKF_FDSROM:
 			if(odirs[FCEUIOD_FDSROM])
-				sprintf(ret,"%s"PSS"disksys.rom",odirs[FCEUIOD_FDSROM]);
+				sprintf(ret,"%s" PSS "disksys.rom",odirs[FCEUIOD_FDSROM]);
 			else
-				sprintf(ret,"%s"PSS"disksys.rom",BaseDirectory.c_str());
+				sprintf(ret,"%s" PSS "disksys.rom",BaseDirectory.c_str());
 			break;
-		case FCEUMKF_PALETTE:sprintf(ret,"%s"PSS"%s.pal",BaseDirectory.c_str(),FileBase);break;
+		case FCEUMKF_PALETTE:sprintf(ret,"%s" PSS "%s.pal",BaseDirectory.c_str(),FileBase);break;
 		case FCEUMKF_MOVIEGLOB:
 			//these globs use ??? because we can load multiple formats
 			if(odirs[FCEUIOD_MOVIES])
-				sprintf(ret,"%s"PSS"*.???",odirs[FCEUIOD_MOVIES]);
+				sprintf(ret,"%s" PSS "*.???",odirs[FCEUIOD_MOVIES]);
 			else
-				sprintf(ret,"%s"PSS"movies"PSS"*.???",BaseDirectory.c_str());
+				sprintf(ret,"%s" PSS "movies" PSS "*.???",BaseDirectory.c_str());
 			break;
-		case FCEUMKF_MOVIEGLOB2:sprintf(ret,"%s"PSS"*.???",BaseDirectory.c_str());break;
+		case FCEUMKF_MOVIEGLOB2:sprintf(ret,"%s" PSS "*.???",BaseDirectory.c_str());break;
 		case FCEUMKF_STATEGLOB:
 			if(odirs[FCEUIOD_STATES])
-				sprintf(ret,"%s"PSS"%s*.fc?",odirs[FCEUIOD_STATES],FileBase);
+				sprintf(ret,"%s" PSS "%s*.fc?",odirs[FCEUIOD_STATES],FileBase);
 			else
-				sprintf(ret,"%s"PSS"fcs"PSS"%s*.fc?",BaseDirectory.c_str(),FileBase);
+				sprintf(ret,"%s" PSS "fcs" PSS "%s*.fc?",BaseDirectory.c_str(),FileBase);
 			break;
 	}
 

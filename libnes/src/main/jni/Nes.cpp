@@ -1,22 +1,16 @@
 #include <jni.h>
-#include <android/log.h>
 #include <android/bitmap.h>
 #include "fceux/driver.h"
 #include "fceux/state.h"
 #include "fceux/fceu.h"
 #include "Emulator.h"
 #include "Bridge.h"
+#include "fceux/android_log.h"
 
 extern "C" {
 
 using namespace std;
 using namespace emudroid;
-
-#define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE,"NOSTALIGIA.NES", __VA_ARGS__)
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG  ,"NOSTALIGIA.NES", __VA_ARGS__)
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO   ,"NOSTALIGIA.NES", __VA_ARGS__)
-#define LOGW(...) __android_log_print(ANDROID_LOG_WARN   ,"NOSTALIGIA.NES", __VA_ARGS__)
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR  ,"NOSTALIGIA.NES", __VA_ARGS__)
 
 #define WIDTH 256
 #define HEIGHT_PAL 240
@@ -31,7 +25,7 @@ private:
     bool stereo;
 public:
     NesEmulator() {
-        LOGE("CONSTRUCTOR");
+        LOGE("NesEmulator Constructor");
         pads = 0;
         inited = false;
         gfxBuf = NULL;
@@ -221,10 +215,8 @@ public:
                 && (cType == 1)) {
                 return true;
             }
-
             i++;
         }
-
         return FCEUI_AddCheat(name, ggAddr, ggVal, ggComp, 1);
     }
 
@@ -420,23 +412,19 @@ FILE *FCEUD_UTF8fopen(const char *fn, const char *mode) {
 
 EMUFILE_FILE *FCEUD_UTF8_fstream(const char *n, const char *m) {
     EMUFILE_FILE *f = new EMUFILE_FILE(n, m);
-
     if (!f->is_open()) {
         delete f;
         return NULL;
-
     } else {
         return f;
     }
 }
 
-FCEUFILE *FCEUD_OpenArchiveIndex(ArchiveScanRecord &asr, std::string &fname,
-                                 int innerIndex) {
+FCEUFILE *FCEUD_OpenArchiveIndex(ArchiveScanRecord &asr, std::string &fname, int innerIndex) {
     return NULL;
 }
 
-FCEUFILE *FCEUD_OpenArchive(ArchiveScanRecord &asr, std::string &fname,
-                            std::string *innerFilename) {
+FCEUFILE *FCEUD_OpenArchive(ArchiveScanRecord &asr, std::string &fname, std::string *innerFilename) {
     return NULL;
 }
 
@@ -460,9 +448,11 @@ void FCEUD_GetPalette(uint8 i, uint8 *r, uint8 *g, uint8 *b) {
 
 
 void FCEUD_PrintError(const char *s) {
+    LOGE(s);
 }
 
 void FCEUD_Message(const char *s) {
+    LOGI(s);
 }
 
 
@@ -536,8 +526,7 @@ void FCEUD_LoadStateFrom(void) {
 }
 
 
-void FCEUD_SetInput(bool fourscore, bool microphone, ESI port0, ESI port1,
-                    ESIFC fcexp) {
+void FCEUD_SetInput(bool fourscore, bool microphone, ESI port0, ESI port1, ESIFC fcexp) {
 }
 
 void FCEUD_MovieRecordTo(void) {

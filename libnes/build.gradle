@@ -13,13 +13,14 @@ model {
         }
 
         ndk {
-            moduleName "nostalgia"
+            moduleName "nes"
             platformVersion 18
             abiFilters.addAll(['armeabi', 'armeabi-v7a', 'x86'])
             stl = "gnustl_static"
             cppFlags.addAll(['-DPSS_STYLE=1', '-DHAVE_ASPRINTF', '-DLSB_FIRST', '-DFRAMESKIP',
-                             '-D_STLP_HAS_WCHAR_T', '-D_GLIBCXX_USE_WCHAR_T', '-Wno-write-strings',
-                             '-Ofast', '-ffast-math', '-fexceptions', '-frtti', '-fno-builtin-sin',
+                             '-DIOAPI_NO_64','-DNDK_DEBUG', '-D_STLP_HAS_WCHAR_T',
+                             '-D_GLIBCXX_USE_WCHAR_T', '-Wno-write-strings', '-Ofast',
+                             '-ffast-math', '-fexceptions', '-frtti', '-fno-builtin-sin',
                              '-fno-builtin-cos', '-fmerge-all-constants', '-fvisibility=hidden',
                              '-fvisibility-inlines-hidden', '-funroll-loops'])
             ldLibs.addAll(['z', 'log', 'jnigraphics', 'GLESv1_CM'])

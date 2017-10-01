@@ -21,19 +21,6 @@
 /// \file
 /// \brief This file contains all code for coordinating the mapping in of the address space external to the NES.
 
-#include <android/log.h>
-#define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE,"NOSTALIGIA.NES", __VA_ARGS__)
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG  ,"NOSTALIGIA.NES", __VA_ARGS__)
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO   ,"NOSTALIGIA.NES", __VA_ARGS__)
-#define LOGW(...) __android_log_print(ANDROID_LOG_WARN   ,"NOSTALIGIA.NES", __VA_ARGS__)
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR  ,"NOSTALIGIA.NES", __VA_ARGS__)
-
-
-
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <limits.h>
 #include "types.h"
 #include "fceu.h"
 #include "ppu.h"
@@ -46,6 +33,11 @@
 #include "utils/memory.h"
 
 
+#include <cstring>
+#include <cstdlib>
+#include <cstdio>
+#include <climits>
+
 uint8 *Page[32], *VPage[8];
 uint8 **VPageR = VPage;
 uint8 *VPageG[8];
@@ -55,8 +47,8 @@ uint8 *MMC5BGVPage[8];
 static uint8 PRGIsRAM[32];  /* This page is/is not PRG RAM. */
 
 /* 16 are (sort of) reserved for UNIF/iNES and 16 to map other stuff. */
-static int CHRram[32];
-static int PRGram[32];
+uint8 CHRram[32];
+uint8 PRGram[32];
 
 uint8 *PRGptr[32];
 uint8 *CHRptr[32];
@@ -348,40 +340,48 @@ static uint8 *GENIEROM = 0;
 
 void FixGenieMap(void);
 
-// Called when a game(file) is opened successfully.
-void FCEU_OpenGenie(void) {
+// Called when a game(file) is opened successfully. Returns TRUE on error.
+bool FCEU_OpenGenie(void)
+{
 	FILE *fp;
 	int x;
 
-	if (!GENIEROM) {
+	if (!GENIEROM)
+	{
 		char *fn;
 
-		if (!(GENIEROM = (uint8*)FCEU_malloc(4096 + 1024))) return;
+		if (!(GENIEROM = (uint8*)FCEU_malloc(4096 + 1024)))
+			return true;
 
 		fn = strdup(FCEU_MakeFName(FCEUMKF_GGROM, 0, 0).c_str());
 		fp = FCEUD_UTF8fopen(fn, "rb");
-		if (!fp) {
-			FCEU_PrintError("Error opening Game Genie ROM image!");
+		if (!fp)
+		{
+			FCEU_PrintError("Error opening Game Genie ROM image!\nIt should be named \"gg.rom\"!");
 			free(GENIEROM);
 			GENIEROM = 0;
-			return;
+			return true;
 		}
-		if (fread(GENIEROM, 1, 16, fp) != 16) {
+		if (fread(GENIEROM, 1, 16, fp) != 16)
+		{
  grerr:
 			FCEU_PrintError("Error reading from Game Genie ROM image!");
 			free(GENIEROM);
 			GENIEROM = 0;
 			fclose(fp);
-			return;
+			return true;
 		}
-		if (GENIEROM[0] == 0x4E) { /* iNES ROM image */
+		if (GENIEROM[0] == 0x4E)
+		{
+			/* iNES ROM image */
 			if (fread(GENIEROM, 1, 4096, fp) != 4096)
 				goto grerr;
 			if (fseek(fp, 16384 - 4096, SEEK_CUR))
 				goto grerr;
 			if (fread(GENIEROM + 4096, 1, 256, fp) != 256)
 				goto grerr;
-		} else {
+		} else
+		{
 			if (fread(GENIEROM + 16, 1, 4352 - 16, fp) != (4352 - 16))
 				goto grerr;
 		}
@@ -389,10 +389,13 @@ void FCEU_OpenGenie(void) {
 
 		/* Workaround for the FCE Ultra CHR page size only being 1KB */
 		for (x = 0; x < 4; x++)
+		{
 			memcpy(GENIEROM + 4096 + (x << 8), GENIEROM + 4096, 256);
+		}
 	}
 
 	geniestage = 1;
+	return false;
 }
 
 /* Called when a game is closed. */
@@ -534,8 +537,6 @@ void FCEU_SaveGameSave(CartInfo *LocalHWInfo) {
 		FILE *sp;
 
 		std::string soot = FCEU_MakeFName(FCEUMKF_SAV, 0, "sav");
-
-
 		if ((sp = FCEUD_UTF8fopen(soot, "wb")) == NULL) {
 			FCEU_PrintError("WRAM file \"%s\" cannot be written to.\n", soot.c_str());
 		} else {
@@ -544,8 +545,6 @@ void FCEU_SaveGameSave(CartInfo *LocalHWInfo) {
 					fwrite(LocalHWInfo->SaveGame[x], 1,
 						   LocalHWInfo->SaveGameLen[x], sp);
 				}
-
-			fclose(sp); // !!!
 		}
 	}
 }
@@ -556,19 +555,15 @@ int disableBatterySaving = 0;
 const char* batterySaveDir;
 
 void FCEU_LoadGameSave(CartInfo *LocalHWInfo) {
-
 	if (LocalHWInfo->battery && LocalHWInfo->SaveGame[0] && !disableBatteryLoading) {
 		FILE *sp;
 
 		std::string soot = FCEU_MakeFName(FCEUMKF_SAV, 0, "sav");
-		LOGE("loading %s", soot.c_str());
 		sp = FCEUD_UTF8fopen(soot, "rb");
 		if (sp != NULL) {
-			for (int x = 0; x < 4; x++) {
-				if (LocalHWInfo->SaveGame[x]) {
+			for (int x = 0; x < 4; x++)
+				if (LocalHWInfo->SaveGame[x])
 					fread(LocalHWInfo->SaveGame[x], 1, LocalHWInfo->SaveGameLen[x], sp);
-				}
-			}
 		}
 	}
 }

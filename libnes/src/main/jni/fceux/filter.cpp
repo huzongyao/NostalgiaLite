@@ -1,16 +1,17 @@
 /// \file
 /// \brief Sound filtering code
 
-#include <math.h>
-#include <stdio.h>
 #include "types.h"
 
 #include "sound.h"
 #include "x6502.h"
 #include "fceu.h"
 #include "filter.h"
-#include <jni.h>
+
 #include "fcoeffs.h"
+
+#include <cmath>
+#include <cstdio>
 
 static int32 sq2coeffs[SQ2NCOEFFS];
 static int32 coeffs[NCOEFFS];
@@ -47,47 +48,32 @@ void SexyFilter2(int32 *in, int32 count)
  }
 }
 
-static int32 mul1,mul2,vmul;
-static int ttr = 0;
-
-
-void initFilter(){
-	ttr = 0;
-
-}
-
 void SexyFilter(int32 *in, int32 *out, int32 count)
 {
  static int64 acc1=0,acc2=0;
+ int32 mul1,mul2,vmul;
 
- if (ttr == 0) {
-	 ttr = 1;
-	 mul1=(94<<16)/FSettings.SndRate;
-	 mul2=(24<<16)/FSettings.SndRate;
-	 vmul=(FSettings.SoundVolume<<16)*3/4/100;
-	 //FCEU_DispMessage("SoundVolume %d, vmul %d",0,FSettings.SoundVolume,vmul);
-	  if(FSettings.soundq) vmul/=4;
-	  else vmul*=6;			/* TODO:  Increase volume in low quality sound rendering code itself */
+ mul1=(94<<16)/FSettings.SndRate;
+ mul2=(24<<16)/FSettings.SndRate;
+ vmul=(FSettings.SoundVolume<<16)*3/4/100;
 
-}
-
-
-
+ //FCEU_DispMessage("SoundVolume %d, vmul %d",0,FSettings.SoundVolume,vmul);
+ if(FSettings.soundq) vmul/=4;
+ else vmul*=2;			/* TODO:  Increase volume in low quality sound rendering code itself */
 
  while(count)
  {
-
   int64 ino=(int64)*in*vmul;
   acc1+=((ino-acc1)*mul1)>>16;
   acc2+=((ino-acc1-acc2)*mul2)>>16;
-//  //printf("%d ",*in);
+  //printf("%d ",*in);
   *in=0;
   {
    int32 t=(acc1-ino+acc2)>>16;
-    // if(t>32767 || t<-32768) printf("Flow: %d\n",t);
+   //if(t>32767 || t<-32768) printf("Flow: %d\n",t);
    if(t>32767) t=32767;
    if(t<-32768) t=-32768;
-   *out = t;
+   *out=t;
   }
   in++;
   out++;

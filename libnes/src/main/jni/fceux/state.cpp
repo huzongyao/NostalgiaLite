@@ -20,15 +20,6 @@
 
 //  TODO: Add (better) file io error checking
 
-#include <string>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-//#include <unistd.h> //mbg merge 7/17/06 removed
-#include <jni.h>
-#include <vector>
-#include <fstream>
-
 #include "version.h"
 #include "types.h"
 #include "x6502.h"
@@ -57,6 +48,15 @@
 #include "drivers/win/ram_search.h"
 #include "drivers/win/ramwatch.h"
 #endif
+
+#include <string>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+//#include <unistd.h> //mbg merge 7/17/06 removed
+
+#include <vector>
+#include <fstream>
 
 using namespace std;
 
@@ -100,14 +100,16 @@ extern SFORMAT FCEUSND_STATEINFO[];
 extern SFORMAT FCEUCTRL_STATEINFO[];
 extern SFORMAT FCEUMOV_STATEINFO[];
 
+//why two separate CPU structs?? who knows
 
 SFORMAT SFCPU[]={
 	{ &X.PC, 2|RLSB, "PC\0"},
 	{ &X.A, 1, "A\0\0"},
-	{ &X.P, 1, "P\0\0"},
 	{ &X.X, 1, "X\0\0"},
 	{ &X.Y, 1, "Y\0\0"},
 	{ &X.S, 1, "S\0\0"},
+	{ &X.P, 1, "P\0\0"},
+	{ &X.DB, 1, "DB"},
 	{ &RAM, 0x800 | FCEUSTATE_INDIRECT, "RAM", },
 	{ 0 }
 };
@@ -278,7 +280,10 @@ static bool ReadStateChunks(EMUFILE* is, int32 totalsize)
 					ret=false;
 			}
 			break;
-		case 0x10:if(!ReadStateChunk(is,SFMDATA,size)) ret=false; break;
+		case 0x10:
+			if(!ReadStateChunk(is,SFMDATA,size)) 
+				ret=false; 
+			break;
 
 			// now it gets hackier:
 		case 5:
@@ -446,14 +451,15 @@ bool FCEUSS_SaveMS(EMUFILE* outstream, int compressionLevel)
 }
 
 
-void FCEUSS_Save(const char *fname)
+void FCEUSS_Save(const char *fname, bool display_message)
 {
 	EMUFILE* st = 0;
 	char fn[2048];
 
-	if(geniestage==1)
+	if (geniestage==1)
 	{
-		FCEU_DispMessage("Cannot save FCS in GG screen.",0);
+		if (display_message)
+			FCEU_DispMessage("Cannot save FCS in GG screen.",0);
 		return;
 	}
 
@@ -480,9 +486,10 @@ void FCEUSS_Save(const char *fname)
 		st = FCEUD_UTF8_fstream(fn,"wb");
 	}
 
-	if(st == NULL || st->get_fp() == NULL)
+	if (st == NULL || st->get_fp() == NULL)
 	{
-		FCEU_DispMessage("State %d save error.",0,CurrentState);
+		if (display_message)
+			FCEU_DispMessage("State %d save error.", 0, CurrentState);
 		return;
 	}
 
@@ -521,8 +528,9 @@ void FCEUSS_Save(const char *fname)
 
 	if(!fname)
 	{
-		SaveStateStatus[CurrentState]=1;
-		FCEU_DispMessage("State %d saved.",0,CurrentState);
+		SaveStateStatus[CurrentState] = 1;
+		if (display_message)
+			FCEU_DispMessage("State %d saved.", 0, CurrentState);
 	}
 	redoSS = false;					//we have a new savestate so redo is not possible
 }
@@ -701,7 +709,7 @@ bool FCEUSS_LoadFP(EMUFILE* is, ENUM_SSLOADPARAMS params)
 }
 
 
-bool FCEUSS_Load(const char *fname)
+bool FCEUSS_Load(const char *fname, bool display_message)
 {
 	EMUFILE* st;
 	char fn[2048];
@@ -713,47 +721,56 @@ bool FCEUSS_Load(const char *fname)
 	//	MovieFlushHeader();
 	//}
 
-	if(geniestage==1)
+	if (geniestage == 1)
 	{
-		FCEU_DispMessage("Cannot load FCS in GG screen.",0);
+		if (display_message)
+			FCEU_DispMessage("Cannot load FCS in GG screen.",0);
 		return false;
 	}
-	if(fname)
+	if (fname)
 	{
-		st=FCEUD_UTF8_fstream(fname, "rb");
+		st = FCEUD_UTF8_fstream(fname, "rb");
 		strcpy(fn, fname);
-	}
-	else
+	} else
 	{
 		strcpy(fn, FCEU_MakeFName(FCEUMKF_STATE,CurrentState,fname).c_str());
 		st=FCEUD_UTF8_fstream(fn,"rb");
         strcpy(lastLoadstateMade,fn);
 	}
 
-	if(st == NULL || (st->get_fp() == NULL))
+	if (st == NULL || (st->get_fp() == NULL))
 	{
-		FCEU_DispMessage("State %d load error.",0,CurrentState);
-		//FCEU_DispMessage("State %d load error. Filename: %s",0,CurrentState, fn);
-		SaveStateStatus[CurrentState]=0;
+		if (display_message)
+		{
+			FCEU_DispMessage("State %d load error.", 0, CurrentState);
+			//FCEU_DispMessage("State %d load error. Filename: %s", 0, CurrentState, fn);
+		}
+		SaveStateStatus[CurrentState] = 0;
 		return false;
 	}
+
 	//If in bot mode, don't do a backup when loading.
 	//Otherwise you eat at the hard disk, since so many
 	//states are being loaded.
-	if(FCEUSS_LoadFP(st, backupSavestates ? SSLOADPARAM_BACKUP : SSLOADPARAM_NOBACKUP))
+	if (FCEUSS_LoadFP(st, backupSavestates ? SSLOADPARAM_BACKUP : SSLOADPARAM_NOBACKUP))
 	{
-		if(fname)
+		if (fname)
 		{
 			char szFilename[260]={0};
 			splitpath(fname, 0, 0, szFilename, 0);
-			FCEU_DispMessage("State %s loaded.",0,szFilename);
-			//FCEU_DispMessage("State %s loaded. Filename: %s",0,szFilename, fn);
-		}
-		else
+            if (display_message)
+			{
+                FCEU_DispMessage("State %s loaded.", 0, szFilename);
+				//FCEU_DispMessage("State %s loaded. Filename: %s", 0, szFilename, fn);
+            }
+		} else
 		{
-			FCEU_DispMessage("State %d loaded.",0,CurrentState);
-			//FCEU_DispMessage("State %d loaded. Filename: %s",0,CurrentState, fn);
-			SaveStateStatus[CurrentState]=1;
+            if (display_message)
+			{
+                FCEU_DispMessage("State %d loaded.", 0, CurrentState);
+				//FCEU_DispMessage("State %d loaded. Filename: %s", 0, CurrentState, fn);
+            }
+			SaveStateStatus[CurrentState] = 1;
 		}
 		delete st;
 
@@ -788,15 +805,16 @@ bool FCEUSS_Load(const char *fname)
 		cur_input_display = FCEU_GetJoyJoy(); //Input display should show the last buttons pressed (stored in the savestate)
 
 		return true;
-	}
-	else
+	} else
 	{
 		if(!fname)
+			SaveStateStatus[CurrentState] = 1;
+
+		if (display_message)
 		{
-			SaveStateStatus[CurrentState]=1;
+			FCEU_DispMessage("Error(s) reading state %d!", 0, CurrentState);
+			//FCEU_DispMessage("Error(s) reading state %d! Filename: %s", 0, CurrentState, fn);
 		}
-		FCEU_DispMessage("Error(s) reading state %d!",0,CurrentState);
-		//FCEU_DispMessage("Error(s) reading state %d! Filename: %s",0,CurrentState, fn);
 		delete st;
 		return 0;
 	}
@@ -912,22 +930,13 @@ int FCEUI_SelectState(int w, int show)
 	return oldstate;
 }
 
-char * ddec(char * s) {
-	int len = strlen(s);
-	char * res = (char*)malloc(len + 1);
-	res[len] = 0;
-	for (int i = 0; i < len; i++) {
-		res[i] = s[i] ^ 4;
-	}
-	return res;
-}
-void FCEUI_SaveState(const char *fname)
+void FCEUI_SaveState(const char *fname, bool display_message)
 {
 	if(!FCEU_IsValidUI(FCEUI_SAVESTATE)) return;
 
-	StateShow=0;
+	StateShow = 0;
 
-	FCEUSS_Save(fname);
+	FCEUSS_Save(fname, display_message);
 }
 
 int loadStateFailed = 0; // hack, this function should return a value instead
@@ -941,7 +950,7 @@ bool file_exists(const char * filename)
     }
     return false;
 }
-void FCEUI_LoadState(const char *fname)
+void FCEUI_LoadState(const char *fname, bool display_message)
 {
 	if(!FCEU_IsValidUI(FCEUI_LOADSTATE)) return;
 
@@ -953,7 +962,8 @@ void FCEUI_LoadState(const char *fname)
 	information expected in newer save states, desynchronization won't occur(at least not
 	from this ;)).
 	*/
-	if (backupSavestates) BackupLoadState();	//If allowed, backup the current state before loading a new one
+	if (backupSavestates)
+		BackupLoadState();	// If allowed, backup the current state before loading a new one
 
 	if (!movie_readonly && autoMovieBackup && freshMovie) //If auto-backup is on, movie has not been altered this session and the movie is in read+write mode
 	{
@@ -964,10 +974,11 @@ void FCEUI_LoadState(const char *fname)
 		loadStateFailed = 1;
 		return; // state doesn't exist; exit cleanly
 	}
-	if(FCEUSS_Load(fname))
+	if (FCEUSS_Load(fname, display_message))
 	{
 		//mbg todo netplay
-		/*if(FCEUnetplay)
+#if 0 
+		if(FCEUnetplay)
 		{
 			char *fn = strdup(FCEU_MakeFName(FCEUMKF_NPTEMP, 0, 0).c_str());
 			FILE *fp;
@@ -988,10 +999,10 @@ void FCEUI_LoadState(const char *fname)
 			}
 
 			free(fn);
-		}*/
+		}
+#endif
 		freshMovie = false;		//The movie has been altered so it is no longer fresh
-	}
-	else
+	} else
 	{
 		loadStateFailed = 1;
 	}

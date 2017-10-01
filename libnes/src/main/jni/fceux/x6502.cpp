@@ -18,7 +18,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <string.h>
 #include "types.h"
 #include "x6502.h"
 #include "fceu.h"
@@ -29,6 +28,8 @@
 #endif
 
 #include "x6502abbrev.h"
+
+#include <cstring>
 X6502 X;
 uint32 timestamp;
 void (*MapIRQHook)(int a);
@@ -481,6 +482,8 @@ extern int test; test++;
 
 	//will probably cause a major speed decrease on low-end systems
    DEBUG( DebugCycle() );
+
+   IncrementInstructionsCounters();
 
    _PI=_P;
    b1=RdMem(_PC);

@@ -18,16 +18,6 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef WIN32
-#include <stdint.h>
-#endif
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <zlib.h>
-
 #include "types.h"
 #include "video.h"
 #include "fceu.h"
@@ -55,6 +45,17 @@
 #include "drivers/videolog/nesvideos-piece.h"
 #endif
 
+//no stdint in win32 (but we could add it if we needed to)
+#ifndef WIN32
+#include <stdint.h>
+#endif
+
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
+#include <cstdarg>
+#include <zlib.h>
+
 uint8 *XBuf=NULL;
 uint8 *XBackBuf=NULL;
 int ClipSidesOffset=0;	//Used to move displayed messages when Clips left and right sides is checked
@@ -79,22 +80,22 @@ std::string FCEUI_GetSnapshotAsName() { return AsSnapshotName; }
 void FCEU_KillVirtualVideo(void)
 {
 	//mbg merge TODO 7/17/06 temporarily removed
-//	if(xbsave)
-//	{
-//	 free(xbsave);
-//	 xbsave=0;
-//	}
-//	if(XBuf)
-//	{
-//	//UnmapViewOfFile(XBuf);
-//	//CloseHandle(mapXBuf);
-//	//mapXBuf=NULL;
-//	}
-//	if(XBackBuf)
-//	{
-//	 free(XBackBuf);
-//	 XBackBuf=0;
-//	}
+	//if(xbsave)
+	//{
+	// free(xbsave);
+	// xbsave=0;
+	//}
+	//if(XBuf)
+	//{
+	//UnmapViewOfFile(XBuf);
+	//CloseHandle(mapXBuf);
+	//mapXBuf=NULL;
+	//}
+	//if(XBackBuf)
+	//{
+	// free(XBackBuf);
+	// XBackBuf=0;
+	//}
 }
 
 /**
@@ -169,7 +170,7 @@ void FCEU_PutImage(void)
 	{
 		char nameo[512];
 		strcpy(nameo,FCEUI_GetSnapshotAsName().c_str());
-		if (nameo)
+		if (nameo[0])
 		{
 			SaveSnapshot(nameo);
 			FCEU_DispMessage("Snapshot Saved.",0);
@@ -443,35 +444,35 @@ void FCEU_DispMessageOnMovie(char *format, ...)
 
 void FCEU_DispMessage(char *format, int disppos=0, ...)
 {
-//	va_list ap;
-//
-//	va_start(ap,disppos);
-//	vsnprintf(guiMessage.errmsg,sizeof(guiMessage.errmsg),format,ap);
-//	va_end(ap);
-//	// also log messages
-//	char temp[2048];
-//	va_start(ap,disppos);
-//	vsnprintf(temp,sizeof(temp),format,ap);
-//	va_end(ap);
-//	strcat(temp, "\n");
-//	FCEU_printf(temp);
-//
-//	guiMessage.howlong = 180;
-//	guiMessage.isMovieMessage = false;
-//
-//	guiMessage.linesFromBottom = disppos;
-//
-//	//adelikat: Pretty sure this code fails, Movie playback stopped is done with FCEU_DispMessageOnMovie()
-//	#ifdef CREATE_AVI
-//	if(LoggingEnabled == 2)
-//	{
-//		/* While in AVI recording mode, only display bare minimum
-//		 * of messages
-//		 */
-//		if(strcmp(guiMessage.errmsg, "Movie playback stopped.") != 0)
-//			guiMessage.howlong = 0;
-//	}
-//	#endif
+	va_list ap;
+
+	va_start(ap,disppos);
+	vsnprintf(guiMessage.errmsg,sizeof(guiMessage.errmsg),format,ap);
+	va_end(ap);
+	// also log messages
+	char temp[2048];
+	va_start(ap,disppos);
+	vsnprintf(temp,sizeof(temp),format,ap);
+	va_end(ap);
+	strcat(temp, "\n");
+	FCEU_printf(temp);
+
+	guiMessage.howlong = 180;
+	guiMessage.isMovieMessage = false;
+
+	guiMessage.linesFromBottom = disppos;
+
+	//adelikat: Pretty sure this code fails, Movie playback stopped is done with FCEU_DispMessageOnMovie()
+	#ifdef CREATE_AVI
+	if(LoggingEnabled == 2)
+	{
+		/* While in AVI recording mode, only display bare minimum
+		 * of messages
+		 */
+		if(strcmp(guiMessage.errmsg, "Movie playback stopped.") != 0)
+			guiMessage.howlong = 0;
+	}
+	#endif
 }
 
 void FCEU_ResetMessages()

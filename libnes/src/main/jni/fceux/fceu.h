@@ -1,6 +1,8 @@
 #ifndef _FCEUH
 #define _FCEUH
 
+#include "types.h"
+
 extern int fceuindbg;
 extern int newppu;
 extern int disableBatterySaving;
@@ -8,7 +10,7 @@ extern int disableBatterySaving;
 void ResetGameLoaded(void);
 
 extern bool AutoResumePlay;
-extern char rom_name_when_closing_emulator[];
+extern char romNameWhenClosingEmulator[];
 
 #define DECLFR(x) uint8 x (uint32 A)
 #define DECLFW(x) void x (uint32 A, uint8 V)
@@ -31,7 +33,7 @@ void PowerNES(void);
 void SetAutoFireOffset(int offset);
 void SetAutoFirePattern(int onframes, int offframes);
 void AutoFire(void);
-void FCEUI_Autosave(void);
+void FCEUI_RewindToLastAutosave(void);
 
 //mbg 7/23/06
 char *FCEUI_GetAboutString();
@@ -39,7 +41,7 @@ char *FCEUI_GetAboutString();
 extern uint64 timestampbase;
 extern uint32 MMC5HackVROMMask;
 extern uint8 *MMC5HackExNTARAMPtr;
-extern int MMC5Hack;
+extern int MMC5Hack, PEC586Hack;
 extern uint8 *MMC5HackVROMPTR;
 extern uint8 MMC5HackCHRMode;
 extern uint8 MMC5HackSPMode;

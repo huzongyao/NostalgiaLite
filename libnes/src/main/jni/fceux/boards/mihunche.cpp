@@ -1,7 +1,7 @@
 /* FCE Ultra - NES/Famicom Emulator
  *
  * Copyright notice for this file:
- *  Copyright (C) 2012 CaH4e3
+ *  Copyright (C) 2013 CaH4e3
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,49 +20,49 @@
 
 #include "mapinc.h"
 
-static uint8 bank, preg;
+static uint16 latche;
+
 static SFORMAT StateRegs[] =
 {
-	{ &bank, 1, "BANK" },
-	{ &preg, 1, "PREG" },
+	{ &latche, 2, "LATC" },
 	{ 0 }
 };
 
 static void Sync(void) {
-//	uint32 bbank = (bank & 0x18) >> 1;
-	uint32 bbank = ((bank & 0x10) >> 2) | (bank & 8);	// some dumps have bbanks swapped, if swap commands,
-														// then all roms can be played, but with some swapped
-														// games in menu. if not, some dumps are unplayable
-														// make hard dump for both cart types to check
-	setprg16(0x8000, bbank | (preg & 3));
-	setprg16(0xC000, bbank | 3);
-	setchr8(0);
+	setprg32(0x8000, 0);
+	if(CHRsize[0] == 8192) {
+		setchr4(0x0000, latche & 1);
+		setchr4(0x1000, latche & 1);
+	} else {
+		setchr8(latche & 1);    // actually, my bad, overdumped roms, the real CHR size if 8K
+	}
+	setmirror(MI_0 + (latche & 1));
 }
 
-static DECLFW(M232WriteBank) {
-	bank = V;
+static DECLFW(UNLCC21Write1) {
+	latche = A;
 	Sync();
 }
 
-static DECLFW(M232WritePreg) {
-	preg = V;
+static DECLFW(UNLCC21Write2) {
+	latche = V;
 	Sync();
 }
 
-static void M232Power(void) {
-	bank = preg = 0;
+static void UNLCC21Power(void) {
+	latche = 0;
 	Sync();
-	SetWriteHandler(0x8000, 0xBFFF, M232WriteBank);
-	SetWriteHandler(0xC000, 0xFFFF, M232WritePreg);
 	SetReadHandler(0x8000, 0xFFFF, CartBR);
+	SetWriteHandler(0x8001, 0xFFFF, UNLCC21Write1);
+	SetWriteHandler(0x8000, 0x8000, UNLCC21Write2); // another one many-in-1 mapper, there is a lot of similar carts with little different wirings
 }
 
 static void StateRestore(int version) {
 	Sync();
 }
 
-void Mapper232_Init(CartInfo *info) {
-	info->Power = M232Power;
-	AddExState(&StateRegs, ~0, 0, 0);
+void UNLCC21_Init(CartInfo *info) {
+	info->Power = UNLCC21Power;
 	GameStateRestore = StateRestore;
+	AddExState(&StateRegs, ~0, 0, 0);
 }

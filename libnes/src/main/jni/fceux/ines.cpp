@@ -19,10 +19,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "types.h"
 #include "x6502.h"
 #include "fceu.h"
@@ -42,10 +38,14 @@
 #include "vsuni.h"
 #include "driver.h"
 
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+
 extern SFORMAT FCEUVSUNI_STATEINFO[];
 
 //mbg merge 6/29/06 - these need to be global
-uint8 *trainerpoo = 0;
+uint8 *trainerpoo = NULL;
 uint8 *ROM = NULL;
 uint8 *VROM = NULL;
 uint8 *ExtraNTARAM = NULL;
@@ -233,7 +233,6 @@ struct BADINF {
 	char *name;
 	uint32 type;
 };
-
 
 static struct BADINF BadROMImages[] =
 {
@@ -436,7 +435,7 @@ typedef struct {
 //size
 static int not_power2[] =
 {
-	198, 228
+	53, 198, 228
 };
 typedef struct {
 	char *name;
@@ -459,9 +458,9 @@ static BMAPPINGLocal bmap[] = {
 	{"Color Dreams",		 11, Mapper11_Init},
 	{"REX DBZ 5",			 12, Mapper12_Init},
 	{"CPROM",				 13, CPROM_Init},
-//	{"",					 14, Mapper14_Init},
+	{"REX SL-1632",			 14, UNLSL1632_Init},
 	{"100-in-1",			 15, Mapper15_Init},
-	{"Bandai",				 16, Mapper16_Init},
+	{"BANDAI 24C02",		 16, Mapper16_Init},
 	{"FFE Rev. B",			 17, Mapper17_Init},
 	{"JALECO SS880006",		 18, Mapper18_Init},	// JF-NNX (EB89018-30007) boards
 	{"Namcot 106",			 19, Mapper19_Init},
@@ -472,8 +471,8 @@ static BMAPPINGLocal bmap[] = {
 	{"Konami VRC6 Rev. A",	 24, Mapper24_Init},
 	{"Konami VRC2/VRC4 D",	 25, Mapper25_Init},
 	{"Konami VRC6 Rev. B",	 26, Mapper26_Init},
-//	{"",					 27, Mapper27_Init},	// Deprecated, dupe for VRC2/VRC4 mapper
-//	{"",					 28, Mapper28_Init},
+	{"CC-21 MI HUN CHE",	 27, UNLCC21_Init},		// Former dupe for VRC2/VRC4 mapper, redefined with crc to mihunche boards
+	{"",					 28, Mapper28_Init},
 //	{"",					 29, Mapper29_Init},
 //	{"",					 30, Mapper30_Init},
 //	{"",					 31, Mapper31_Init},
@@ -498,7 +497,7 @@ static BMAPPINGLocal bmap[] = {
 	{"SMB2j FDS Rev. A",	 50, Mapper50_Init},
 	{"11-in-1 BALL SERIES",	 51, Mapper51_Init},	// 1993 year version
 	{"MMC3 BMC PIRATE D",	 52, Mapper52_Init},
-//	{"",					 53, Mapper53_Init},	// iNES version of complex UNIF board, can't emulate properly as iNES
+	{"SUPERVISION 16-in-1",	 53, Supervision16_Init},
 //	{"",					 54, Mapper54_Init},
 //	{"",					 55, Mapper55_Init},
 //	{"",					 56, Mapper56_Init},
@@ -534,11 +533,11 @@ static BMAPPINGLocal bmap[] = {
 	{"JALECO JF-13",		 86, Mapper86_Init},
 	{"74*139/74 DISCRETE",	 87, Mapper87_Init},
 	{"NAMCO 3433",			 88, Mapper88_Init},
-	{"SUNSOFT-3",			 89, Mapper89_Init},		// SUNSOFT-2 mapper
+	{"SUNSOFT-3",			 89, Mapper89_Init},	// SUNSOFT-2 mapper
 	{"HUMMER/JY BOARD",		 90, Mapper90_Init},
 	{"EARLY HUMMER/JY BOARD",91, Mapper91_Init},
 	{"JALECO JF-19",		 92, Mapper92_Init},
-	{"SUNSOFT-3R",			 93, SUNSOFT_UNROM_Init},	// SUNSOFT-2 mapper with VRAM, different wiring
+	{"SUNSOFT-3R",			 93, SUNSOFT_UNROM_Init},// SUNSOFT-2 mapper with VRAM, different wiring
 	{"HVC-UN1ROM",			 94, Mapper94_Init},
 	{"NAMCOT 108 Rev. B",	 95, Mapper95_Init},
 	{"BANDAI OEKAKIDS",		 96, Mapper96_Init},
@@ -598,13 +597,13 @@ static BMAPPINGLocal bmap[] = {
 	{"S74LS374N",			150, S74LS374N_Init},
 	{"",					151, Mapper151_Init},
 	{"",					152, Mapper152_Init},
-	{"",					153, Mapper153_Init},
+	{"BANDAI SRAM",			153, Mapper153_Init},	// Bandai board 16 with SRAM instead of EEPROM
 	{"",					154, Mapper154_Init},
 	{"",					155, Mapper155_Init},
 	{"",					156, Mapper156_Init},
-	{"",					157, Mapper157_Init},
+	{"BANDAI BARCODE",		157, Mapper157_Init},
 //	{"",					158, Mapper158_Init},
-//	{"",					159, Mapper159_Init},
+	{"BANDAI 24C01",		159, Mapper159_Init},	// Different type of EEPROM on the  bandai board
 	{"SA009",				160, SA009_Init},
 //	{"",					161, Mapper161_Init},
 	{"",					162, UNLFS304_Init},
@@ -621,7 +620,7 @@ static BMAPPINGLocal bmap[] = {
 	{"",					173, Mapper173_Init},
 //	{"",					174, Mapper174_Init},
 	{"",					175, Mapper175_Init},
-	{"BMCFK23C",			176, BMCFK23C_Init},	//zero 26-may-2012 - well, i have some WXN junk games that use 176 for instance ????. i dont know what game uses this BMCFK23C as mapper 176. we'll have to make a note when we find it.
+	{"BMCFK23C",			176, BMCFK23C_Init},	// zero 26-may-2012 - well, i have some WXN junk games that use 176 for instance ????. i dont know what game uses this BMCFK23C as mapper 176. we'll have to make a note when we find it.
 	{"",					177, Mapper177_Init},
 	{"",					178, Mapper178_Init},
 //	{"",					179, Mapper179_Init},
@@ -719,7 +718,10 @@ int iNESLoad(const char *name, FCEUFILE *fp, int OverwriteVidMode) {
 
 	MapperNo = (head.ROM_type >> 4);
 	MapperNo |= (head.ROM_type2 & 0xF0);
-	Mirroring = (head.ROM_type & 1);
+	if (head.ROM_type & 8) {
+		Mirroring = 2;
+	} else
+		Mirroring = (head.ROM_type & 1);
 
 	if (!head.ROM_size)
 		ROM_size = 256;
@@ -741,10 +743,6 @@ int iNESLoad(const char *name, FCEUFILE *fp, int OverwriteVidMode) {
 		}
 	}
 
-	if (head.ROM_type & 8) {
-		Mirroring = 2;
-	}
-
 	if ((ROM = (uint8*)FCEU_malloc(ROM_size << 14)) == NULL)
 		return 0;
 	memset(ROM, 0xFF, ROM_size << 14);
@@ -758,7 +756,7 @@ int iNESLoad(const char *name, FCEUFILE *fp, int OverwriteVidMode) {
 		memset(VROM, 0xFF, VROM_size << 13);
 	}
 
-	if (head.ROM_type & 4) { /* Trainer */
+	if (head.ROM_type & 4) {	/* Trainer */
 		trainerpoo = (uint8*)FCEU_gmalloc(512);
 		FCEU_fread(trainerpoo, 512, 1, fp);
 	}
@@ -951,8 +949,10 @@ int iNesSaveAs(char* name)
 char *iNesShortFName() {
 	char *ret;
 
-	if (!(ret = strrchr(LoadedRomFName, '\\'))) {
-		if (!(ret = strrchr(LoadedRomFName, '/'))) return 0;
+	if (!(ret = strrchr(LoadedRomFName, '\\')))
+	{
+		if (!(ret = strrchr(LoadedRomFName, '/')))
+			return 0;
 	}
 	return ret + 1;
 }

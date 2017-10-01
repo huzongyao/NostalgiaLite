@@ -34,6 +34,9 @@ DECLFR(CartBROB);
 DECLFR(CartBR);
 DECLFW(CartBW);
 
+extern uint8 PRGram[32];
+extern uint8 CHRram[32];
+
 extern uint8 *PRGptr[32];
 extern uint8 *CHRptr[32];
 
@@ -86,6 +89,6 @@ extern int geniestage;
 
 void FCEU_GeniePower(void);
 
-void FCEU_OpenGenie(void);
+bool FCEU_OpenGenie(void);
 void FCEU_CloseGenie(void);
 void FCEU_KillGenie(void);
