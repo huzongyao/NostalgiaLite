@@ -19,10 +19,12 @@ using namespace emudroid;
 #define SFX_BUF_SIZE 2048 * 8 * 2
 
 class NesEmulator : public Emulator {
+
 private:
     bool zapperEnabled;
     BUFFER_TYPE travel[40][256 * 256];
     bool stereo;
+
 public:
     NesEmulator() {
         LOGE("NesEmulator Constructor");
@@ -108,7 +110,6 @@ public:
         inited = success;
         return success;
     }
-
 
     int cur;
     int fps;
@@ -383,6 +384,7 @@ public:
 
 NesEmulator emulator;
 Bridge bridge(&emulator);
+
 }
 
 
@@ -424,7 +426,8 @@ FCEUFILE *FCEUD_OpenArchiveIndex(ArchiveScanRecord &asr, std::string &fname, int
     return NULL;
 }
 
-FCEUFILE *FCEUD_OpenArchive(ArchiveScanRecord &asr, std::string &fname, std::string *innerFilename) {
+FCEUFILE *FCEUD_OpenArchive(ArchiveScanRecord &asr, std::string &fname,
+                            std::string *innerFilename) {
     return NULL;
 }
 
@@ -586,5 +589,11 @@ bool FCEUD_PauseAfterPlayback() {
 
 
 void FCEUD_VideoChanged() {
+}
+
+void GetMouseData(uint32 (&md)[3]) {
+}
+
+void RefreshThrottleFPS() {
 }
 

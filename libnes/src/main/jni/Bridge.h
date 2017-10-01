@@ -1,4 +1,3 @@
-
 #ifndef BRIDGE_H_
 #define BRIDGE_H_
 

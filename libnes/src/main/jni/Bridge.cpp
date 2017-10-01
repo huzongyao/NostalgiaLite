@@ -126,8 +126,8 @@ JNIEXPORT jboolean JNICALL BRIDGE_PACKAGE(loadState)(JNIEnv *env, jobject obj,
     return success;
 }
 
-JNIEXPORT jboolean JNICALL BRIDGE_PACKAGE(saveState)(JNIEnv *env, jobject obj,
-                                                     jstring path, int slot) {
+JNIEXPORT jboolean JNICALL BRIDGE_PACKAGE(saveState)(JNIEnv *env, jobject obj, jstring path,
+                                                     int slot) {
     jboolean isCopy;
     const char *fname = env->GetStringUTFChars(path, &isCopy);
     bool success = emu->saveState(fname, slot);
@@ -135,8 +135,7 @@ JNIEXPORT jboolean JNICALL BRIDGE_PACKAGE(saveState)(JNIEnv *env, jobject obj,
     return success;
 }
 
-JNIEXPORT jboolean JNICALL BRIDGE_PACKAGE(reset)(JNIEnv *env, jobject obj,
-                                                 jstring path) {
+JNIEXPORT jboolean JNICALL BRIDGE_PACKAGE(reset)(JNIEnv *env, jobject obj, jstring path) {
     return emu->reset();
 }
 
