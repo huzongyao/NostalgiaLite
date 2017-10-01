@@ -35,11 +35,9 @@ public class Benchmark {
         if (!isRunning) {
             return;
         }
-
         if (startTime != -1) {
             totalTime += System.currentTimeMillis() - startTime;
         }
-
         if (steps == numSteps) {
             callback.onBenchmarkEnded(this, steps, totalTime);
             stop();

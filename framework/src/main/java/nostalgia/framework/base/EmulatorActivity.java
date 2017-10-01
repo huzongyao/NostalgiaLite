@@ -63,8 +63,8 @@ import nostalgia.framework.utils.NLog;
 import nostalgia.framework.utils.Utils;
 
 
-public abstract class EmulatorActivity extends Activity implements
-        OnGameMenuListener, EmulatorRunner.OnNotRespondingListener {
+public abstract class EmulatorActivity extends Activity
+        implements OnGameMenuListener, EmulatorRunner.OnNotRespondingListener {
 
     public static final String EXTRA_GAME = "game";
     public static final String EXTRA_SLOT = "slot";
@@ -203,8 +203,8 @@ public abstract class EmulatorActivity extends Activity implements
             }
         }
 
-        emulatorView = openGLView != null ?
-                openGLView : new UnacceleratedView(this, emulator, paddingLeft, paddingTop);
+        emulatorView = openGLView != null ? openGLView :
+                new UnacceleratedView(this, emulator, paddingLeft, paddingTop);
         controllers = new ArrayList<>();
         touchController = new TouchController(this);
         controllers.add(touchController);
@@ -335,8 +335,7 @@ public abstract class EmulatorActivity extends Activity implements
         setShouldPauseOnResume(false);
         if (resultCode == RESULT_OK) {
             canRestart = false;
-            int slotIdx = data
-                    .getIntExtra(SlotSelectionActivity.EXTRA_SLOT, -1);
+            int slotIdx = data.getIntExtra(SlotSelectionActivity.EXTRA_SLOT, -1);
             switch (requestCode) {
                 case REQUEST_SAVE:
                     slotToSave = slotIdx;
@@ -406,7 +405,6 @@ public abstract class EmulatorActivity extends Activity implements
     @Override
     protected void onPause() {
         super.onPause();
-
         if (isRestarting) {
             finish();
             return;
@@ -527,9 +525,7 @@ public abstract class EmulatorActivity extends Activity implements
             restartProcess(this.getClass());
             return;
         }
-
         canRestart = true;
-
         if (exceptionOccurred) {
             return;
         }
@@ -537,7 +533,6 @@ public abstract class EmulatorActivity extends Activity implements
         isToggleFF = PreferenceUtil.isFastForwardToggleable(this);
         isFF = false;
         isFFPressed = false;
-
         switch (PreferenceUtil.getDisplayRotation(this)) {
             case AUTO:
                 this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
@@ -549,57 +544,44 @@ public abstract class EmulatorActivity extends Activity implements
                 this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                 break;
         }
-
         manager.setFastForwardFrameCount(PreferenceUtil.getFastForwardFrameCount(this));
-
         if (PreferenceUtil.isDynamicDPADEnable(this)) {
             if (!controllers.contains(dynamic)) {
                 controllers.add(dynamic);
                 controllerViews.add(dynamic.getView());
             }
             PreferenceUtil.setDynamicDPADUsed(this, true);
-
         } else {
             controllers.remove(dynamic);
             controllerViews.remove(dynamic.getView());
         }
-
         if (PreferenceUtil.isFastForwardEnabled(this)) {
             PreferenceUtil.setFastForwardUsed(this, true);
         }
-
         if (PreferenceUtil.isScreenSettingsSaved(this)) {
             PreferenceUtil.setScreenLayoutUsed(this, true);
         }
-
         VirtualDPad.getInstance().detachFromWindow();
         pm = getPackageManager();
         pn = getPackageName();
-
         for (EmulatorController controller : controllers) {
             controller.onResume();
         }
-
         try {
             manager.startGame(game);
-
             for (EmulatorController controller : controllers) {
                 controller.onGameStarted(game);
             }
-
             if (slotToRun != -1) {
                 manager.loadState(slotToRun);
-
             } else {
                 if (SlotUtils.autoSaveExists(baseDir, game.checksum)) {
                     manager.loadState(0);
                 }
             }
-
             if (slotToSave != null) {
                 manager.copyAutoSave(slotToSave);
             }
-
             boolean wasRotated = (oldConfig & ActivityInfo.CONFIG_ORIENTATION) == ActivityInfo.CONFIG_ORIENTATION;
             oldConfig = 0;
 
@@ -801,7 +783,6 @@ public abstract class EmulatorActivity extends Activity implements
                 if (!dir.exists()) {
                     dir.mkdirs();
                 }
-
                 File to = dir;
                 int counter = 0;
                 while (to.exists()) {

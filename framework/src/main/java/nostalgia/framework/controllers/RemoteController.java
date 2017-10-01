@@ -37,7 +37,7 @@ public class RemoteController implements EmulatorController {
     private SparseIntArray mapping;
     private SparseIntArray systemKeyMapping;
     private boolean zapperWarningShow = false;
-    private HashSet<Integer> specialKeys = new HashSet<Integer>();
+    private HashSet<Integer> specialKeys = new HashSet<>();
 
     public RemoteController(EmulatorActivity activity) {
         start();
@@ -106,8 +106,7 @@ public class RemoteController implements EmulatorController {
             emulatorActivity.hideTouchController();
         }
 
-        if (event.port != 0 && warningListener != null
-                && zapperWarningShow == false) {
+        if (event.port != 0 && warningListener != null && !zapperWarningShow) {
             String hash = emulator.getLoadedGame().md5;
 
             if (PreferenceUtil.isZapperEnabled(emulatorActivity, hash)) {
@@ -119,13 +118,11 @@ public class RemoteController implements EmulatorController {
     }
 
     private void processAndroidKeyEvent(KeyEvent event) {
-        if (event.getAction() == KeyEvent.ACTION_DOWN
-                && !specialKeys.contains(event.getKeyCode())) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN && !specialKeys.contains(event.getKeyCode())) {
             specialKeys.add(event.getKeyCode());
             inputConnection.sendKeyEvent(event);
 
-        } else if (event.getAction() == KeyEvent.ACTION_UP
-                && specialKeys.contains(event.getKeyCode())) {
+        } else if (event.getAction() == KeyEvent.ACTION_UP && specialKeys.contains(event.getKeyCode())) {
             specialKeys.remove(event.getKeyCode());
             inputConnection.sendKeyEvent(event);
         }
@@ -146,7 +143,7 @@ public class RemoteController implements EmulatorController {
     }
 
     public interface OnRemoteControllerWarningListener {
-        public void onZapperCollision();
+        void onZapperCollision();
     }
 
     private static class Dispatcher implements OnControllerEventListener {

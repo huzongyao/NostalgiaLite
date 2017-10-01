@@ -101,49 +101,37 @@ public class CheatsActivity extends ControllableActivity {
 
         chars.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onTextChanged(CharSequence arg0, int arg1, int arg2,
-                                      int arg3) {
+            public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
             }
 
             @Override
-            public void beforeTextChanged(CharSequence arg0, int arg1,
-                                          int arg2, int arg3) {
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
             }
 
-            @SuppressLint({"NewApi", "DefaultLocale"})
             @Override
             public void afterTextChanged(Editable arg0) {
                 String s = arg0.toString();
                 Locale locale = Locale.getDefault();
-
                 if (!s.equals(s.toUpperCase(locale))) {
                     s = s.toUpperCase(locale);
                     chars.setSelection(s.length());
                 }
-
                 if (Build.VERSION.SDK_INT > 8) {
-                    String newText = s.replaceAll(
-                            "\\p{InCombiningDiacriticalMarks}+", "");
-
+                    String newText = s.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
                     if (!newText.equals(s)) {
                         chars.setText(newText);
                         chars.setSelection(newText.length());
                     }
-
                     s = newText;
                 }
-
-                String newText = s.replaceAll(EmulatorHolder.getInfo()
-                        .getCheatInvalidCharsRegex(), "");
-
+                String newText =
+                        s.replaceAll(EmulatorHolder.getInfo().getCheatInvalidCharsRegex(), "");
                 if (!newText.equals(s)) {
                     chars.setText(newText);
                     chars.setSelection(newText.length());
                 }
-
                 if (newText.equals("")) {
                     save.setEnabled(false);
-
                 } else {
                     save.setEnabled(true);
                 }
@@ -153,15 +141,12 @@ public class CheatsActivity extends ControllableActivity {
             @Override
             public void onClick(View v) {
                 if (idx == -1) {
-                    cheats.add(new Cheat(chars.getText().toString(), desc
-                            .getText().toString(), true));
-
+                    cheats.add(new Cheat(chars.getText().toString(), desc.getText().toString(), true));
                 } else {
                     Cheat cheat = cheats.get(idx);
                     cheat.chars = chars.getText().toString();
                     cheat.desc = desc.getText().toString();
                 }
-
                 adapter.notifyDataSetChanged();
                 Cheat.saveCheats(CheatsActivity.this, gameHash, cheats);
                 dialog.cancel();

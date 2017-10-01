@@ -23,8 +23,7 @@ public class QuickSaveController implements EmulatorController {
                                TouchController touchController) {
         this.activity = activity;
         this.touchController = touchController;
-        this.gestureDetector = new GestureDetectorCompat(activity,
-                new GestureListener());
+        this.gestureDetector = new GestureDetectorCompat(activity, new GestureListener());
     }
 
     @Override
@@ -66,14 +65,10 @@ public class QuickSaveController implements EmulatorController {
                 if (!isEnabled) {
                     return true;
                 }
-
                 int pointerId = event.getPointerId(event.getActionIndex());
+                return touchController.isPointerHandled(pointerId)
+                        || gestureDetector.onTouchEvent(event);
 
-                if (!touchController.isPointerHandled(pointerId)) {
-                    return gestureDetector.onTouchEvent(event);
-                }
-
-                return true;
             }
         };
     }
@@ -84,8 +79,7 @@ public class QuickSaveController implements EmulatorController {
         touchController = null;
     }
 
-    private class GestureListener extends
-            GestureDetector.SimpleOnGestureListener {
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener {
 
         @Override
         public boolean onDown(MotionEvent e) {

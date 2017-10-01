@@ -10,8 +10,7 @@ public class JniBridge {
 
     public native boolean reset();
 
-    public native boolean loadGame(String fileName, String batteryDir,
-                                   String strippedName);
+    public native boolean loadGame(String fileName, String batteryDir, String strippedName);
 
     public native boolean loadState(String fileName, int slot);
 

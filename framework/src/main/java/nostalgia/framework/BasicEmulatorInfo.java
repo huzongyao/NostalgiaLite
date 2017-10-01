@@ -66,14 +66,14 @@ abstract public class BasicEmulatorInfo implements EmulatorInfo {
 
     @Override
     public String[] getDeviceKeyboardNames() {
-        String[] base = new String[]{"UP", "DOWN", "RIGHT", "LEFT", "START",
-                "SELECT", "A", "B", "TURBO A", "TURBO B", "LEFT+UP",
-                "RIGHT+UP", "RIGHT+DOWN", "LEFT+DOWN", "SAVE STATE 1",
-                "LOAD STATE 1",
-                "SAVE STATE 2",
-                "LOAD STATE 2",
-                "SAVE STATE 3",
-                "LOAD STATE 3",
+        String[] base = new String[]{
+                "UP", "DOWN", "RIGHT", "LEFT",
+                "START", "SELECT",
+                "A", "B", "TURBO A", "TURBO B",
+                "LEFT+UP", "RIGHT+UP", "RIGHT+DOWN", "LEFT+DOWN",
+                "SAVE STATE 1", "LOAD STATE 1",
+                "SAVE STATE 2", "LOAD STATE 2",
+                "SAVE STATE 3", "LOAD STATE 3",
                 "MENU", "FAST FORWARD", "EXIT",
         };
 

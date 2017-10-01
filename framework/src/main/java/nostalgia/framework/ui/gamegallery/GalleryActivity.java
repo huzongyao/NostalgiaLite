@@ -393,8 +393,7 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
     }
 
     @Override
-    public void onRomsFinderFoundZipEntry(final String message,
-                                          final int skipEntries) {
+    public void onRomsFinderFoundZipEntry(final String message, final int skipEntries) {
         if (searchDialog != null) {
             runOnUiThread(new Runnable() {
                 @Override

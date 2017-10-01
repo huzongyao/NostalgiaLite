@@ -20,8 +20,7 @@ class UnacceleratedView extends SurfaceView implements EmulatorView {
     private int paddingLeft;
     private ViewPort viewPort;
 
-    public UnacceleratedView(Activity context, Emulator emulator,
-                             int paddingLeft, int paddingTop) {
+    public UnacceleratedView(Activity context, Emulator emulator, int paddingLeft, int paddingTop) {
         super(context);
         this.emulator = emulator;
         this.context = context.getApplication();
@@ -54,8 +53,8 @@ class UnacceleratedView extends SurfaceView implements EmulatorView {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        ViewPort vp = ViewUtils.loadOrComputeViewPort(context, emulator, w, h,
-                paddingLeft, paddingTop, false);
+        ViewPort vp = ViewUtils.loadOrComputeViewPort(context, emulator,
+                w, h, paddingLeft, paddingTop, false);
         x = vp.x;
         y = vp.y;
         emulator.setViewPortSize(vp.width, vp.height);
@@ -77,7 +76,6 @@ class UnacceleratedView extends SurfaceView implements EmulatorView {
         if (delay > 0) {
             try {
                 Thread.sleep(delay);
-
             } catch (InterruptedException e) {
             }
         }

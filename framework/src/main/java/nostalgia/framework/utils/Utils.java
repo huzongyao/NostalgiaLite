@@ -125,8 +125,7 @@ public class Utils {
         try {
             ZipFile zf = new ZipFile(dir);
             ZipEntry ze = zf.getEntry(entry);
-            long crc = ze.getCrc();
-            return crc;
+            return ze.getCrc();
         } catch (Exception e) {
             return -1;
         }
@@ -139,9 +138,8 @@ public class Utils {
         egl.eglInitialize(display, version);
         int EGL_OPENGL_ES2_BIT = 4;
         int[] configAttribs = {
-                EGL10.EGL_RED_SIZE, 4, EGL10.EGL_GREEN_SIZE, 4,
-                EGL10.EGL_BLUE_SIZE, 4, EGL10.EGL_RENDERABLE_TYPE,
-                EGL_OPENGL_ES2_BIT, EGL10.EGL_NONE
+                EGL10.EGL_RED_SIZE, 4, EGL10.EGL_GREEN_SIZE, 4, EGL10.EGL_BLUE_SIZE, 4,
+                EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT, EGL10.EGL_NONE
         };
         EGLConfig[] configs = new EGLConfig[10];
         int[] num_config = new int[1];
@@ -220,18 +218,17 @@ public class Utils {
     }
 
     public static boolean isNetworkAvailable(Context context) {
-        ConnectivityManager connectivityManager = (ConnectivityManager)
-                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     public static boolean isWifiAvailable(Context context) {
-        WifiManager manager = (WifiManager) context.getApplicationContext()
-                .getSystemService(Context.WIFI_SERVICE);
+        WifiManager manager =
+                (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInfo = manager.getConnectionInfo();
-        return (manager.getWifiState() == WifiManager.WIFI_STATE_ENABLED)
-                & (wifiInfo.getIpAddress() != 0);
+        return (manager.getWifiState() == WifiManager.WIFI_STATE_ENABLED) & (wifiInfo.getIpAddress() != 0);
     }
 
     public static InetAddress getBroadcastAddress(Context context) {
@@ -297,8 +294,8 @@ public class Utils {
         int newH = h * 2;
         Rect from = new Rect(0, 0, w, h);
         Rect to = new Rect(0, 0, newW, newH);
-        Bitmap largeBitmap = Bitmap.createBitmap(bitmap.getWidth() * 2,
-                bitmap.getHeight() * 2, Config.ARGB_8888);
+        Bitmap largeBitmap =
+                Bitmap.createBitmap(bitmap.getWidth() * 2, bitmap.getHeight() * 2, Config.ARGB_8888);
         Canvas c = new Canvas(largeBitmap);
         Paint p = new Paint();
         p.setDither(false);
@@ -311,7 +308,8 @@ public class Utils {
     public static boolean isIntentAvailable(Context context, String action) {
         final PackageManager packageManager = context.getPackageManager();
         final Intent intent = new Intent(action);
-        List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+        List<ResolveInfo> list =
+                packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
         return list.size() > 0;
     }
 

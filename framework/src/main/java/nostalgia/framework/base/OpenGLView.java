@@ -25,8 +25,8 @@ class OpenGLView extends GLSurfaceView implements EmulatorView {
     private static final String TAG = "base.OpenGLView";
     private final Renderer renderer;
 
-    public OpenGLView(EmulatorActivity context, Emulator emulator,
-                      int paddingLeft, int paddingTop, String shader) {
+    public OpenGLView(EmulatorActivity context, Emulator emulator, int paddingLeft,
+                      int paddingTop, String shader) {
         super(context);
         setEGLContextClientVersion(2);
         renderer = new Renderer(context, emulator, paddingLeft, paddingTop, shader);
@@ -106,8 +106,9 @@ class OpenGLView extends GLSurfaceView implements EmulatorView {
         private int paddingLeft;
         private int paddingTop;
 
-        public Renderer(EmulatorActivity context, Emulator emulator,
-                        int paddingLeft, int paddingTop, String shader) {
+        public Renderer(EmulatorActivity context, Emulator emulator, int paddingLeft,
+                        int paddingTop, String shader) {
+
             this.emulator = emulator;
             this.hasPalette = context.hasGLPalette();
             this.context = context.getApplication();
@@ -172,11 +173,11 @@ class OpenGLView extends GLSurfaceView implements EmulatorView {
 
         @Override
         public void onSurfaceChanged(GL10 unused, int width, int height) {
-            ViewPort vp = ViewUtils.loadOrComputeViewPort(context, emulator,
-                    width, height, paddingLeft, paddingTop, false);
+            ViewPort vp = ViewUtils.loadOrComputeViewPort(context, emulator, width, height,
+                    paddingLeft, paddingTop, false);
             viewPort = vp;
-            Matrix.orthoM(projMatrix, 0, -vp.width / 2, +vp.width / 2,
-                    -vp.height / 2, +vp.height / 2, -2f, 2f);
+            Matrix.orthoM(projMatrix, 0, -vp.width / 2, +vp.width / 2, -vp.height / 2,
+                    +vp.height / 2, -2f, 2f);
             int nvpy = (height - vp.y - vp.height);
             GLES20.glViewport(vp.x, nvpy, vp.width, vp.height);
             initQuadCoordinates(emulator, vp.width, vp.height);
@@ -221,10 +222,10 @@ class OpenGLView extends GLSurfaceView implements EmulatorView {
             GLES20.glEnableVertexAttribArray(positionHandle);
             GLES20.glEnableVertexAttribArray(texCoordHandle);
             checkGlError("handles");
-            GLES20.glVertexAttribPointer(positionHandle, COORDS_PER_VERTEX,
-                    GLES20.GL_FLOAT, false, VERTEX_STRIDE, vertexBuffer);
-            GLES20.glVertexAttribPointer(texCoordHandle, COORDS_PER_TEXTURE,
-                    GLES20.GL_FLOAT, false, TEXTURE_STRIDE, textureBuffer);
+            GLES20.glVertexAttribPointer(positionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT,
+                    false, VERTEX_STRIDE, vertexBuffer);
+            GLES20.glVertexAttribPointer(texCoordHandle, COORDS_PER_TEXTURE, GLES20.GL_FLOAT,
+                    false, TEXTURE_STRIDE, textureBuffer);
             mvpMatrixHandle = GLES20.glGetUniformLocation(program, "uMVPMatrix");
             GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, projMatrix, 0);
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
@@ -268,7 +269,8 @@ class OpenGLView extends GLSurfaceView implements EmulatorView {
                     width / 2f, height / 2f, 0,
                     width / 2f, -height / 2f, 0
             };
-            textureCoords = new float[]{0,
+            textureCoords = new float[]{
+                    0,
                     maxTexY / (float) textureSize,
                     0,
                     0,

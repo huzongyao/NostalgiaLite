@@ -11,7 +11,7 @@ public class FilenameExtFilter implements java.io.FilenameFilter {
     boolean showHiden = false;
 
     public FilenameExtFilter(String[] exts, boolean showDirs, boolean showHiden) {
-        Set<String> tmp = new HashSet<String>();
+        Set<String> tmp = new HashSet<>();
 
         for (String ext : exts)
             tmp.add(ext);
@@ -37,7 +37,7 @@ public class FilenameExtFilter implements java.io.FilenameFilter {
     }
 
     private Set<String> addDots(Set<String> exts) {
-        Set<String> temp = new HashSet<String>();
+        Set<String> temp = new HashSet<>();
 
         for (String ext : exts) {
             temp.add("." + ext);

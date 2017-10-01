@@ -14,7 +14,7 @@ import nostalgia.framework.utils.NLog;
 
 public class WifiControllerClient {
     public static final int PACKET_SIZE = 32;
-    private static final String TAG = "remote.wifi.WifiControllerClient";
+    private static final String TAG = "WifiControllerClient";
     ByteBuffer byteBuffer = ByteBuffer.allocate(PACKET_SIZE);
     long lastSendTimestamp = 0;
     private InetAddress ip;
@@ -39,35 +39,31 @@ public class WifiControllerClient {
     }
 
 
-    public synchronized void sendControllerCommandEvent(int command,
-                                                        int param0, int param1) {
+    public synchronized void sendControllerCommandEvent(int command, int param0, int param1) {
         thread.sendCommandEventForce(command, param0, param1);
     }
 
 
-    public synchronized void sendControllerEmulatorKeyEvent(final int action,
-                                                            final int keyCode) {
+    public synchronized void sendControllerEmulatorKeyEvent(final int action, final int keyCode) {
         if (action == 1) {
             keysStates = keysStates | (1 << keyCode);
-
         } else if (action == 0) {
             keysStates = keysStates & ~(1 << keyCode);
         }
-
         thread.forceSend();
     }
 
     private void sendKeyStates(final int port) {
         try {
             lastSendTimestamp = System.currentTimeMillis();
-            NLog.i(TAG, "send new event:" + Integer.toBinaryString(keysStates)
-                    + " port:" + port + " ip:" + ip);
+            NLog.i(TAG, "send new event:" +
+                    Integer.toBinaryString(keysStates) + " port:" + port + " ip:" + ip);
             byteBuffer.clear();
             byteBuffer.putInt(0, PACKET_TYPE.EMULATOR_KEY_PACKET.ordinal());
             byteBuffer.putInt(4, port);
             byteBuffer.putInt(8, keysStates);
-            DatagramPacket sendPacket = new DatagramPacket(byteBuffer.array(),
-                    PACKET_SIZE, ip, WifiControllerServer.SERVER_PORT);
+            DatagramPacket sendPacket =
+                    new DatagramPacket(byteBuffer.array(), PACKET_SIZE, ip, WifiControllerServer.SERVER_PORT);
             DatagramSocket clientSocket = null;
 
             try {
@@ -92,8 +88,8 @@ public class WifiControllerClient {
             byteBuffer.putInt(0, PACKET_TYPE.ANDROID_KEY_PACKET.ordinal());
             byteBuffer.putInt(4, event.getKeyCode());
             byteBuffer.putInt(8, event.getAction());
-            DatagramPacket sendPacket = new DatagramPacket(byteBuffer.array(),
-                    PACKET_SIZE, ip, WifiControllerServer.SERVER_PORT);
+            DatagramPacket sendPacket =
+                    new DatagramPacket(byteBuffer.array(), PACKET_SIZE, ip, WifiControllerServer.SERVER_PORT);
             DatagramSocket clientSocket = null;
 
             try {
@@ -122,12 +118,11 @@ public class WifiControllerClient {
 
             try {
                 clientSocket = new DatagramSocket();
-                DatagramPacket sendPacket = new DatagramPacket(
-                        byteBuffer.array(), PACKET_SIZE, ip,
-                        WifiControllerServer.SERVER_PORT);
+                DatagramPacket sendPacket =
+                        new DatagramPacket(byteBuffer.array(), PACKET_SIZE, ip, WifiControllerServer.SERVER_PORT);
                 clientSocket.send(sendPacket);
-                sendPacket = new DatagramPacket(textData, textData.length, ip,
-                        WifiControllerServer.SERVER_PORT);
+                sendPacket =
+                        new DatagramPacket(textData, textData.length, ip, WifiControllerServer.SERVER_PORT);
                 clientSocket.send(sendPacket);
 
             } finally {
@@ -143,8 +138,7 @@ public class WifiControllerClient {
 
     private void sendCommandEvent(int command, int param0, int param1) {
         try {
-            NLog.i(TAG, "send command event:" + command + " " + param0 + " "
-                    + param1);
+            NLog.i(TAG, "send command event:" + command + " " + param0 + " " + param1);
             byteBuffer.clear();
             byteBuffer.putInt(0, PACKET_TYPE.COMMAND_PACKET.ordinal());
             byteBuffer.putInt(4, command);
@@ -154,17 +148,14 @@ public class WifiControllerClient {
 
             try {
                 clientSocket = new DatagramSocket();
-                DatagramPacket sendPacket = new DatagramPacket(
-                        byteBuffer.array(), PACKET_SIZE, ip,
-                        WifiControllerServer.SERVER_PORT);
+                DatagramPacket sendPacket =
+                        new DatagramPacket(byteBuffer.array(), PACKET_SIZE, ip, WifiControllerServer.SERVER_PORT);
                 clientSocket.send(sendPacket);
-
             } finally {
                 if (clientSocket != null) {
                     clientSocket.close();
                 }
             }
-
         } catch (Exception e) {
             NLog.e(TAG, "", e);
         }
@@ -174,7 +165,6 @@ public class WifiControllerClient {
         if (thread != null) {
             thread.finish();
         }
-
         thread = new SenderThread();
         thread.start();
     }
@@ -209,49 +199,38 @@ public class WifiControllerClient {
                 if (needsSend) {
                     synchronized (keyFifo) {
                         KeyEvent event = keyFifo.poll();
-
                         while (event != null) {
                             sendAndroidKeyEvent(event);
                             event = keyFifo.poll();
                         }
                     }
-
                     sendKeyStates(port);
-
                     if (textEvent != null) {
                         synchronized (textEvent) {
                             sendTextEvent(textEvent);
                             textEvent = null;
                         }
                     }
-
                     if (commandEvent != null) {
                         synchronized (commandEvent) {
                             Pair<Integer, Integer> params = commandEvent.second;
-                            sendCommandEvent(commandEvent.first, params.first,
-                                    params.second);
+                            sendCommandEvent(commandEvent.first, params.first, params.second);
                             commandEvent = null;
                         }
                     }
-
                     needsSend = false;
                     counter = 0;
-
                 } else {
                     counter += DELAY;
                 }
-
                 if (counter >= 300) {
                     needsSend = true;
                 }
-
                 try {
                     Thread.sleep(DELAY);
-
                 } catch (InterruptedException e) {
                 }
             }
-
             NLog.d(TAG, "Wifi client thread stop");
         }
 
@@ -267,7 +246,6 @@ public class WifiControllerClient {
             synchronized (keyFifo) {
                 keyFifo.add(event);
             }
-
             needsSend = true;
         }
 
@@ -277,8 +255,7 @@ public class WifiControllerClient {
         }
 
         public void sendCommandEventForce(int command, int param0, int param1) {
-            commandEvent = new Pair<Integer, Pair<Integer, Integer>>(command,
-                    new Pair<Integer, Integer>(param0, param1));
+            commandEvent = new Pair<>(command, new Pair<>(param0, param1));
             needsSend = true;
         }
     }

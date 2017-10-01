@@ -169,11 +169,9 @@ public class KeyboardController implements EmulatorController {
         } else if (mapValue == KEY_FAST_FORWARD) {
             if (pressed) {
                 emulatorActivity.onFastForwardDown();
-
             } else {
                 emulatorActivity.onFastForwardUp();
             }
-
         } else if (mapValue == KEY_MENU) {
             if (pressed) {
                 emulatorActivity.openGameMenu();
@@ -196,7 +194,6 @@ public class KeyboardController implements EmulatorController {
             loadingOrSaving[slot] = true;
             emulatorActivity.getManager().saveState(slot);
         }
-
         if (!isKeyPressed) {
             loadingOrSaving[slot] = false;
         }
@@ -207,7 +204,6 @@ public class KeyboardController implements EmulatorController {
             loadingOrSaving[slot] = true;
             emulatorActivity.getManager().loadState(slot);
         }
-
         if (!isKeyPressed) {
             loadingOrSaving[slot] = false;
         }

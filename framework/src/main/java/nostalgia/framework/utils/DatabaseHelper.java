@@ -59,7 +59,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (oldVersion == 13 && newVersion == 21) {
             return;
         }
-
         removeTablesDB(db);
         onCreate(db);
     }

@@ -16,6 +16,7 @@ import nostalgia.framework.remote.wifi.WifiControllerServer;
 import nostalgia.framework.utils.NLog;
 
 public class VirtualDPad implements OnControllerEventListener {
+
     private static final String TAG = "remote.VirtualDPad";
     private static VirtualDPad instance = new VirtualDPad();
     public long downTime;
@@ -100,8 +101,8 @@ public class VirtualDPad implements OnControllerEventListener {
                 return;
         }
 
-        int action = event.action == EmulatorController.ACTION_DOWN ?
-                KeyEvent.ACTION_DOWN : KeyEvent.ACTION_UP;
+        int action = event.action ==
+                EmulatorController.ACTION_DOWN ? KeyEvent.ACTION_DOWN : KeyEvent.ACTION_UP;
         final KeyEvent keyEvent = new KeyEvent(action, kc);
 
         if (action == EmulatorController.ACTION_DOWN) {

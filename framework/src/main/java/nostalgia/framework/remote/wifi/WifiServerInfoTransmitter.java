@@ -56,16 +56,16 @@ public class WifiServerInfoTransmitter extends Thread {
             InetAddress broadcastAddress = Utils.getBroadcastAddress(context);
             String manufacturer = Build.MANUFACTURER;
             String model = Build.MODEL;
-            byte[] sendData = (MESSAGE_PREFIX + "%" + manufacturer + " "
-                    + model + "%" + Utils.getDeviceType(context).name() + "%"
-                    + sessionDescription + "%").getBytes();
+            byte[] sendData = (MESSAGE_PREFIX + "%" + manufacturer + " " + model +
+                    "%" + Utils.getDeviceType(context).name() +
+                    "%" + sessionDescription + "%").getBytes();
             int counter = 0;
 
             while (running) {
                 NLog.i(TAG, "send broadcast " + (counter++) + " to " + broadcastAddress);
                 try {
-                    DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length,
-                            broadcastAddress, BROADCAST_PORT);
+                    DatagramPacket sendPacket =
+                            new DatagramPacket(sendData, sendData.length, broadcastAddress, BROADCAST_PORT);
                     serverSocket.send(sendPacket);
                 } catch (Exception e) {
                     try {

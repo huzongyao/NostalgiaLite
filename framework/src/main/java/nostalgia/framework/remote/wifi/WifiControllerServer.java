@@ -99,21 +99,17 @@ public class WifiControllerServer implements ControllerEventSource {
                 NLog.i(TAG, "Start listening on");
 
                 while (running.get()) {
-                    DatagramPacket packet = new DatagramPacket(buffer,
-                            WifiControllerClient.PACKET_SIZE);
-
+                    DatagramPacket packet = new DatagramPacket(buffer, WifiControllerClient.PACKET_SIZE);
                     try {
                         serverSocket.receive(packet);
                         byte[] data = packet.getData();
                         ByteBuffer bb = ByteBuffer.wrap(data);
-                        PACKET_TYPE packetType = PACKET_TYPE.values()[bb
-                                .getInt(0)];
+                        PACKET_TYPE packetType = PACKET_TYPE.values()[bb.getInt(0)];
 
                         switch (packetType) {
                             case PING_PACKET:
                                 DatagramPacket responsePacket = new DatagramPacket(
-                                        new byte[]{1, 1, 1, 1}, 4,
-                                        packet.getAddress(), packet.getPort());
+                                        new byte[]{1, 1, 1, 1}, 4, packet.getAddress(), packet.getPort());
                                 NLog.i(TAG, "sending response packet");
                                 serverSocket.send(responsePacket);
                                 break;
@@ -165,8 +161,7 @@ public class WifiControllerServer implements ControllerEventSource {
                             case TEXT_PACKET: {
                                 int len = bb.getInt(4);
                                 byte[] txtbuffer = new byte[len];
-                                DatagramPacket txtpacket = new DatagramPacket(
-                                        txtbuffer, len);
+                                DatagramPacket txtpacket = new DatagramPacket(txtbuffer, len);
                                 serverSocket.receive(txtpacket);
                                 byte[] arr = txtpacket.getData();
                                 String txt = new String(arr, 0, len);
@@ -186,8 +181,7 @@ public class WifiControllerServer implements ControllerEventSource {
 
                                 synchronized (listenerLock) {
                                     if (listener != null) {
-                                        listener.onControllerCommandEvent(command,
-                                                param1, param2);
+                                        listener.onControllerCommandEvent(command, param1, param2);
                                     }
                                 }
 
@@ -211,8 +205,7 @@ public class WifiControllerServer implements ControllerEventSource {
                     }
                 }
 
-                NLog.d(TAG, "Stopping remote controller SERVER THREAD "
-                        + getName());
+                NLog.d(TAG, "Stopping remote controller SERVER THREAD " + getName());
 
             } catch (Exception e) {
                 NLog.e(TAG, "Error: SERVER STOPPED " + getName());

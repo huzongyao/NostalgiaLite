@@ -24,12 +24,11 @@ public class Cheat {
 
 
     public static ArrayList<Cheat> getAllCheats(Context context, String gameHash) {
-        ArrayList<Cheat> result = new ArrayList<Cheat>();
-        SharedPreferences pref = context.getSharedPreferences(gameHash
-                + CHEAT_PREF_SUFFIX, Context.MODE_PRIVATE);
+        ArrayList<Cheat> result = new ArrayList<>();
+        SharedPreferences pref =
+                context.getSharedPreferences(gameHash + CHEAT_PREF_SUFFIX, Context.MODE_PRIVATE);
         @SuppressWarnings("unchecked")
         Map<String, String> all = (Map<String, String>) pref.getAll();
-
         for (Entry<String, String> item : all.entrySet()) {
             String[] pom = item.getValue().split("\\|");
 
@@ -45,8 +44,8 @@ public class Cheat {
 
     public static int[] rawToValues(String raw) {
         String comp = null;
-        String addr = raw.split("\\:")[0];
-        String val = raw.split("\\:")[1];
+        String addr = raw.split(":")[0];
+        String val = raw.split(":")[1];
 
         if (addr.contains("?")) {
             String[] segments = addr.split("\\?");
@@ -77,41 +76,31 @@ public class Cheat {
             hexComp = Integer.toHexString(comp);
             hexComp = "00".substring(hexComp.length()) + hexComp;
         }
-
-        String res = hexAddr + (hexComp != null ? "?" + hexComp + ":" : ":")
-                + hexVal;
-        return res;
+        return hexAddr + (hexComp != null ? "?" + hexComp + ":" : ":") + hexVal;
     }
 
 
-    public static ArrayList<String> getAllEnableCheats(Context context,
-                                                       String gameHash) {
+    public static ArrayList<String> getAllEnableCheats(Context context, String gameHash) {
         ArrayList<Cheat> cheats = getAllCheats(context, gameHash);
-        ArrayList<String> result = new ArrayList<String>();
-
+        ArrayList<String> result = new ArrayList<>();
         for (Cheat cheat : cheats) {
             if (cheat.enable)
                 result.add(cheat.chars);
         }
-
         return result;
     }
 
 
-    public static void saveCheats(Context context, String gameHash,
-                                  ArrayList<Cheat> items) {
-        SharedPreferences pref = context.getSharedPreferences(gameHash
-                + CHEAT_PREF_SUFFIX, Context.MODE_PRIVATE);
+    public static void saveCheats(Context context, String gameHash, ArrayList<Cheat> items) {
+        SharedPreferences pref =
+                context.getSharedPreferences(gameHash + CHEAT_PREF_SUFFIX, Context.MODE_PRIVATE);
         Editor editor = pref.edit();
         editor.clear();
-
         for (Cheat cheat : items) {
             if (!cheat.chars.equals("")) {
-                editor.putString(cheat.chars, (cheat.enable ? "1" : "0") + "|"
-                        + cheat.desc + "|");
+                editor.putString(cheat.chars, (cheat.enable ? "1" : "0") + "|" + cheat.desc + "|");
             }
         }
-
         editor.apply();
     }
 }

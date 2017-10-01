@@ -52,9 +52,8 @@ public class SDCardUtil {
      * @return A map of all storage locations available
      */
     public static HashSet<File> getAllStorageLocations() {
-        HashSet<String> sdcards = new HashSet<String>(3);
+        HashSet<String> sdcards = new HashSet<>(3);
         sdcards.add("/mnt/sdcard");
-
         try {
             File mountFile = new File("/proc/mounts");
             if (mountFile.exists()) {
@@ -66,10 +65,8 @@ public class SDCardUtil {
                     // line, protoze
                     // zbytek line je
                     // case sensitive
-                    if (lineLower.contains("vfat")
-                            || lineLower.contains("exfat")
-                            || lineLower.contains("fuse")
-                            || lineLower.contains("sdcardfs")) {
+                    if (lineLower.contains("vfat") || lineLower.contains("exfat") ||
+                            lineLower.contains("fuse") || lineLower.contains("sdcardfs")) {
                         String[] lineElements = line.split(" ");
                         String path = lineElements[1];
                         sdcards.add(path);
@@ -79,11 +76,8 @@ public class SDCardUtil {
         } catch (Exception e) {
             NLog.e(TAG, "", e);
         }
-
         getSDcardsPath(sdcards);
-
-        HashSet<File> result = new HashSet<File>(sdcards.size());
-
+        HashSet<File> result = new HashSet<>(sdcards.size());
         for (String mount : sdcards) {
             File root = new File(mount);
             if (root.exists() && root.isDirectory() && root.canRead()) {
@@ -103,17 +97,15 @@ public class SDCardUtil {
         File file = new File("/system/etc/vold.fstab");
         FileReader fr = null;
         BufferedReader br = null;
-
         try {
             fr = new FileReader(file);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-
         try {
             if (fr != null) {
-                String defaultExternalStorage = Environment
-                        .getExternalStorageDirectory().getAbsolutePath();
+                String defaultExternalStorage =
+                        Environment.getExternalStorageDirectory().getAbsolutePath();
                 br = new BufferedReader(fr);
                 String s = br.readLine();
                 while (s != null) {

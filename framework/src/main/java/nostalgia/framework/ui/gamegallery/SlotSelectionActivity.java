@@ -31,6 +31,7 @@ import nostalgia.framework.ui.widget.PopupMenu.OnItemSelectedListener;
 import nostalgia.framework.utils.NLog;
 
 public class SlotSelectionActivity extends ControllableActivity {
+
     public static final String EXTRA_GAME = "EXTRA_GAME";
     public static final String EXTRA_BASE_DIRECTORY = "EXTRA_BASE_DIR";
     public static final String EXTRA_SLOT = "EXTRA_SLOT";
@@ -48,19 +49,17 @@ public class SlotSelectionActivity extends ControllableActivity {
     int saveFocusIdx = 0;
     private ActionBar actionBar;
 
-    private void initSlot(final SlotInfo slotInfo, final int idx,
-                          final String labelS, String messageS, final String dateS,
-                          final String timeS) {
+    private void initSlot(final SlotInfo slotInfo, final int idx, final String labelS,
+                          String messageS, final String dateS, final String timeS) {
+
         final View slotView = slots[idx];
         final boolean isUsed = slotInfo.isUsed;
         Bitmap screenshotBitmap = slotInfo.screenShot;
         TextView label = (TextView) slotView.findViewById(R.id.row_slot_label);
-        TextView message = (TextView) slotView
-                .findViewById(R.id.row_slot_message);
+        TextView message = (TextView) slotView.findViewById(R.id.row_slot_message);
         TextView date = (TextView) slotView.findViewById(R.id.row_slot_date);
         TextView time = (TextView) slotView.findViewById(R.id.row_slot_time);
-        ImageView screenshot = (ImageView) slotView
-                .findViewById(R.id.row_slot_screenshot);
+        ImageView screenshot = (ImageView) slotView.findViewById(R.id.row_slot_screenshot);
         label.setText(labelS);
         message.setText(messageS);
         date.setText(dateS);
@@ -155,10 +154,8 @@ public class SlotSelectionActivity extends ControllableActivity {
             }
             String label = "SLOT  " + (i + 1);
             Date time = new Date(slotInfo.lastModified);
-            String dateString = slotInfo.lastModified == -1 ? emptyDate
-                    : dateFormat.format(time);
-            String timeString = slotInfo.lastModified == -1 ? "--:--"
-                    : timeFormat.format(time);
+            String dateString = slotInfo.lastModified == -1 ? emptyDate : dateFormat.format(time);
+            String timeString = slotInfo.lastModified == -1 ? "--:--" : timeFormat.format(time);
             initSlot(slotInfo, i, label, message, dateString, timeString);
 
             if (focusTime < slotInfo.lastModified) {

@@ -2,10 +2,10 @@ package nostalgia.framework.remote;
 
 public interface ControllerEventSource {
 
-    public void setControllerEventListener(OnControllerEventListener listener);
+    void setControllerEventListener(OnControllerEventListener listener);
 
-    public void onResume();
+    void onResume();
 
-    public void onPause();
+    void onPause();
 
 }

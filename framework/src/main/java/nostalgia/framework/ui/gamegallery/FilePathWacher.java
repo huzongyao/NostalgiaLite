@@ -17,15 +17,12 @@ public class FilePathWacher extends FileObserver {
         flags = FileObserver.ALL_EVENTS;
     }
 
-    private HashSet<String> exts = new HashSet<String>();
+    private HashSet<String> exts = new HashSet<>();
     private OnSDCardChangeListener listener;
 
-    public FilePathWacher(Context context, HashSet<String> exts,
-                          OnSDCardChangeListener listener) {
-        super(Environment.getExternalStorageDirectory().getAbsolutePath(),
-                flags);
-        NLog.i(TAG, "create watcher "
-                + Environment.getExternalStorageDirectory().getAbsolutePath()
+    public FilePathWacher(Context context, HashSet<String> exts, OnSDCardChangeListener listener) {
+        super(Environment.getExternalStorageDirectory().getAbsolutePath(), flags);
+        NLog.i(TAG, "create watcher " + Environment.getExternalStorageDirectory().getAbsolutePath()
                 + " " + Integer.toBinaryString(flags));
         this.exts = exts;
         this.listener = listener;

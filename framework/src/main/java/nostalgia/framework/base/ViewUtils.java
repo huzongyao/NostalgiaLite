@@ -64,8 +64,8 @@ public class ViewUtils {
         return res;
     }
 
-    public static ViewPort loadOrComputeViewPort(Context context,
-                                                 Emulator emulator, int w, int h, int paddingLeft, int paddingTop,
+    public static ViewPort loadOrComputeViewPort(Context context, Emulator emulator,
+                                                 int w, int h, int paddingLeft, int paddingTop,
                                                  boolean ignoreFullscreenSettings) {
         ViewPort vp = null;
         GfxProfile profile = null;
