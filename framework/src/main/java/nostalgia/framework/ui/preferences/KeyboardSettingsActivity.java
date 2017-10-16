@@ -70,8 +70,7 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
         NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_DPAD_RIGHT, "Right");
         NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_DPAD_UP, "Up");
         NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_DPAD_DOWN, "Down");
-        NON_PRINTABLE_KEY_LABELS.put(KeyboardController.KEY_XPERIA_CIRCLE,
-                "Circle");
+        NON_PRINTABLE_KEY_LABELS.put(KeyboardController.KEY_XPERIA_CIRCLE, "Circle");
 
         if (Build.VERSION.SDK_INT > 8) {
             NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_A, "A");
@@ -80,15 +79,11 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
             NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_X, "X");
             NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_Y, "Y");
             NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_Z, "Z");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_SELECT,
-                    "Select");
-            NON_PRINTABLE_KEY_LABELS
-                    .put(KeyEvent.KEYCODE_BUTTON_START, "Start");
+            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_SELECT, "Select");
+            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_START, "Start");
             NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_MODE, "MODE");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_THUMBL,
-                    "THUMBL");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_THUMBR,
-                    "THUMBR");
+            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_THUMBL, "THUMBL");
+            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_THUMBR, "THUMBR");
             NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_1, "1");
             NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_2, "2");
             NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_3, "3");
@@ -388,28 +383,24 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = inflater.inflate(R.layout.row_keyboard_settings,
-                        null);
+                convertView = inflater.inflate(R.layout.row_keyboard_settings, null);
             }
 
-            TextView name = (TextView) convertView
-                    .findViewById(R.id.row_keyboard_name);
-            TextView desc = (TextView) convertView
-                    .findViewById(R.id.row_keyboard_desc);
-            TextView keyName = (TextView) convertView
-                    .findViewById(R.id.row_keyboard_key_name);
+            TextView name = (TextView) convertView.findViewById(R.id.row_keyboard_name);
+            TextView desc = (TextView) convertView.findViewById(R.id.row_keyboard_desc);
+            TextView keyName = (TextView) convertView.findViewById(R.id.row_keyboard_key_name);
             convertView.setEnabled(true);
 
             if (position < KeyboardProfile.BUTTON_NAMES.length) {
                 name.setText(KeyboardProfile.BUTTON_NAMES[position]);
-                int keyCode = inverseMap
-                        .get(KeyboardProfile.BUTTON_KEY_EVENT_CODES[position]);
+                int keyCode = inverseMap.get(KeyboardProfile.BUTTON_KEY_EVENT_CODES[position]);
                 String label = getKeyLabel(keyCode);
                 keyName.setText(label);
                 keyName.setVisibility(View.VISIBLE);
 
             } else {
-                name.setText(KeyboardProfile.isDefaultProfile(profile.name) ? getText(R.string.pref_keyboard_settings_restore_def)
+                name.setText(KeyboardProfile.isDefaultProfile(profile.name) ?
+                        getText(R.string.pref_keyboard_settings_restore_def)
                         : getText(R.string.pref_keyboard_settings_delete_prof));
                 desc.setVisibility(View.GONE);
                 keyName.setVisibility(View.GONE);
@@ -435,12 +426,9 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
 
         public int getRowHeight() {
             if (heightCache < 0) {
-                View convertView = inflater.inflate(
-                        R.layout.row_keyboard_settings, null);
-                convertView
-                        .measure(MeasureSpec.makeMeasureSpec(0,
-                                MeasureSpec.UNSPECIFIED), MeasureSpec
-                                .makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+                View convertView = inflater.inflate(R.layout.row_keyboard_settings, null);
+                convertView.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
+                        MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
                 heightCache = convertView.getMeasuredHeight();
             }
 

@@ -32,6 +32,7 @@
 #include "vsuni.h"
 #include "drawing.h"
 #include "driver.h"
+#include "android_log.h"
 //#include "drivers/common/vidblit.h"
 #ifdef _S9XLUA_H
 #include "fceulua.h"
@@ -462,6 +463,7 @@ void FCEU_DispMessageOnMovie(char *format, ...)
 
 void FCEU_DispMessage(char *format, int disppos=0, ...)
 {
+#if 0
 	va_list ap;
 
 	va_start(ap,disppos);
@@ -490,7 +492,15 @@ void FCEU_DispMessage(char *format, int disppos=0, ...)
 		if(strcmp(guiMessage.errmsg, "Movie playback stopped.") != 0)
 			guiMessage.howlong = 0;
 	}
-	#endif
+    #endif
+#else
+    va_list ap;
+    char temp[2048];
+    va_start(ap,disppos);
+    vsnprintf(temp,sizeof(temp),format,ap);
+    va_end(ap);
+    FCEU_printf(temp);
+#endif
 }
 
 void FCEU_ResetMessages()

@@ -645,7 +645,7 @@ public abstract class EmulatorActivity extends Activity
 
     @Override
     public void onGameMenuCreate(GameMenu menu) {
-        menu.add(R.string.game_menu_reset, R.drawable.ic_reset);
+        menu.add(R.string.game_menu_reset, R.drawable.ic_reload);
         menu.add(R.string.game_menu_save, R.drawable.ic_save);
         menu.add(R.string.game_menu_load, R.drawable.ic_load);
         menu.add(R.string.game_menu_cheats, R.drawable.ic_cheats);

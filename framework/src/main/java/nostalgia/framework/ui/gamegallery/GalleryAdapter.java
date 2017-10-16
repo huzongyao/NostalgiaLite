@@ -22,7 +22,7 @@ import nostalgia.framework.R;
 
 public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
 
-    public static final int SORT_BY_NAME = 0;
+    public static final int SORT_BY_NAME_ALPHA = 0;
     public static final int SORT_BY_INSERT_DATE = 1;
     public static final int SORT_BY_MOST_PLAYED = 2;
     public static final int SORT_BY_LAST_PLAYED = 3;
@@ -36,7 +36,7 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
     private ArrayList<GameDescription> games = new ArrayList<>();
     private ArrayList<RowItem> filterGames = new ArrayList<>();
     private int sumRuns = 0;
-    private int sortType = SORT_BY_NAME;
+    private int sortType = SORT_BY_NAME_ALPHA;
 
     private Comparator<GameDescription> nameComparator = new Comparator<GameDescription>() {
         @Override
@@ -135,7 +135,7 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
     private void filterGames() {
         filterGames.clear();
         switch (sortType) {
-            case SORT_BY_NAME:
+            case SORT_BY_NAME_ALPHA:
                 Collections.sort(games, nameComparator);
                 break;
             case SORT_BY_INSERT_DATE:
@@ -166,7 +166,7 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
         }
 
         alphaIndexer.clear();
-        if (sortType == SORT_BY_NAME) {
+        if (sortType == SORT_BY_NAME_ALPHA) {
             for (int i = 0; i < filterGames.size(); i++) {
                 RowItem item = filterGames.get(i);
                 char ch = item.firstLetter;

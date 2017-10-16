@@ -227,7 +227,7 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_gravity="center"
-            android:hint="Type search name"
+            android:hint="@string/type_search_name"
             android:singleLine="true" />
     </FrameLayout>
 

@@ -683,6 +683,7 @@ std::string FCEU_MakeFName(int type, int id1, const char *cd1)
 				sprintf(ret,"%s" PSS "sav" PSS "%s.fds",BaseDirectory.c_str(),FileBase);
 			break;
 		case FCEUMKF_SAV:
+#if 0
 			if(odirs[FCEUIOD_NV])
 				sprintf(ret,"%s" PSS "%s.%s",odirs[FCEUIOD_NV],FileBase,cd1);
 			else
@@ -694,6 +695,9 @@ std::string FCEU_MakeFName(int type, int id1, const char *cd1)
 				else
 					sprintf(ret,"%s" PSS "sav" PSS "%s.%s",BaseDirectory.c_str(),FileBase,cd1);
 			}
+#else
+            sprintf(ret,"%s/%s.%s",BatterySaveDir.c_str(), FileBase,cd1);
+#endif
 			break;
 		case FCEUMKF_AUTOSTATE:
 			mfnString = GetMfn();

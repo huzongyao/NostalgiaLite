@@ -15,8 +15,7 @@ public class SeekBarVibrationPreference extends SeekBarPreference {
 
     public SeekBarVibrationPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
-        vibrator = (Vibrator) getContext().getSystemService(
-                Context.VIBRATOR_SERVICE);
+        vibrator = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
         setNegativeButtonText("");
     }
 

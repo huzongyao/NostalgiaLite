@@ -10,9 +10,10 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
+import android.support.v7.app.ActionBar;
+import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
@@ -24,7 +25,7 @@ import nostalgia.framework.R;
 import nostalgia.framework.base.EmulatorHolder;
 import nostalgia.framework.remote.VirtualDPad;
 
-public class GeneralPreferenceActivity extends PreferenceActivity {
+public class GeneralPreferenceActivity extends AppCompatPreferenceActivity {
 
     static String[] keyboardProfileNames = null;
     static ListPreference selProfile;
@@ -114,9 +115,22 @@ public class GeneralPreferenceActivity extends PreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
         NEW_PROFILE = getText(R.string.key_profile_new).toString();
         initKeyboardProfiles();
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

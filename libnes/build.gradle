@@ -18,17 +18,24 @@ model {
             abiFilters.addAll(['armeabi', 'armeabi-v7a', 'x86'])
             stl = "gnustl_static"
             cppFlags.addAll(['-DPSS_STYLE=1', '-DHAVE_ASPRINTF', '-DLSB_FIRST', '-DFRAMESKIP',
-                             '-DIOAPI_NO_64','-DNDK_DEBUG', '-D_STLP_HAS_WCHAR_T',
-                             '-D_GLIBCXX_USE_WCHAR_T', '-Wno-write-strings', '-Ofast',
-                             '-ffast-math', '-fexceptions', '-frtti', '-fno-builtin-sin',
-                             '-fno-builtin-cos', '-fmerge-all-constants', '-fvisibility=hidden',
-                             '-fvisibility-inlines-hidden', '-funroll-loops'])
+                             '-DIOAPI_NO_64', '-D_STLP_HAS_WCHAR_T', '-D_GLIBCXX_USE_WCHAR_T',
+                             '-Wno-write-strings', '-Ofast', '-ffast-math', '-fexceptions',
+                             '-frtti', '-fno-builtin-sin', '-fno-builtin-cos', '-fmerge-all-constants',
+                             '-fvisibility=hidden', '-fvisibility-inlines-hidden', '-funroll-loops'])
             ldLibs.addAll(['z', 'log', 'jnigraphics', 'GLESv1_CM'])
         }
     }
 
     android.buildTypes {
+        debug {
+            ndk {
+                cppFlags.add('-DNDK_DEBUG')
+            }
+        }
         release {
+            ndk {
+                cppFlags.add('-DNDK_DEBUG')
+            }
             shrinkResources true
             useProguard true
             proguardFiles.add(file('proguard-rules.pro'))

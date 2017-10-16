@@ -91,8 +91,7 @@ bool Emulator::loadGame(const char *path, const char *batteryPath, const char *s
 }
 
 // based on http://willperone.net/Code/codescaling.php
-bool Emulator::render(JNIEnv *env, jobject bitmap, int w, int h,
-                      BUFFER_TYPE *force) {
+bool Emulator::render(JNIEnv *env, jobject bitmap, int w, int h, BUFFER_TYPE *force) {
     int stable = swapBuffersBeforeRead();
     void *pixels;
 

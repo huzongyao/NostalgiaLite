@@ -2,9 +2,9 @@
 <resources>
     <string-array name="gallery_page_tab_names">
         <item>名称排序</item>
-        <item>最后使用</item>
-        <item>最后导入</item>
-        <item>最多使用</item>
+        <item>最近导入</item>
+        <item>最热门的</item>
+        <item>最近玩的</item>
     </string-array>
     <string-array name="general_pref_rotation_list">
         <item>自动</item>

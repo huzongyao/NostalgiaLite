@@ -391,11 +391,11 @@ Bridge bridge(&emulator);
 bool turbo = 0;
 int closeFinishedMovie = 0;
 
-unsigned long FCEUD_GetTime(void) {
+uint64 FCEUD_GetTime(void) {
     return 0;
 }
 
-unsigned long FCEUD_GetTimeFreq(void) {
+uint64 FCEUD_GetTimeFreq(void) {
     return 0;
 }
 

@@ -78,8 +78,8 @@ public class GGEmulator extends JniEmulator {
 
     private static class Info extends BasicEmulatorInfo {
 
-        static List<GfxProfile> profiles = new ArrayList<GfxProfile>();
-        static List<SfxProfile> sfxProfiles = new ArrayList<SfxProfile>();
+        static List<GfxProfile> profiles = new ArrayList<>();
+        static List<SfxProfile> sfxProfiles = new ArrayList<>();
 
         static {
             GfxProfile prof = new GGGfxProfile();

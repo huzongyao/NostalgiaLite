@@ -20,8 +20,9 @@ public class GalleryPagerAdapter extends PagerAdapter {
 
     public static final String EXTRA_POSITIONS = "EXTRA_POSITIONS";
     private final static int[] SORT_TYPES = new int[]{
-            GalleryAdapter.SORT_BY_NAME,
+            GalleryAdapter.SORT_BY_NAME_ALPHA,
             GalleryAdapter.SORT_BY_LAST_PLAYED,
+            GalleryAdapter.SORT_BY_MOST_PLAYED,
     };
     private final String[] mTabTitles;
     private int[] yOffsets = new int[SORT_TYPES.length];
@@ -47,7 +48,7 @@ public class GalleryPagerAdapter extends PagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return mTabTitles[position];
+        return mTabTitles[SORT_TYPES[position]];
     }
 
     @Override

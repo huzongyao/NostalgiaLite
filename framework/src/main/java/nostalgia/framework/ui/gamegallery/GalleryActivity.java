@@ -11,8 +11,10 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -65,6 +67,8 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
         dbHelper = new DatabaseHelper(this);
         gameMenu = new GameMenu(this, this);
         setContentView(R.layout.activity_gallery);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         adapter = new GalleryPagerAdapter(this, this);
         adapter.onRestoreInstanceState(savedInstanceState);
         pager = (ViewPager) findViewById(R.id.game_gallery_pager);
@@ -134,11 +138,9 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
                         Editor editor = pref.edit();
                         editor.putBoolean("import", true);
                         editor.apply();
-                        Toast.makeText(this, getText(R.string.export_lite_ok),
-                                Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, getText(R.string.export_lite_ok), Toast.LENGTH_LONG).show();
                     } catch (Exception e) {
-                        Toast.makeText(this, getText(R.string.export_lite_error),
-                                Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, getText(R.string.export_lite_error), Toast.LENGTH_LONG).show();
                     } finally {
                         try {
                             File[] files = new File(sSource).listFiles();
@@ -150,8 +152,7 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
                         }
                     }
                 } else {
-                    Toast.makeText(this, getText(R.string.export_lite_error),
-                            Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getText(R.string.export_lite_error), Toast.LENGTH_LONG).show();
                 }
                 importing = false;
                 if (reloadGames) {
@@ -188,7 +189,7 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
         if (Utils.getDeviceType(this) == ServerType.mobile) {
             menu.add(R.string.gallery_menu_remote_control, R.drawable.ic_gamepad);
         }
-        menu.add(R.string.gallery_menu_reload, R.drawable.ic_reset);
+        menu.add(R.string.gallery_menu_reload, R.drawable.ic_reload);
         menu.add(R.string.gallery_menu_pref, R.drawable.ic_game_settings);
     }
 
@@ -339,9 +340,9 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
                 }
                 if (showToast) {
                     if (count > 0) {
-                        Toast.makeText(GalleryActivity.this,
+                        Snackbar.make(pager,
                                 getString(R.string.gallery_count_of_found_games, count),
-                                Toast.LENGTH_LONG).show();
+                                Snackbar.LENGTH_LONG).setAction("Action", null).show();
                     }
                 }
             }

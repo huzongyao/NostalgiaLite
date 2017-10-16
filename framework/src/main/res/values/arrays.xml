@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string-array name="gallery_page_tab_names">
-        <item>BY NAME</item>
-        <item>LAST PLAYED</item>
-        <item>LAST INSERTED</item>
-        <item>MOST PLAYED</item>
+        <item>Sort By Name</item>
+        <item>Newest Found</item>
+        <item>Most Favourite</item>
+        <item>Play History</item>
     </string-array>
     <string-array name="general_pref_rotation_list">
         <item>Auto</item>
