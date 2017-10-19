@@ -9,14 +9,15 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
 import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.MeasureSpec;
 import android.view.ViewGroup;
@@ -71,59 +72,51 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
         NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_DPAD_UP, "Up");
         NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_DPAD_DOWN, "Down");
         NON_PRINTABLE_KEY_LABELS.put(KeyboardController.KEY_XPERIA_CIRCLE, "Circle");
-
-        if (Build.VERSION.SDK_INT > 8) {
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_A, "A");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_B, "B");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_C, "C");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_X, "X");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_Y, "Y");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_Z, "Z");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_SELECT, "Select");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_START, "Start");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_MODE, "MODE");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_THUMBL, "THUMBL");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_THUMBR, "THUMBR");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_1, "1");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_2, "2");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_3, "3");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_4, "4");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_5, "5");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_6, "6");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_7, "7");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_8, "8");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_9, "9");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_10, "10");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_11, "11");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_12, "12");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_13, "13");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_14, "14");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_15, "15");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_16, "16");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_R1, "R1");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_R2, "R2");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_L1, "L1");
-            NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_L2, "L2");
-        }
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_A, "A");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_B, "B");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_C, "C");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_X, "X");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_Y, "Y");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_Z, "Z");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_SELECT, "Select");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_START, "Start");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_MODE, "MODE");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_THUMBL, "THUMBL");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_THUMBR, "THUMBR");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_1, "1");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_2, "2");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_3, "3");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_4, "4");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_5, "5");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_6, "6");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_7, "7");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_8, "8");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_9, "9");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_10, "10");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_11, "11");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_12, "12");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_13, "13");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_14, "14");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_15, "15");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_16, "16");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_R1, "R1");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_R2, "R2");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_L1, "L1");
+        NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_L2, "L2");
     }
 
     public static String getKeyLabel(int keyCode) {
         if (keyCode == 0) {
             return "";
         }
-
         String text = NON_PRINTABLE_KEY_LABELS.get(keyCode);
-
         if (text != null) {
             return text;
-
         } else {
             KeyEvent event = new KeyEvent(0, keyCode);
             char ch = (char) event.getUnicodeChar();
-
             if (ch != 0) {
                 return ch + "";
-
             } else {
                 return "key-" + keyCode;
             }
@@ -135,21 +128,22 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_keyboard_settings);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
         profilesNames = KeyboardProfile.getProfilesNames(this);
         list = (ListView) findViewById(R.id.act_keyboard_settings_list);
-        profile = KeyboardProfile.load(this,
-                getIntent().getStringExtra(EXTRA_PROFILE_NAME));
+        profile = KeyboardProfile.load(this, getIntent().getStringExtra(EXTRA_PROFILE_NAME));
         inverseMap.clear();
-        SparseIntArray keyMap = profile.keyMap;
 
+        SparseIntArray keyMap = profile.keyMap;
         for (Integer code : KeyboardProfile.BUTTON_KEY_EVENT_CODES) {
             inverseMap.append(code, 0);
         }
-
         for (int i = 0; i < keyMap.size(); i++) {
             inverseMap.append(keyMap.valueAt(i), keyMap.keyAt(i));
         }
-
         if (getIntent().getBooleanExtra(EXTRA_NEW_BOOL, false)) {
             profile.name = "new profile";
             newProfile = true;
@@ -167,22 +161,18 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
             plv.setPlayersOffsets(adapter.getPlayersOffset());
             list.setOnScrollListener(new OnScrollListener() {
                 @Override
-                public void onScrollStateChanged(AbsListView view,
-                                                 int scrollState) {
+                public void onScrollStateChanged(AbsListView view, int scrollState) {
                 }
 
                 @Override
                 public void onScroll(AbsListView view, int firstVisibleItem,
                                      int visibleItemCount, int totalItemCount) {
                     View v = list.getChildAt(0);
-
                     if (v != null) {
                         int currentY = 0;
-
                         for (int i = 0; i < list.getFirstVisiblePosition(); i++) {
                             currentY += adapter.getRowHeight();
                         }
-
                         int scrollY = -list.getChildAt(0).getTop() + currentY;
                         plv.setOffset(scrollY);
                     }
@@ -227,8 +217,7 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
         final Pattern pattern = Pattern.compile("[a-zA-Z0-9]");
         editText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onTextChanged(CharSequence s, int start, int before,
-                                      int count) {
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
                 Button ok = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
                 String txt = s.toString();
                 Matcher m = pattern.matcher(txt);
@@ -268,23 +257,28 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
     }
 
     @Override
-    public void onItemClick(AdapterView<?> arg0, View arg1, final int position,
-                            long arg3) {
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> arg0, View arg1, final int position, long arg3) {
         if (position == KeyboardProfile.BUTTON_NAMES.length) {
             if (KeyboardProfile.isDefaultProfile(profile.name)) {
                 KeyboardProfile.restoreDefaultProfile(profile.name, this);
-
             } else {
                 profile.delete(this);
             }
-
             deleted = true;
             finish();
-
         } else {
             Builder builder = new Builder(this);
-            builder.setTitle(String.format(
-                    getResources().getString(R.string.press_key),
+            builder.setTitle(String.format(getResources().getString(R.string.press_key),
                     KeyboardProfile.BUTTON_NAMES[position]));
             builder.setNegativeButton("Cancel", null);
             EditText view = new EditText(KeyboardSettingsActivity.this);
@@ -292,15 +286,13 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
             final Dialog d = builder.create();
             view.addTextChangedListener(new TextWatcher() {
                 @Override
-                public void onTextChanged(CharSequence s, int start,
-                                          int before, int count) {
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
                     char ch = s.charAt(0);
                     proccessKeyEvent(ch + "", d, (int) ch, position);
                 }
 
                 @Override
-                public void beforeTextChanged(CharSequence s, int start,
-                                              int count, int after) {
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 }
 
                 @Override
@@ -318,10 +310,8 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
                     }
 
                     String txt = getKeyLabel(keyCode);
-
                     if (event.getAction() == KeyEvent.ACTION_DOWN) {
                         return proccessKeyEvent(txt, dialog, keyCode, position);
-
                     } else {
                         return false;
                     }
@@ -331,25 +321,18 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
         }
     }
 
-    private boolean proccessKeyEvent(String txt, DialogInterface dialog,
-                                     int keyCode, int position) {
+    private boolean proccessKeyEvent(String txt, DialogInterface dialog, int keyCode, int position) {
         NLog.i(TAG, "txt:" + txt);
-
         if (!txt.equals("") && keyCode != KeyEvent.KEYCODE_BACK) {
             int idx = inverseMap.indexOfValue(keyCode);
-
             if (idx >= 0) {
                 inverseMap.put(inverseMap.keyAt(idx), 0);
             }
-
-            inverseMap.append(KeyboardProfile.BUTTON_KEY_EVENT_CODES[position],
-                    keyCode);
-            NLog.i(TAG, "isert " + KeyboardProfile.BUTTON_NAMES[position] + " :"
-                    + keyCode);
+            inverseMap.append(KeyboardProfile.BUTTON_KEY_EVENT_CODES[position], keyCode);
+            NLog.i(TAG, "isert " + KeyboardProfile.BUTTON_NAMES[position] + " :" + keyCode);
             adapter.notifyDataSetInvalidated();
             dialog.dismiss();
             return true;
-
         } else {
             return false;
         }
@@ -361,12 +344,9 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
 
         if (!deleted) {
             profile.keyMap.clear();
-
             for (int i = 0; i < inverseMap.size(); i++) {
-                profile.keyMap.append(inverseMap.valueAt(i),
-                        inverseMap.keyAt(i));
+                profile.keyMap.append(inverseMap.valueAt(i), inverseMap.keyAt(i));
             }
-
             profile.save(this);
         }
     }
@@ -385,19 +365,16 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.row_keyboard_settings, null);
             }
-
             TextView name = (TextView) convertView.findViewById(R.id.row_keyboard_name);
             TextView desc = (TextView) convertView.findViewById(R.id.row_keyboard_desc);
             TextView keyName = (TextView) convertView.findViewById(R.id.row_keyboard_key_name);
             convertView.setEnabled(true);
-
             if (position < KeyboardProfile.BUTTON_NAMES.length) {
                 name.setText(KeyboardProfile.BUTTON_NAMES[position]);
                 int keyCode = inverseMap.get(KeyboardProfile.BUTTON_KEY_EVENT_CODES[position]);
                 String label = getKeyLabel(keyCode);
                 keyName.setText(label);
                 keyName.setVisibility(View.VISIBLE);
-
             } else {
                 name.setText(KeyboardProfile.isDefaultProfile(profile.name) ?
                         getText(R.string.pref_keyboard_settings_restore_def)
@@ -405,7 +382,6 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
                 desc.setVisibility(View.GONE);
                 keyName.setVisibility(View.GONE);
             }
-
             return convertView;
         }
 
@@ -431,7 +407,6 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
                         MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
                 heightCache = convertView.getMeasuredHeight();
             }
-
             return heightCache;
         }
 
@@ -439,22 +414,16 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
             ArrayList<Integer> result = new ArrayList<Integer>();
             String lastDesc = "";
             int h = getRowHeight();
-
             for (int i = 0; i < KeyboardProfile.BUTTON_NAMES.length; i++) {
                 String desc = KeyboardProfile.BUTTON_DESCRIPTIONS[i];
-
                 if (!lastDesc.equals(desc)) {
                     result.add(i * h);
                     lastDesc = desc;
                 }
             }
-
             int[] res = new int[result.size()];
-            int i = 0;
-
-            for (i = 0; i < result.size(); i++)
+            for (int i = 0; i < result.size(); i++)
                 res[i] = result.get(i);
-
             return res;
         }
 

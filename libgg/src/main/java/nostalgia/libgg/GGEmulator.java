@@ -88,6 +88,7 @@ public class GGEmulator extends JniEmulator {
             prof.originalScreenWidth = 160;
             prof.originalScreenHeight = 144;
             profiles.add(prof);
+
             SfxProfile sfx = new GGSfxProfile();
             sfx.name = "low";
             sfx.isStereo = true;
@@ -96,6 +97,7 @@ public class GGEmulator extends JniEmulator {
             sfx.quality = 0;
             sfx.rate = 22050;
             sfxProfiles.add(sfx);
+
             sfx = new GGSfxProfile();
             sfx.name = "medium";
             sfx.isStereo = true;
@@ -104,6 +106,7 @@ public class GGEmulator extends JniEmulator {
             sfx.rate = 44100;
             sfx.quality = 1;
             sfxProfiles.add(sfx);
+
             sfx = new GGSfxProfile();
             sfx.name = "high";
             sfx.isStereo = true;

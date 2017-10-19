@@ -32,7 +32,7 @@ public class BatterySaveUtils {
             try {
                 FileUtils.copyFile(batterySavFile, copyFile);
                 saveMD5Meta(context, batterySavFile, sourceMD5);
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
     }
@@ -45,13 +45,13 @@ public class BatterySaveUtils {
             metaFile.createNewFile();
             fw = new FileWriter(metaFile);
             fw.write(md5);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         } finally {
             try {
                 if (fw != null) {
                     fw.close();
                 }
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
     }
@@ -70,7 +70,7 @@ public class BatterySaveUtils {
                 fileReader = new FileReader(metaFile);
                 br = new BufferedReader(fileReader);
                 previousSourceMD5 = br.readLine();
-            } catch (Exception e) {
+            } catch (Exception ignored) {
                 return true;
             } finally {
                 try {
@@ -80,7 +80,7 @@ public class BatterySaveUtils {
                     if (br != null) {
                         br.close();
                     }
-                } catch (Exception e) {
+                } catch (Exception ignored) {
                 }
             }
         }

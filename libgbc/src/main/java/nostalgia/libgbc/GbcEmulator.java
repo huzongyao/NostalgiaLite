@@ -83,8 +83,8 @@ public class GbcEmulator extends JniEmulator {
 
     private static class Info extends BasicEmulatorInfo {
 
-        static List<GfxProfile> profiles = new ArrayList<GfxProfile>();
-        static List<SfxProfile> sfxProfiles = new ArrayList<SfxProfile>();
+        static List<GfxProfile> profiles = new ArrayList<>();
+        static List<SfxProfile> sfxProfiles = new ArrayList<>();
 
         static {
             GfxProfile prof = new GbcGfxProfile();
@@ -93,6 +93,7 @@ public class GbcEmulator extends JniEmulator {
             prof.originalScreenWidth = 160;
             prof.originalScreenHeight = 144;
             profiles.add(prof);
+
             SfxProfile sfx = new GbcSfxProfile();
             sfx.name = "default";
             sfx.isStereo = true;

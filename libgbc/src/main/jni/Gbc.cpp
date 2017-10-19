@@ -1,5 +1,3 @@
-
-
 #include "gambatte.h"
 #include "resamplerinfo.h"
 #include <GLES/gl.h>
@@ -10,8 +8,6 @@
 
 #include "Emulator.h"
 #include "Bridge.h"
-
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR  ,"NOSTALGIA.GBC", __VA_ARGS__)
 
 extern "C" {
 
@@ -32,6 +28,7 @@ public:
 #define HEIGHT 144
 #define SFX_BUF_SIZE 2048 * 8
 #define PADDING 26
+
 class GameBoyEmulator : public Emulator {
 public:
 
@@ -102,8 +99,7 @@ public:
             gb.runFor(NULL, WIDTH, (unsigned int *) tmpSfxBuf, samples);
         }
 
-        gb.runFor((unsigned int *) gfxBuf, WIDTH, (unsigned int *) tmpSfxBuf,
-                  samples);
+        gb.runFor(gfxBuf, WIDTH, (unsigned int *) tmpSfxBuf, samples);
         int wc = workingGfx;
         int C1 = 160 * (144 + PADDING);
         int C2 = 160 * (144 + PADDING) * 2;
@@ -130,8 +126,7 @@ public:
         swapBuffersAfterWrite();
 
         if (soundEnabled) {
-            int ssize = resampler->resample(resampledSfxBuf,
-                                            (const short *) tmpSfxBuf, samples);
+            int ssize = resampler->resample(resampledSfxBuf, (const short *) tmpSfxBuf, samples);
             ssize *= 2;
             sfxLock.Lock();
             int back = curSfx;
@@ -231,8 +226,7 @@ public:
         stream->str("");
         stream->seekp(0);
         gb.saveState(NULL, 0, stream[0]);
-        memcpy((void *) (travel[idx]), (void *) gfxBufs[workingGfx],
-               (144 + PADDING) * 160 * 3);
+        memcpy((void *) (travel[idx]), (void *) gfxBufs[workingGfx], (144 + PADDING) * 160 * 3);
         return true;
     }
 

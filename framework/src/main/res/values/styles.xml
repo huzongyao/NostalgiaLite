@@ -6,7 +6,7 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="PrefTheme" parent="AppTheme" />
+    <style name="PrefTheme" parent="Theme.AppCompat" />
 
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>

@@ -1,9 +1,7 @@
 package nostalgia.framework.ui.cheats;
 
-import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.text.Editable;
@@ -116,16 +114,13 @@ public class CheatsActivity extends ControllableActivity {
                     s = s.toUpperCase(locale);
                     chars.setSelection(s.length());
                 }
-                if (Build.VERSION.SDK_INT > 8) {
-                    String newText = s.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-                    if (!newText.equals(s)) {
-                        chars.setText(newText);
-                        chars.setSelection(newText.length());
-                    }
-                    s = newText;
+                String newText = s.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+                if (!newText.equals(s)) {
+                    chars.setText(newText);
+                    chars.setSelection(newText.length());
                 }
-                String newText =
-                        s.replaceAll(EmulatorHolder.getInfo().getCheatInvalidCharsRegex(), "");
+                s = newText;
+                newText = s.replaceAll(EmulatorHolder.getInfo().getCheatInvalidCharsRegex(), "");
                 if (!newText.equals(s)) {
                     chars.setText(newText);
                     chars.setSelection(newText.length());

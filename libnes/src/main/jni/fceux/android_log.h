@@ -18,4 +18,4 @@
 #define LOGF(...) do{}while(0)
 #endif
 
-#endif //NOSTALGIALITE_ANDROID_LOG_H
+#endif
