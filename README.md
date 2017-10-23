@@ -8,6 +8,7 @@
 * I have changed and simplified some code and compiled it on android studio
 * If you want to compile it, you will need android ndk: https://developer.android.com/ndk/index.html
 * And you will need gradle-experimental: http://tools.android.com/tech-docs/new-build-system/gradle-experimental
+* ic_launcher art: font: Lakki Reddy, padding: 15%. Generate with Android Asset Studio
 
 #### 详情
 * 主要代码是从这儿下载的：http://nostalgiaemulators.com/

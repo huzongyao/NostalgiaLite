@@ -17,13 +17,13 @@
 
             <TextView
                 android:id="@+id/dialog_select_server_title"
-                android:layout_width="fill_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
                 android:text="@string/act_remote_controller_select_server"
                 android:textColor="@color/dialog_main_color"
-                android:textSize="25dp" />
+                android:textSize="25sp" />
 
             <ProgressBar
                 android:id="@+id/dialog_select_server_progressbar"
@@ -42,7 +42,7 @@
         <ListView
             android:id="@+id/dialog_select_server_list"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
             android:listSelector="#33b5e5"
             tools:listitem="@layout/row_server_select_item" />

@@ -139,4 +139,6 @@
     <string name="general_pref_fastforward_speed">Fast Forward Speed</string>
     <string name="general_pref_save_file">SAV File Settings</string>
     <string name="type_search_name">Type search name</string>
+    <string name="insert_ip_adress">Insert IP adress</string>
+    <string name="ok">Ok</string>
 </resources>

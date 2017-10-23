@@ -16,7 +16,7 @@
         android:checked="true" />
 
     <LinearLayout
-        android:layout_width="fill_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_weight="1"
@@ -29,7 +29,7 @@
             android:singleLine="true"
             android:text="FF5467498465"
             android:textColor="@color/main_color"
-            android:textSize="18dp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView
@@ -40,7 +40,7 @@
             android:singleLine="true"
             android:text="Immortallity"
             android:textColor="@color/main_color"
-            android:textSize="13dp" />
+            android:textSize="13sp" />
     </LinearLayout>
 
     <ImageButton

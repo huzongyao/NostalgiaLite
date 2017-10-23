@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:multitouch="http://schemas.android.com/apk/res-auto"
-
     android:id="@+id/direction"
     android:layout_width="160dp"
     android:layout_height="160dp"

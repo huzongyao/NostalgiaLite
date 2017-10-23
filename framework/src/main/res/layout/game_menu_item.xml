@@ -8,7 +8,6 @@
     android:background="@drawable/game_menu_button_selector"
     android:padding="10dp">
 
-
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -29,7 +28,7 @@
             android:layout_margin="1dp"
             android:gravity="center_horizontal"
             android:textColor="@drawable/gamemenu_textcolor_selector"
-            android:textSize="15dp"
+            android:textSize="15sp"
             tools:text="Menu Item" />
     </LinearLayout>
 

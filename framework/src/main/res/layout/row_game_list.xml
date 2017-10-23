@@ -43,17 +43,16 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent">
 
-
             <TextView
                 android:id="@+id/row_game_item_name"
-                android:layout_width="fill_parent"
+                android:layout_width="0dp"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
                 android:ellipsize="end"
                 android:gravity="center_vertical"
                 android:maxLines="2"
                 android:textColor="@drawable/row_game_item_text_selector"
-                android:textSize="18dp" />
+                android:textSize="18sp" />
 
             <ImageView
                 android:id="@+id/game_item_arrow"

@@ -105,5 +105,7 @@
     <string name="pref_setting_touch_ctrl">触摸控件设置</string>
     <string name="general_pref_fastforward_speed">快进速度</string>
     <string name="general_pref_save_file">SAV文件设置</string>
-    <string name="type_search_name">输入要搜索的内容</string>
+    <string name="type_search_name">请输入要搜索的内容</string>
+    <string name="insert_ip_adress">请输入IP地址</string>
+    <string name="ok">确定</string>
 </resources>
