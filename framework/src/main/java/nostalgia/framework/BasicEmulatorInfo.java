@@ -47,18 +47,11 @@ abstract public class BasicEmulatorInfo implements EmulatorInfo {
 
         if (isMultiPlayerSupported()) {
             int[] res = new int[base.length * 2];
-
+            System.arraycopy(base, 0, res, 0, base.length);
             for (int i = 0; i < base.length; i++) {
-                res[i] = base[i];
+                res[i + base.length] = base[i] + KeyboardController.PLAYER2_OFFSET;
             }
-
-            for (int i = 0; i < base.length; i++) {
-                res[i + base.length] = base[i]
-                        + KeyboardController.PLAYER2_OFFSET;
-            }
-
             return res;
-
         } else {
             return base;
         }

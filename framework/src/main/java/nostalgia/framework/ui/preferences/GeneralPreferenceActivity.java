@@ -47,14 +47,21 @@ public class GeneralPreferenceActivity extends AppCompatPreferenceActivity {
             public boolean onPreferenceClick(Preference preference) {
                 InputMethodManager imeManager = (InputMethodManager)
                         activity.getApplicationContext().getSystemService(INPUT_METHOD_SERVICE);
-
                 if (imeManager != null) {
                     imeManager.showInputMethodPicker();
-
                 } else {
                     Toast.makeText(activity, R.string.pref_keyboard_cannot_change_input_method, Toast.LENGTH_LONG).show();
                 }
+                return false;
+            }
+        });
+    }
 
+    static void initAboutGamePreference(Preference pref, final Activity activity) {
+        pref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                activity.startActivity(new Intent(activity, AboutActivity.class));
                 return false;
             }
         });

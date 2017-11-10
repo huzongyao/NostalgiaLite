@@ -34,6 +34,9 @@
             android:label="Cheats" />
 
         <activity android:name=".base.OpenGLTestActivity" />
+        <activity
+            android:name=".ui.preferences.AboutActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
             android:name=".base.RestarterActivity"

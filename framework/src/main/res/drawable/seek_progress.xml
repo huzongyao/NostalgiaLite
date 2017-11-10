@@ -3,9 +3,9 @@
 
     <item
         android:id="@android:id/progress"
-        android:drawable="@drawable/seek_progress_main"></item>
+        android:drawable="@drawable/seek_progress_main" />
     <item
         android:id="@android:id/secondaryProgress"
-        android:drawable="@drawable/seek_progress2"></item>
+        android:drawable="@drawable/seek_progress2" />
 
 </layer-list>

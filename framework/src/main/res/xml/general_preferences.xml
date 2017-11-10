@@ -22,12 +22,10 @@
             android:summary="@string/general_pref_wifi_controlable_desc"
             android:title="@string/general_pref_wifi_controlable" />
 
-
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="general_pref_mute"
             android:title="@string/general_pref_mute" />
-
 
         <CheckBoxPreference
             android:defaultValue="false"
@@ -36,7 +34,6 @@
             android:title="@string/general_pref_quick_save" />
 
     </PreferenceCategory>
-
 
     <PreferenceCategory android:title="@string/pref_setting_layout">
         <Preference
@@ -57,7 +54,6 @@
         </Preference>
     </PreferenceCategory>
 
-
     <PreferenceCategory android:title="@string/pref_setting_display">
 
         <nostalgia.framework.ui.preferences.ControllableListPreference
@@ -71,7 +67,6 @@
             android:defaultValue="false"
             android:key="general_pref_fullscreen"
             android:title="@string/general_pref_fullscreen" />
-
 
     </PreferenceCategory>
 
@@ -94,7 +89,6 @@
             android:defaultValue="false"
             android:key="general_pref_ab_button"
             android:title="@string/general_pref_ab_button" />
-
 
         <nostalgia.framework.ui.preferences.SeekBarVibrationPreference
             android:defaultValue="0"
@@ -120,9 +114,7 @@
             android:summary="@string/game_pref_ui_auto_hide_desc"
             android:title="@string/game_pref_ui_auto_hide" />
 
-
     </PreferenceCategory>
-
 
     <PreferenceCategory
         android:key="general_pref_ff_cat"
@@ -146,7 +138,6 @@
             android:text="[hack]"
             android:title="@string/general_pref_fastforward_speed" />
 
-
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/general_pref_save_file">
@@ -161,7 +152,6 @@
             android:key="general_pref_save_sav_files"
             android:summary="@string/general_pref_load_sav_files_desc"
             android:title="@string/general_pref_save_sav_files" />
-
 
     </PreferenceCategory>
 
@@ -183,6 +173,15 @@
         <Preference
             android:key="pref_game_keyboard_select_input_method"
             android:title="@string/key_profile_select_input_method" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="pref_others_cat"
+        android:title="@string/other_pref">
+
+        <Preference
+            android:key="pref_game_others_about_game"
+            android:title="@string/about" />
     </PreferenceCategory>
 
 </PreferenceScreen>

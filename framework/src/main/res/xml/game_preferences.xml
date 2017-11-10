@@ -13,13 +13,10 @@
         android:title="@string/pref_other_settings">
         <CheckBoxPreference
             android:defaultValue="false"
-            android:icon="@drawable/ic_zapper"
             android:key="game_pref_zapper"
             android:title="@string/game_pref_zapper" />
 
-        <Preference
-            android:icon="@drawable/ic_game_settings"
-            android:title="@string/general_pref">
+        <Preference android:title="@string/general_pref">
             <intent android:action="@string/action_general_pref">
                 <extra
                     android:name=":android:no_headers"

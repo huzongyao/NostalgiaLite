@@ -31,7 +31,6 @@ import android.widget.RelativeLayout;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -1175,8 +1174,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                     elem.computeBoundingBox();
                     elem.computeOffsets();
                 }
-
-                NLog.i(TAG, hashCode() + " isNew:" + isNew + " " + btns.size() + " " + Arrays.toString(boundingBoxs));
+                //NLog.i(TAG, hashCode() + " isNew:" + isNew + " " + btns.size() + " " + Arrays.toString(boundingBoxs));
                 checkFastForwardButton();
                 return isNew;
             }
@@ -1187,11 +1185,11 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
         if (boundingBoxs != null) {
             int idx = ridToIdxMap.get(R.id.button_fast_forward);
             Rect ff_bb = boundingBoxs[idx];
-            NLog.i(TAG, "fast forward btn " + idx + " rect " + ff_bb);
+            //NLog.i(TAG, "fast forward btn " + idx + " rect " + ff_bb);
 
             for (Rect bb2 : boundingBoxs) {
                 if (ff_bb != bb2 && Rect.intersects(ff_bb, bb2)) {
-                    NLog.i(TAG, "colision with " + bb2);
+                    //NLog.i(TAG, "colision with " + bb2);
                     int w = getMeasuredWidth();
                     int h = getMeasuredHeight();
                     boolean wrongPosition = false;
@@ -1206,12 +1204,10 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                                 break;
                             }
                         }
-
-                        NLog.i(TAG, i + " new rect " + ff_bb);
-
+                        //NLog.i(TAG, i + " new rect " + ff_bb);
                         for (Rect bb3 : boundingBoxs) {
                             if (ff_bb != bb3 && Rect.intersects(ff_bb, bb3)) {
-                                NLog.i(TAG, "colision with " + bb3);
+                                //NLog.i(TAG, "colision with " + bb3);
                                 wrongPosition = true;
                                 break;
                             }

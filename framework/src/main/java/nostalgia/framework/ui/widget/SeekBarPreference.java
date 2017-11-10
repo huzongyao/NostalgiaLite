@@ -33,8 +33,7 @@ public class SeekBarPreference extends DialogPreference
         mDialogMessage = attrs.getAttributeValue(ANDROID_NS, "dialogMessage");
         mSuffix = attrs.getAttributeValue(ANDROID_NS, "text");
 
-        if (mSuffix.equals("[hack]")) { // mel sem problem s custom parametrama
-            // takze tak.. sere pes :)
+        if (mSuffix.equals("[hack]")) {
             hack = true;
             mSuffix = "";
         }

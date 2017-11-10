@@ -4,6 +4,7 @@ model {
     android {
         compileSdkVersion 25
         buildToolsVersion "25.0.3"
+        publishNonDefault true
 
         defaultConfig {
             minSdkVersion.apiLevel 15
@@ -29,16 +30,8 @@ model {
     android.buildTypes {
         debug {
             ndk {
-                cppFlags.add('-DNDK_DEBUG')
+                cppFlags.add('-DJNI_LOG')
             }
-        }
-        release {
-            ndk {
-                cppFlags.add('-DNDK_DEBUG')
-            }
-            shrinkResources true
-            useProguard true
-            proguardFiles.add(file('proguard-rules.pro'))
         }
     }
 }

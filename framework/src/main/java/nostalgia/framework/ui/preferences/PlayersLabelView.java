@@ -11,7 +11,7 @@ import android.view.View;
 
 public class PlayersLabelView extends View {
 
-    private static final String TAG = "ui.preferences.PlayersLabelView";
+    private static final String TAG = "PlayersLabelView";
     Paint paint = new Paint();
     float textSize = 0;
     int[] offsets = new int[]{0, 300, 800};
@@ -52,7 +52,6 @@ public class PlayersLabelView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
         canvas.save();
         canvas.translate(0, 40);
         canvas.rotate(-90, 0, 0);
@@ -66,16 +65,13 @@ public class PlayersLabelView extends View {
             } else {
                 active = offsets[i] <= offset && offset < offsets[i] + 20000;
             }
-
             if (active && (offset > (40 - width)))
                 off = (int) (40 - width);
-
             paint.setColor(0xff000000);
             paint.setStyle(Style.FILL);
             canvas.drawRect(off - 2, 0, off + width, getMeasuredWidth(), paint);
             paint.setColor(0xffffffff);
             canvas.drawText(label, off, 40, paint);
-
         }
         canvas.restore();
     }

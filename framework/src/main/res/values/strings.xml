@@ -75,19 +75,13 @@
     <string name="pref_other_settings">Other Settings</string>
     <string name="pref_general_settings">General Settings</string>
     <string name="pref_video_settings">Video Settings</string>
-
     <string name="pref_touch_settings">Controller Layout</string>
     <string name="pref_touch_desc">Customize layout of buttons</string>
-
-
     <string name="pref_screen_settings">Game Screen Layout</string>
     <string name="pref_screen_desc">Customize layout of game screen</string>
-
     <string name="pref_keyboard_settings_restore_def">(Reset to defaults)</string>
     <string name="pref_keyboard_settings_delete_prof">(Delete this profile)</string>
-
     <string name="pref_keyboard_cannot_change_input_method">Cannot change input method</string>
-
     <string name="press_key">Press a key for: %s</string>
 
     <!-- gallery -->
@@ -107,7 +101,9 @@
     <string name="gallery_start_sip_search_label">Searching archives.\nWait a minute please.</string>
 
     <!-- cheat -->
-    <string name="act_cheats_dialog_add_label">CHEAT</string> <!-- nejen game genie -->
+    <string name="act_cheats_dialog_add_label">CHEAT</string>
+
+    <!-- nejen game genie -->
     <string name="act_cheats_dialog_chars_hint">INSERT CHEAT CODE</string>
     <string name="act_cheats_dialog_desc_hint">INSERT CHEAT DESCRIPTION</string>
     <string name="act_cheats_dialog_save">SAVE</string>
@@ -121,7 +117,6 @@
     <string name="action_keyboard_pref" translatable="false">nostalgia.framework.KEYBOARDPREF</string>
     <string name="action_touch_pref" translatable="false">nostalgia.framework.TOUCHPREF</string>
     <string name="action_screen_pref" translatable="false">nostalgia.framework.SCREENPREF</string>
-
     <string name="export_lite_ok">Data from the Lite version successfully imported.</string>
     <string name="export_lite_error">An error has occurred while importing data from the Lite version.</string>
     <string name="export_action" translatable="false">.EXPORT</string>
@@ -139,6 +134,24 @@
     <string name="general_pref_fastforward_speed">Fast Forward Speed</string>
     <string name="general_pref_save_file">SAV File Settings</string>
     <string name="type_search_name">Type search name</string>
-    <string name="insert_ip_adress">Insert IP adress</string>
-    <string name="ok">Ok</string>
+    <string name="insert_ip_adress">Insert IP Address</string>
+    <string name="ok">OK</string>
+    <string name="about">About</string>
+    <string name="other_pref">Others</string>
+    <string name="about_content" translatable="false">
+        NostalgiaLite\n\n
+        · This is an open source project and you can check out all the source code from github:\nhttps://github.com/huzongyao/NostalgiaLite\n\n
+        · The original source code is from Nostalgia.NES, and it\'s an open source project,
+        for more information, you can visit their official website: \nhttp://nostalgiaemulators.com\n\n
+        · I have changed and simplified some code and compiled it on android studio,
+        if you want to compile the project, you will need android gradle, sdk, ndk\n\n
+        More About Me\n
+        GitHub: https://huzongyao.github.io\n
+        ITEye博客：http://hzy3774.iteye.com\n
+        新浪微博: http://weibo.com/hzy3774\n\n
+        Contact To Me:\n
+        QQ: 377406997\n
+        Gmail: hzy3774@gmail.com\n
+        Foxmail: hzy3774@qq.com\n
+    </string>
 </resources>

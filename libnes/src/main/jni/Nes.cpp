@@ -27,7 +27,7 @@ private:
 
 public:
     NesEmulator() {
-        LOGE("NesEmulator Constructor");
+        LOGI("NesEmulator Constructor");
         pads = 0;
         inited = false;
         gfxBuf = NULL;

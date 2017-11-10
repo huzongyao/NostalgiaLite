@@ -1,7 +1,7 @@
 #ifndef NOSTALGIALITE_ANDROID_LOG_H
 #define NOSTALGIALITE_ANDROID_LOG_H
 
-#ifdef NDK_DEBUG
+#ifdef JNI_LOG
 #define LOG_TAG "NES.NATIVE"
 #include <android/log.h>
 

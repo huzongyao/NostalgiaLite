@@ -67,7 +67,7 @@
     <string name="game_pref_ui_vibration_no_vibrator">该设备没有可用的振动器</string>
     <string name="game_pref_ui_timeshift_desc">启用可能会减慢某些设备上的仿真</string>
     <string name="game_pref_ui_timeshift">允许回滚</string>
-    <string name="game_pref_ui_pal_ntsc_desc">尝试切换，以防图形故障</string>
+    <string name="game_pref_ui_pal_ntsc_desc">图像发生故障时，请尝试切换</string>
     <string name="game_pref_ui_auto_hide_desc">使用游戏手柄/键盘/遥控器时隐藏屏幕控制</string>
     <string name="game_menu_back_to_past">回滚</string>
     <string name="gallery_sd_card_not_mounted">对不起，没有安装SD卡进行写入。</string>
@@ -104,8 +104,10 @@
     <string name="pref_setting_display">显示设置</string>
     <string name="pref_setting_touch_ctrl">触摸控件设置</string>
     <string name="general_pref_fastforward_speed">快进速度</string>
-    <string name="general_pref_save_file">SAV文件设置</string>
+    <string name="general_pref_save_file">存档文件设置</string>
     <string name="type_search_name">请输入要搜索的内容</string>
     <string name="insert_ip_adress">请输入IP地址</string>
     <string name="ok">确定</string>
+    <string name="about">关于</string>
+    <string name="other_pref">其他</string>
 </resources>

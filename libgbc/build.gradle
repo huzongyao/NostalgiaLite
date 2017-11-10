@@ -4,6 +4,7 @@ model {
     android {
         compileSdkVersion 25
         buildToolsVersion "25.0.3"
+        publishNonDefault true
 
         defaultConfig {
             minSdkVersion.apiLevel 15
@@ -30,14 +31,6 @@ model {
             cppFlags.addAll(['-fno-exceptions', '-fno-rtti', '-DINLINE=inline', '-DHAVE_STDINT_H',
                              '-DINT_LEAST_32', '-DHAVE_INTTYPES_H', '-DLSB_FIRST'])
             ldLibs.addAll(['z', 'log', 'jnigraphics', 'GLESv1_CM'])
-        }
-    }
-
-    android.buildTypes {
-        release {
-            shrinkResources true
-            useProguard true
-            proguardFiles.add(file('proguard-rules.pro'))
         }
     }
 }

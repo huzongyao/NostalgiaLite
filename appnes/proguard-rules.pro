@@ -15,3 +15,8 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+-keepclasseswithmembers class nostalgia.framework.ui.gamegallery.GameDescription{*;}
+-keepclasseswithmembers class nostalgia.framework.ui.gamegallery.ZipRomFile{*;}
+-keepclassmembers class * extends nostalgia.framework.base.JniEmulator{public ** getInstance();}
+

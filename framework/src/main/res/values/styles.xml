@@ -6,7 +6,7 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="PrefTheme" parent="Theme.AppCompat" />
+    <style name="PrefTheme" parent="AppTheme" />
 
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
@@ -28,5 +28,9 @@
     <style name="HintTheme" parent="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
         <item name="android:background">@null</item>
     </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>
