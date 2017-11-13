@@ -184,7 +184,7 @@ public class WifiControllerClient {
     private class SenderThread extends Thread {
 
         private final int DELAY = 20;
-        private LinkedList<KeyEvent> keyFifo = new LinkedList<KeyEvent>();
+        private LinkedList<KeyEvent> keyFifo = new LinkedList<>();
         private String textEvent = null;
         private Pair<Integer, Pair<Integer, Integer>> commandEvent = null;
         private int counter;
@@ -228,7 +228,7 @@ public class WifiControllerClient {
                 }
                 try {
                     Thread.sleep(DELAY);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException ignored) {
                 }
             }
             NLog.d(TAG, "Wifi client thread stop");

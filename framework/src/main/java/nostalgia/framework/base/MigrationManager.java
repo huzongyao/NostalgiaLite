@@ -106,8 +106,7 @@ public class MigrationManager {
             doImport(baseDir, context, PreferenceUtil.GAME_PREF_SUFFIX);
         }
 
-        private void doImport(String baseDir, Context context,
-                              final String importSuffix) {
+        private void doImport(String baseDir, Context context, final String importSuffix) {
             File dir = new File(baseDir);
             String[] files = dir.list(new FilenameFilter() {
                 @Override
@@ -117,9 +116,7 @@ public class MigrationManager {
             });
 
             for (String file : files) {
-                String prefName = file;
-                SharedPreferences pref = context.getSharedPreferences(prefName,
-                        Context.MODE_PRIVATE);
+                SharedPreferences pref = context.getSharedPreferences(file, Context.MODE_PRIVATE);
                 PreferenceUtil.importPreferences(pref, new File(baseDir, file),
                         PreferenceUtil.NotFoundHandling.FAIL);
             }

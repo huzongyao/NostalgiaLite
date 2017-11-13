@@ -67,7 +67,7 @@ public class TimeTravelDialog extends Dialog implements OnSeekBarChangeListener 
                     TimeTravelDialog.this.manager.enableCheats(context,
                             TimeTravelDialog.this.game);
 
-                } catch (EmulatorException e) {
+                } catch (EmulatorException ignored) {
                 }
 
                 dismiss();

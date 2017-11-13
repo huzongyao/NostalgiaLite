@@ -258,7 +258,7 @@ public class RemoteControllerActivity extends Activity {
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View content = inflater.inflate(R.layout.dialog_select_server, null);
         final ListView listView = (ListView) content.findViewById(R.id.dialog_select_server_list);
-        final ArrayList<DetectionResult> values = new ArrayList<DetectionResult>();
+        final ArrayList<DetectionResult> values = new ArrayList<>();
         final ServerSelectAdapter listAdapter = new ServerSelectAdapter(this, values);
         listView.setAdapter(listAdapter);
         dialog.setContentView(content);

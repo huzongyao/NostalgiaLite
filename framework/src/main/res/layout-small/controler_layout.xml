@@ -28,9 +28,9 @@
                     android:layout_margin="1dp"
                     android:background="@drawable/button_top_panel_selector"
                     android:padding="1dp"
-                    android:text="SELECT"
+                    android:text="@string/control_select"
                     android:textColor="@color/main_color"
-                    android:textSize="14dp" />
+                    android:textSize="14sp" />
 
                 <nostalgia.framework.ui.multitouchbutton.MultitouchButton
                     android:id="@+id/button_start"
@@ -39,9 +39,9 @@
                     android:layout_margin="1dp"
                     android:background="@drawable/button_top_panel_selector"
                     android:padding="1dp"
-                    android:text="START"
+                    android:text="@string/control_start"
                     android:textColor="@color/main_color"
-                    android:textSize="14dp" />
+                    android:textSize="14sp" />
             </LinearLayout>
 
             <nostalgia.framework.ui.multitouchbutton.MultitouchImageButton
@@ -53,9 +53,9 @@
                 android:background="@drawable/button_top_panel_selector"
                 android:padding="1dp"
                 android:src="@drawable/ic_menu"
-                android:text="MENU"
+                android:text="@string/control_menu"
                 android:textColor="@color/main_color"
-                android:textSize="14dp" />
+                android:textSize="14sp" />
 
             <nostalgia.framework.ui.multitouchbutton.MultitouchImageButton
                 android:id="@+id/button_fast_forward"

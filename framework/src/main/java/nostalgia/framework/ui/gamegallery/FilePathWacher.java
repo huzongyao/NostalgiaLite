@@ -55,7 +55,7 @@ public class FilePathWacher extends FileObserver {
     }
 
     public interface OnSDCardChangeListener {
-        public void onSDCardChange();
+        void onSDCardChange();
     }
 
 }

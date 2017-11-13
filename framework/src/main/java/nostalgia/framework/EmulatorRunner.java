@@ -70,7 +70,7 @@ public class EmulatorRunner {
                 source.delete();
                 NLog.d("SAV", "copying: " + source + " " + dest);
 
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
 
@@ -306,7 +306,7 @@ public class EmulatorRunner {
                         try {
                             pauseLock.wait();
 
-                        } catch (InterruptedException e) {
+                        } catch (InterruptedException ignored) {
                         }
 
                         if (benchmark != null) {
@@ -326,13 +326,13 @@ public class EmulatorRunner {
                     try {
                         Thread.sleep(delay);
 
-                    } catch (Exception e) {
+                    } catch (Exception ignored) {
                     }
                 } else {
                     try {
                         Thread.sleep(1);
 
-                    } catch (Exception e) {
+                    } catch (Exception ignored) {
                     }
                 }
 

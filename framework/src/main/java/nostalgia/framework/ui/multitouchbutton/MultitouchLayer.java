@@ -87,7 +87,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
     int cacheRotation = -1;
     int cacheW = -1;
     int cacheH = -1;
-    private ArrayList<View> btns = new ArrayList<View>();
+    private ArrayList<View> btns = new ArrayList<>();
     private SparseIntArray pointerMap = new SparseIntArray();
     private int touchMapWidth;
     private int touchMapHeight;
@@ -95,13 +95,13 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
     private Paint editElementPaint = new Paint();
     private Bitmap resizeIcon;
     private float buttonMinSizePx = 0;
-    private ArrayList<EditElement> editElements = new ArrayList<EditElement>();
+    private ArrayList<EditElement> editElements = new ArrayList<>();
     private byte[][] maps;
     private Rect[] boundingBoxs;
     private Bitmap[] buttonsBitmaps = new Bitmap[0];
     private Bitmap[] pressedButtonsBitmaps = new Bitmap[0];
-    private ArrayList<Integer> dpadRIDs = new ArrayList<Integer>();
-    private ArrayList<Integer> btnIdMap = new ArrayList<Integer>();
+    private ArrayList<Integer> dpadRIDs = new ArrayList<>();
+    private ArrayList<Integer> btnIdMap = new ArrayList<>();
     private int initCounter = 0;
     private int[] optimCounters = new int[MAX_POINTERS];
     private int vibrationDuration = 100;
@@ -133,7 +133,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
     private void remapOldMTLprefToNew(SharedPreferences pref, Map<String, ?> prefMap) {
         HashMap<Integer, Integer> oldIdsToNewMap = null;
         Editor editor = pref.edit();
-        HashSet<String> keysToRemove = new HashSet<String>();
+        HashSet<String> keysToRemove = new HashSet<>();
         boolean wrongFormat = false;
 
         for (Entry<String, ?> entry : prefMap.entrySet()) {
@@ -1281,14 +1281,14 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
 
         RectF boundingbox = new RectF();
 
-        ArrayList<Integer> ids = new ArrayList<Integer>();
-        ArrayList<RectF> offsets = new ArrayList<RectF>();
-        ArrayList<RectF> resizeRects = new ArrayList<RectF>();
+        ArrayList<Integer> ids = new ArrayList<>();
+        ArrayList<RectF> offsets = new ArrayList<>();
+        ArrayList<RectF> resizeRects = new ArrayList<>();
 
         boolean movable = true;
         RectF boundingboxHistory = new RectF();
-        ArrayList<Rect> boundingboxsHistory = new ArrayList<Rect>();
-        ArrayList<RectF> offsetshistory = new ArrayList<RectF>();
+        ArrayList<Rect> boundingboxsHistory = new ArrayList<>();
+        ArrayList<RectF> offsetshistory = new ArrayList<>();
 
 
         boolean validPosition = true;

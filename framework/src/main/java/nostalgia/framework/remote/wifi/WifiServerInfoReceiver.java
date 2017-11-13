@@ -38,14 +38,14 @@ public class WifiServerInfoReceiver {
     }
 
     public interface BroadcastReceiverListener {
-        public void onServerDetect(DetectionResult result);
+        void onServerDetect(DetectionResult result);
     }
 
     public class DetectionResult {
         public InetAddress address;
         public String desc;
         public String sessionDescription = "";
-        public SparseArray<String> slots = new SparseArray<String>();
+        public SparseArray<String> slots = new SparseArray<>();
         public ServerType type = ServerType.mobile;
         long lastDetect = 0;
 
@@ -68,12 +68,7 @@ public class WifiServerInfoReceiver {
             if (o instanceof DetectionResult) {
                 DetectionResult oo = (DetectionResult) o;
 
-                if (desc.equals(oo.desc) && oo.address.equals(address)) {
-                    return true;
-
-                } else {
-                    return false;
-                }
+                return desc.equals(oo.desc) && oo.address.equals(address);
 
             } else
                 return false;

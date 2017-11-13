@@ -300,7 +300,7 @@ public abstract class EmulatorActivity extends Activity
                 });
                 try {
                     manager.pauseEmulation();
-                } catch (EmulatorException e) {
+                } catch (EmulatorException ignored) {
                 }
                 DialogUtils.show(dialog, true);
             }
@@ -322,7 +322,7 @@ public abstract class EmulatorActivity extends Activity
         controllerViews.clear();
         try {
             manager.destroy();
-        } catch (EmulatorException e) {
+        } catch (EmulatorException ignored) {
         }
         for (EmulatorController controller : controllers) {
             controller.onDestroy();

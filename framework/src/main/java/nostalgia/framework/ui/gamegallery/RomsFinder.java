@@ -54,7 +54,7 @@ public class RomsFinder extends Thread {
 
     private void getRomAndPackedFiles(File root, List<File> result, HashSet<String> usedPaths) {
         String dirPath = null;
-        Stack<DirInfo> dirStack = new Stack<DirInfo>();
+        Stack<DirInfo> dirStack = new Stack<>();
         dirStack.removeAllElements();
         dirStack.add(new DirInfo(root, 0));
         final int MAX_LEVEL = 12;
@@ -181,7 +181,7 @@ public class RomsFinder extends Thread {
                                     if (is != null) {
                                         is.close();
                                     }
-                                } catch (Exception e) {
+                                } catch (Exception ignored) {
                                 }
                                 GameDescription game = new GameDescription(ze.getName(), "", checksum);
                                 game.inserTime = System.currentTimeMillis();

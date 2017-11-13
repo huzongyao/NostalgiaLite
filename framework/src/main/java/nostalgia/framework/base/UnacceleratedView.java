@@ -76,7 +76,7 @@ class UnacceleratedView extends SurfaceView implements EmulatorView {
         if (delay > 0) {
             try {
                 Thread.sleep(delay);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ignored) {
             }
         }
 

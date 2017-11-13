@@ -34,7 +34,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.List;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import javax.microedition.khronos.egl.EGL10;
@@ -75,7 +74,7 @@ public class Utils {
             try {
                 if (fis != null)
                     fis.close();
-            } catch (IOException e) {
+            } catch (IOException ignored) {
             }
         }
         return "";
@@ -149,7 +148,7 @@ public class Utils {
     }
 
     public static void extractFile(File zipFile, String entryName, File outputFile)
-            throws ZipException, IOException {
+            throws IOException {
         NLog.i(TAG, "extract " + entryName + " from " + zipFile.getAbsolutePath() + " to "
                 + outputFile.getAbsolutePath());
         ZipFile zipFile2 = new ZipFile(zipFile);
@@ -212,7 +211,7 @@ public class Utils {
         try {
             ApplicationInfo appinfo = pm.getApplicationInfo(ctx.getPackageName(), 0);
             debuggable = (0 != (appinfo.flags &= ApplicationInfo.FLAG_DEBUGGABLE));
-        } catch (NameNotFoundException e) {
+        } catch (NameNotFoundException ignored) {
         }
         return debuggable;
     }
@@ -270,7 +269,7 @@ public class Utils {
                     }
                 }
             }
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
         return new IpInfo();
     }
@@ -326,7 +325,7 @@ public class Utils {
             netmask = 0;
             int n = 31;
             for (int i = 0; i < len; i++) {
-                netmask |= ((int) 1) << (n);
+                netmask |= 1 << (n);
                 n--;
             }
             NLog.e("netmask", len + "");

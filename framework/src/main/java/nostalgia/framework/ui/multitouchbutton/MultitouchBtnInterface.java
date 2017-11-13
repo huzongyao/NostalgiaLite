@@ -3,22 +3,22 @@ package nostalgia.framework.ui.multitouchbutton;
 import android.view.MotionEvent;
 
 public interface MultitouchBtnInterface {
-    public void onTouchEnter(MotionEvent event);
+    void onTouchEnter(MotionEvent event);
 
-    public void onTouchExit(MotionEvent event);
+    void onTouchExit(MotionEvent event);
 
-    public void setOnMultitouchEventlistener(OnMultitouchEventListener listener);
+    void setOnMultitouchEventlistener(OnMultitouchEventListener listener);
 
-    public int getId();
+    int getId();
 
-    public boolean isPressed();
+    boolean isPressed();
 
-    public void requestRepaint();
+    void requestRepaint();
 
-    public void removeRequestRepaint();
+    void removeRequestRepaint();
 
-    public boolean isRepaintState();
+    boolean isRepaintState();
 
-    public int getVisibility();
+    int getVisibility();
 
 }

@@ -93,7 +93,7 @@ public class Manager extends EmulatorRunner {
             try {
                 Thread.sleep(2);
 
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
 

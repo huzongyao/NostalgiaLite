@@ -34,7 +34,7 @@ public class RestarterActivity extends Activity {
         Class<?> clazz = null;
         try {
             clazz = Class.forName(className);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         Intent restartIntent = null;
         if (clazz != null) {
@@ -74,12 +74,12 @@ public class RestarterActivity extends Activity {
         public void run() {
             try {
                 Thread.sleep(500);
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
             android.os.Process.killProcess(pid);
             try {
                 Thread.sleep(300);
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
             ActivityManager activityManager = (ActivityManager) getApplicationContext()
                     .getSystemService(ACTIVITY_SERVICE);

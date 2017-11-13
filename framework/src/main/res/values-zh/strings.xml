@@ -110,4 +110,8 @@
     <string name="ok">确定</string>
     <string name="about">关于</string>
     <string name="other_pref">其他</string>
+    <string name="gallery_menu_exit">退出</string>
+    <string name="control_select">SELECT</string>
+    <string name="control_start">START</string>
+    <string name="control_menu">MENU</string>
 </resources>

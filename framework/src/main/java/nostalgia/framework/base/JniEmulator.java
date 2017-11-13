@@ -199,7 +199,7 @@ public abstract class JniEmulator implements Emulator {
                     try {
                         out.flush();
                         out.close();
-                    } catch (Exception e) {
+                    } catch (Exception ignored) {
                     }
                 }
             }
@@ -271,7 +271,7 @@ public abstract class JniEmulator implements Emulator {
             if (gameInfo == null && !loadFailed) {
                 try {
                     loadLock.wait();
-                } catch (InterruptedException e) {
+                } catch (InterruptedException ignored) {
                 }
             }
         }

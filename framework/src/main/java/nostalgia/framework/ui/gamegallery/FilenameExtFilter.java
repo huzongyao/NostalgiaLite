@@ -1,6 +1,7 @@
 package nostalgia.framework.ui.gamegallery;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,8 +14,7 @@ public class FilenameExtFilter implements java.io.FilenameFilter {
     public FilenameExtFilter(String[] exts, boolean showDirs, boolean showHiden) {
         Set<String> tmp = new HashSet<>();
 
-        for (String ext : exts)
-            tmp.add(ext);
+        Collections.addAll(tmp, exts);
 
         showDir = showDirs;
         this.showHiden = showHiden;

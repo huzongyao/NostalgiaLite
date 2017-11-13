@@ -70,7 +70,7 @@ public class WifiServerInfoTransmitter extends Thread {
                 } catch (Exception e) {
                     try {
                         Thread.sleep(SLEEP_TIME_AFTER_EXCEPTION);
-                    } catch (InterruptedException ie) {
+                    } catch (InterruptedException ignored) {
                     }
                 }
                 try {

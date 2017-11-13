@@ -154,4 +154,8 @@
         Gmail: hzy3774@gmail.com\n
         Foxmail: hzy3774@qq.com\n
     </string>
+    <string name="gallery_menu_exit">Exit</string>
+    <string name="control_select">SELECT</string>
+    <string name="control_start">START</string>
+    <string name="control_menu">MENU</string>
 </resources>

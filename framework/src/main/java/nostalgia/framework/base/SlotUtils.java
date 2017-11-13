@@ -33,7 +33,7 @@ public class SlotUtils {
     }
 
     public static List<SlotInfo> getSlots(String baseDir, String md5) {
-        ArrayList<SlotInfo> result = new ArrayList<SlotInfo>();
+        ArrayList<SlotInfo> result = new ArrayList<>();
 
         for (int i = 1; i < (NUM_SLOTS + 1); i++) {
             SlotInfo slot = getSlot(baseDir, md5, i);

@@ -2,9 +2,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/gallery_menu_settings"
-        android:icon="@drawable/ic_menu"
-        android:title="@string/menu_settings"
-        app:showAsAction="always" />
+        android:id="@+id/gallery_menu_remote_control"
+        android:icon="@drawable/ic_gamepad"
+        android:title="@string/gallery_menu_remote_control"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/gallery_menu_reload"
+        android:icon="@drawable/ic_reload"
+        android:title="@string/gallery_menu_reload"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/gallery_menu_pref"
+        android:icon="@drawable/ic_game_settings"
+        android:title="@string/gallery_menu_pref"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/gallery_menu_exit"
+        android:icon="@drawable/ic_exit"
+        android:title="@string/gallery_menu_exit"
+        app:showAsAction="never" />
 
 </menu>

@@ -35,7 +35,7 @@ public class ViewUtils {
 
     public static HashMap<String, ViewPort> computeAllInitViewPorts(
             Context context, int w, int h, int paddingLeft, int paddingTop) {
-        HashMap<String, ViewPort> res = new HashMap<String, ViewPort>();
+        HashMap<String, ViewPort> res = new HashMap<>();
 
         for (GfxProfile profile : EmulatorHolder.getInfo()
                 .getAvailableGfxProfiles()) {
@@ -151,7 +151,7 @@ public class ViewUtils {
 
         ViewPort result = new ViewPort();
         result.x = (w - vpw) / 2 + paddingLeft;
-        result.y = 0 + paddingTop;
+        result.y = paddingTop;
         result.height = vph;
         result.width = vpw;
         return result;

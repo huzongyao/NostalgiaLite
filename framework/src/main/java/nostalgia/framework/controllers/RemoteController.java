@@ -148,7 +148,7 @@ public class RemoteController implements EmulatorController {
 
     private static class Dispatcher implements OnControllerEventListener {
 
-        private List<RemoteController> controllers = new ArrayList<RemoteController>();
+        private List<RemoteController> controllers = new ArrayList<>();
 
         @Override
         public void onControllerEmulatorKeyEvent(ControllerKeyEvent event) {

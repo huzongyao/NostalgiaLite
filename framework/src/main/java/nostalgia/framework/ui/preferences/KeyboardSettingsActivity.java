@@ -49,7 +49,7 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
     public static final String EXTRA_NEW_BOOL = "EXTRA_NEW_BOOL";
     public static final int RESULT_NAME_CANCEL = 645943;
     private static final String TAG = "KeyboardSettingsActivity";
-    private static SparseArray<String> NON_PRINTABLE_KEY_LABELS = new SparseArray<String>();
+    private static SparseArray<String> NON_PRINTABLE_KEY_LABELS = new SparseArray<>();
 
     static {
         initNonPrintMap();
@@ -411,7 +411,7 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
         }
 
         public int[] getPlayersOffset() {
-            ArrayList<Integer> result = new ArrayList<Integer>();
+            ArrayList<Integer> result = new ArrayList<>();
             String lastDesc = "";
             int h = getRowHeight();
             for (int i = 0; i < KeyboardProfile.BUTTON_NAMES.length; i++) {

@@ -51,7 +51,7 @@ public class PopupMenu {
         mWindowManager.getDefaultDisplay().getMetrics(metrics);
         mScale = metrics.scaledDensity;
 
-        mItems = new ArrayList<MenuItem>();
+        mItems = new ArrayList<>();
 
         mPopupWindow = new PopupWindow(context);
         mPopupWindow.setTouchInterceptor(new OnTouchListener() {
@@ -227,7 +227,7 @@ public class PopupMenu {
      * PopupMenu has been selected.
      */
     public interface OnItemSelectedListener {
-        public void onItemSelected(MenuItem item);
+        void onItemSelected(MenuItem item);
     }
 
     static class ViewHolder {

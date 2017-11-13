@@ -26,7 +26,7 @@
 
             <TextView
                 android:id="@+id/dialog_time_title"
-                android:layout_width="fill_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
@@ -80,7 +80,7 @@
 
             <SeekBar
                 android:id="@+id/dialog_time_seek"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:maxHeight="200dp"
@@ -119,7 +119,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/dialog_button_shape"
                 android:padding="10dp"
-                android:text="Ok"
+                android:text="@string/ok"
                 android:textColor="@color/dialog_main_color" />
         </LinearLayout>
     </LinearLayout>

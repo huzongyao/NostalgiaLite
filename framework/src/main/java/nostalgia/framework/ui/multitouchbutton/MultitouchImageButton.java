@@ -3,9 +3,8 @@ package nostalgia.framework.ui.multitouchbutton;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.widget.ImageButton;
 
-public class MultitouchImageButton extends ImageButton implements MultitouchBtnInterface {
+public class MultitouchImageButton extends android.support.v7.widget.AppCompatImageButton implements MultitouchBtnInterface {
     protected boolean repaint = true;
     OnMultitouchEventListener listener;
 

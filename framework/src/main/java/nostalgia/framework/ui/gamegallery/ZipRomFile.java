@@ -20,7 +20,7 @@ public class ZipRomFile {
     public String path;
 
     @ObjectFromOtherTable(columnName = "zipfile_id")
-    public ArrayList<GameDescription> games = new ArrayList<GameDescription>();
+    public ArrayList<GameDescription> games = new ArrayList<>();
 
     public ZipRomFile() {
     }

@@ -264,7 +264,7 @@ public class PreferenceUtil {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
         Editor edit = pref.edit();
         edit.putString("general_pref_quality", quality + "");
-        edit.commit();
+        edit.apply();
     }
 
     public static int getEmulationQuality(Context context) {
@@ -330,7 +330,7 @@ public class PreferenceUtil {
                     return profile;
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
 
         return EmulatorHolder.getInfo().getDefaultGfxProfile();
