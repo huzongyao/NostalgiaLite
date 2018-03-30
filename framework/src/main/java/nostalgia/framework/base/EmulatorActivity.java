@@ -59,8 +59,8 @@ import nostalgia.framework.ui.preferences.GeneralPreferenceFragment;
 import nostalgia.framework.ui.preferences.PreferenceUtil;
 import nostalgia.framework.ui.timetravel.TimeTravelDialog;
 import nostalgia.framework.utils.DialogUtils;
+import nostalgia.framework.utils.EmuUtils;
 import nostalgia.framework.utils.NLog;
-import nostalgia.framework.utils.Utils;
 
 
 public abstract class EmulatorActivity extends Activity
@@ -173,7 +173,7 @@ public abstract class EmulatorActivity extends Activity
             return;
         }
         NLog.d(TAG, "onCreate - BaseActivity");
-        boolean hasOpenGL20 = Utils.checkGL20Support(getApplicationContext());
+        boolean hasOpenGL20 = EmuUtils.checkGL20Support(getApplicationContext());
         gameMenu = new GameMenu(this, this);
         game = (GameDescription) getIntent().getSerializableExtra(EXTRA_GAME);
         slotToRun = -1;
@@ -239,8 +239,8 @@ public abstract class EmulatorActivity extends Activity
         controllers.add(kc);
         group = new FrameLayout(this);
         Display display = getWindowManager().getDefaultDisplay();
-        int w = Utils.getDisplayWidth(display);
-        int h = Utils.getDisplayHeight(display);
+        int w = EmuUtils.getDisplayWidth(display);
+        int h = EmuUtils.getDisplayHeight(display);
         LayoutParams params = new LayoutParams(w, h);
         group.setLayoutParams(params);
         group.addView(emulatorView.asView());
@@ -792,7 +792,7 @@ public abstract class EmulatorActivity extends Activity
                 }
                 try {
                     FileOutputStream fos = new FileOutputStream(to);
-                    Utils.createScreenshotBitmap(this, game).compress(CompressFormat.PNG, 90, fos);
+                    EmuUtils.createScreenshotBitmap(this, game).compress(CompressFormat.PNG, 90, fos);
                     fos.close();
                     Toast.makeText(this, getString(R.string.act_game_screenshot_saved,
                             to.getAbsolutePath()), Toast.LENGTH_LONG).show();

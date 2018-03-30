@@ -22,7 +22,7 @@ import nostalgia.framework.ui.multitouchbutton.MultitouchImageButton;
 import nostalgia.framework.ui.multitouchbutton.MultitouchLayer;
 import nostalgia.framework.ui.multitouchbutton.OnMultitouchEventListener;
 import nostalgia.framework.ui.preferences.PreferenceUtil;
-import nostalgia.framework.utils.Utils;
+import nostalgia.framework.utils.EmuUtils;
 
 public class TouchController implements EmulatorController, OnMultitouchEventListener {
 
@@ -211,7 +211,7 @@ public class TouchController implements EmulatorController, OnMultitouchEventLis
         palIc.setVisibility(gfxProfile.name.equals("PAL") ? View.VISIBLE : View.GONE);
         ntscIc.setVisibility(gfxProfile.name.equals("NTSC") ? View.VISIBLE : View.GONE);
         boolean remoteVisible = PreferenceUtil.isWifiServerEnable(emulatorActivity)
-                && Utils.isWifiAvailable(emulatorActivity);
+                && EmuUtils.isWifiAvailable(emulatorActivity);
         remoteIc.setVisibility(remoteVisible ? View.VISIBLE : View.INVISIBLE);
         muteIc.setVisibility(PreferenceUtil.isSoundEnabled(emulatorActivity) ? View.GONE : View.VISIBLE);
 

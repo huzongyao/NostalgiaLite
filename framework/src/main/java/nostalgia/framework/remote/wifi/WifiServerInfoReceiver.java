@@ -15,7 +15,7 @@ import java.net.SocketTimeoutException;
 import java.nio.channels.DatagramChannel;
 
 import nostalgia.framework.utils.NLog;
-import nostalgia.framework.utils.Utils.ServerType;
+import nostalgia.framework.utils.EmuUtils.ServerType;
 
 @SuppressLint("HandlerLeak")
 public class WifiServerInfoReceiver {

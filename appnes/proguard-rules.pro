@@ -20,3 +20,7 @@
 -keepclasseswithmembers class nostalgia.framework.ui.gamegallery.ZipRomFile{*;}
 -keepclassmembers class * extends nostalgia.framework.base.JniEmulator{public ** getInstance();}
 
+-keep class com.blankj.utilcode.** { *; }
+-keepclassmembers class com.blankj.utilcode.** { *; }
+-dontwarn com.blankj.utilcode.**
+

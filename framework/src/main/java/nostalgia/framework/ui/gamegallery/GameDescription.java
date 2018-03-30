@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import java.io.File;
 import java.io.Serializable;
 
-import nostalgia.framework.utils.Utils;
+import nostalgia.framework.utils.EmuUtils;
 import nostalgia.framework.utils.annotations.Column;
 import nostalgia.framework.utils.annotations.Table;
 
@@ -45,7 +45,7 @@ public class GameDescription implements Serializable, Comparable<GameDescription
 
     public GameDescription(File file) {
         this(file, "");
-        checksum = Utils.getMD5Checksum(file);
+        checksum = EmuUtils.getMD5Checksum(file);
     }
 
     public GameDescription(File file, String checksum) {
@@ -71,7 +71,7 @@ public class GameDescription implements Serializable, Comparable<GameDescription
 
     public String getCleanName() {
         if (cleanNameCache == null) {
-            String name = Utils.removeExt(this.name);
+            String name = EmuUtils.removeExt(this.name);
             int idx = name.lastIndexOf('/');
             if (idx != -1) {
                 cleanNameCache = name.substring(idx + 1);

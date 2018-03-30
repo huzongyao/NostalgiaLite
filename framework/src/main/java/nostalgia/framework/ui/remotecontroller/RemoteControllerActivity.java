@@ -44,7 +44,7 @@ import nostalgia.framework.ui.multitouchbutton.MultitouchLayer;
 import nostalgia.framework.ui.multitouchbutton.OnMultitouchEventListener;
 import nostalgia.framework.ui.preferences.PreferenceUtil;
 import nostalgia.framework.utils.NLog;
-import nostalgia.framework.utils.Utils;
+import nostalgia.framework.utils.EmuUtils;
 
 public class RemoteControllerActivity extends Activity {
 
@@ -332,7 +332,7 @@ public class RemoteControllerActivity extends Activity {
         final Button okBtn = (Button) content.findViewById(R.id.dialog_select_server_btn_ok);
         final Button cancel = (Button) content.findViewById(R.id.dialog_select_server_btn_cancel);
         TextView title = (TextView) content.findViewById(R.id.dialog_select_server_title);
-        String prefixS = Utils.getNetPrefix(this) + ".";
+        String prefixS = EmuUtils.getNetPrefix(this) + ".";
         prefix.setText(prefixS);
         String iptxt = ip;
 

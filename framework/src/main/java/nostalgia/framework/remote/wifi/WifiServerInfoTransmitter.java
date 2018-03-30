@@ -9,7 +9,7 @@ import java.net.InetAddress;
 
 import nostalgia.framework.ui.preferences.PreferenceUtil;
 import nostalgia.framework.utils.NLog;
-import nostalgia.framework.utils.Utils;
+import nostalgia.framework.utils.EmuUtils;
 
 
 public class WifiServerInfoTransmitter extends Thread {
@@ -31,7 +31,7 @@ public class WifiServerInfoTransmitter extends Thread {
     }
 
     public boolean startSending() {
-        if (PreferenceUtil.isWifiServerEnable(context) && Utils.isWifiAvailable(context)) {
+        if (PreferenceUtil.isWifiServerEnable(context) && EmuUtils.isWifiAvailable(context)) {
             stopSending();
             running = true;
             start();
@@ -53,11 +53,11 @@ public class WifiServerInfoTransmitter extends Thread {
             serverSocket = new DatagramSocket();
             serverSocket.setBroadcast(true);
             NLog.i(TAG, "Start sending broadcast");
-            InetAddress broadcastAddress = Utils.getBroadcastAddress(context);
+            InetAddress broadcastAddress = EmuUtils.getBroadcastAddress(context);
             String manufacturer = Build.MANUFACTURER;
             String model = Build.MODEL;
             byte[] sendData = (MESSAGE_PREFIX + "%" + manufacturer + " " + model +
-                    "%" + Utils.getDeviceType(context).name() +
+                    "%" + EmuUtils.getDeviceType(context).name() +
                     "%" + sessionDescription + "%").getBytes();
             int counter = 0;
 

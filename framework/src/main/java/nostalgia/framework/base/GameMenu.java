@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 import nostalgia.framework.R;
 import nostalgia.framework.utils.DialogUtils;
-import nostalgia.framework.utils.Utils;
+import nostalgia.framework.utils.EmuUtils;
 
 public class GameMenu {
 
@@ -92,7 +92,7 @@ public class GameMenu {
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) container.getLayoutParams();
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
-        int width = Utils.getDisplayWidth(display);
+        int width = EmuUtils.getDisplayWidth(display);
         int px = width / 10;
         params.setMargins(px, 0, px, 0);
         container.setLayoutParams(params);

@@ -9,7 +9,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 
 import nostalgia.framework.utils.FileUtils;
-import nostalgia.framework.utils.Utils;
+import nostalgia.framework.utils.EmuUtils;
 
 
 public class BatterySaveUtils {
@@ -19,14 +19,14 @@ public class BatterySaveUtils {
     public static void createSavFileCopyIfNeeded(Context context, String gameFilePath) {
         File gameFile = new File(gameFilePath);
         File batterySavFile =
-                new File(gameFile.getParent(), Utils.stripExtension(gameFile.getName()) + ".sav");
+                new File(gameFile.getParent(), EmuUtils.stripExtension(gameFile.getName()) + ".sav");
         if (!batterySavFile.exists()) {
             return;
         }
         if (batterySavFile.canWrite()) {
             return;
         }
-        String sourceMD5 = Utils.getMD5Checksum(batterySavFile);
+        String sourceMD5 = EmuUtils.getMD5Checksum(batterySavFile);
         if (needsRewrite(context, batterySavFile, sourceMD5)) {
             File copyFile = new File(EmulatorUtils.getBaseDir(context), batterySavFile.getName());
             try {

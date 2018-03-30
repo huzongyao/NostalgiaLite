@@ -1,5 +1,7 @@
 package nostalgia.framework.ui.gamegallery;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,9 +13,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.blankj.utilcode.util.PermissionUtils;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import nostalgia.framework.Emulator;
@@ -92,12 +97,24 @@ abstract public class BaseGameGalleryActivity extends ControllableActivity
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     protected void reloadGames(boolean searchNew, File selectedFolder) {
         if (romsFinder == null) {
             reloadGames = false;
             reloading = searchNew;
             romsFinder = new RomsFinder(exts, inZipExts, this, this, searchNew, selectedFolder);
-            romsFinder.start();
+            PermissionUtils.permission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                    .callback(new PermissionUtils.FullCallback() {
+                        @Override
+                        public void onGranted(List<String> list) {
+                            romsFinder.start();
+                        }
+
+                        @Override
+                        public void onDenied(List<String> list, List<String> list1) {
+
+                        }
+                    }).request();
         }
     }
 

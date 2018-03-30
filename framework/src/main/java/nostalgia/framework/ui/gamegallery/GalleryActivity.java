@@ -30,16 +30,16 @@ import nostalgia.framework.ui.preferences.PreferenceUtil;
 import nostalgia.framework.ui.remotecontroller.RemoteControllerActivity;
 import nostalgia.framework.utils.DatabaseHelper;
 import nostalgia.framework.utils.DialogUtils;
+import nostalgia.framework.utils.EmuUtils;
 import nostalgia.framework.utils.NLog;
-import nostalgia.framework.utils.Utils;
-import nostalgia.framework.utils.Utils.ServerType;
+import nostalgia.framework.utils.EmuUtils.ServerType;
 
 public abstract class GalleryActivity extends BaseGameGalleryActivity
         implements OnItemClickListener {
 
     public static final int COMMAND_SEARCHMODE = 1;
     public static final String EXTRA_TABS_IDX = "EXTRA_TABS_IDX";
-    private static final String TAG = "GalleryActivity";
+    private static final String TAG = GalleryActivity.class.getSimpleName();
     private static final int REQUEST_IMPORT = 2;
     private static final String importPref = "import_pref";
 
@@ -86,9 +86,9 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (Utils.getDeviceType(this) == ServerType.mobile) {
+        if (EmuUtils.getDeviceType(this) == ServerType.mobile) {
             MenuItem item = menu.findItem(R.id.gallery_menu_remote_control);
-            item.setEnabled(Utils.isWifiAvailable(this));
+            item.setEnabled(EmuUtils.isWifiAvailable(this));
         } else {
             menu.removeItem(R.id.gallery_menu_remote_control);
         }
@@ -152,7 +152,7 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
             File zipFile = new File(zipRomFile.path);
             if (!gameFile.exists()) {
                 try {
-                    Utils.extractFile(zipFile, game.name, gameFile);
+                    EmuUtils.extractFile(zipFile, game.name, gameFile);
                 } catch (IOException e) {
                     NLog.e(TAG, "", e);
                 }

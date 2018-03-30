@@ -1,9 +1,0 @@
-<resources>
-    <string name="app_name">AppGG</string>
-
-    <!-- Preference item itentn action -->
-    <string name="action_general_pref" translatable="false">nostalgia.gg.GENERALPREF</string>
-    <string name="action_keyboard_pref" translatable="false">nostalgia.gg.KEYBOARDPREF</string>
-    <string name="action_touch_pref" translatable="false">nostalgia.gg.TOUCHPREF</string>
-    <string name="action_screen_pref" translatable="false">nostalgia.gg.SCREENPREF</string>
-</resources>

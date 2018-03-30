@@ -46,7 +46,7 @@ import nostalgia.framework.base.ViewPort;
 import nostalgia.framework.base.ViewUtils;
 import nostalgia.framework.ui.preferences.PreferenceUtil;
 import nostalgia.framework.utils.NLog;
-import nostalgia.framework.utils.Utils;
+import nostalgia.framework.utils.EmuUtils;
 
 public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
     private static final String TAG = "MultitouchLayer";
@@ -499,7 +499,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                 int newy = y - boundingBox.top;
 
                 if (map == null) {
-                    boolean debug = Utils.isDebuggable(getContext());
+                    boolean debug = EmuUtils.isDebuggable(getContext());
 
                     if (!debug) {
                         IllegalStateException e =
@@ -1079,8 +1079,8 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                     .getSystemService(Context.WINDOW_SERVICE);
             Display mDisplay = mWindowManager.getDefaultDisplay();
             cacheRotation = mDisplay.getRotation() % 2;
-            cacheW = Utils.getDisplayWidth(mDisplay);
-            cacheH = Utils.getDisplayHeight(mDisplay);
+            cacheW = EmuUtils.getDisplayWidth(mDisplay);
+            cacheH = EmuUtils.getDisplayHeight(mDisplay);
         }
         return getContext().getSharedPreferences(getPrefName(cacheRotation), Context.MODE_PRIVATE);
     }

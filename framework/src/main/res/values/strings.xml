@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
-    <string name="app_name">Emudroid</string>
+    <string name="app_name">EmuDroid</string>
     <string name="empty_desc">this component has no textual description</string>
     <string name="menu_settings">Settings</string>
     <string name="cancel">Cancel</string>

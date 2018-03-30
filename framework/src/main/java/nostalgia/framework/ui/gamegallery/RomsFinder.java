@@ -18,9 +18,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import nostalgia.framework.utils.DatabaseHelper;
+import nostalgia.framework.utils.EmuUtils;
 import nostalgia.framework.utils.NLog;
 import nostalgia.framework.utils.SDCardUtil;
-import nostalgia.framework.utils.Utils;
 
 public class RomsFinder extends Thread {
     private static final String TAG = "RomsFinder";
@@ -61,10 +61,8 @@ public class RomsFinder extends Thread {
 
         while (running.get() && !dirStack.empty()) {
             DirInfo dir = dirStack.remove(0);
-
             try {
                 dirPath = dir.file.getCanonicalPath();
-
             } catch (IOException e1) {
                 NLog.e(TAG, "search error", e1);
             }
@@ -72,7 +70,6 @@ public class RomsFinder extends Thread {
             if (dirPath != null && !usedPaths.contains(dirPath) && dir.level <= MAX_LEVEL) {
                 usedPaths.add(dirPath);
                 File[] files = dir.file.listFiles(filenameExtFilter);
-
                 if (files != null) {
                     for (File file : files) {
                         if (file.isDirectory()) {
@@ -129,9 +126,7 @@ public class RomsFinder extends Thread {
             for (GameDescription desc : oldRoms) {
                 oldGames.put(desc.path, desc);
             }
-
             startFileSystemMode(oldRoms);
-
         } else {
             activity.runOnUiThread(new Runnable() {
                 @Override
@@ -176,7 +171,7 @@ public class RomsFinder extends Thread {
                             if (inZipFileNameExtFilter.accept(dir, filename)) {
                                 counterRoms++;
                                 InputStream is = zip.getInputStream(ze);
-                                String checksum = Utils.getMD5Checksum(is);
+                                String checksum = EmuUtils.getMD5Checksum(is);
                                 try {
                                     if (is != null) {
                                         is.close();
@@ -258,7 +253,7 @@ public class RomsFinder extends Thread {
         for (File file : result) {
             String path = file.getAbsolutePath();
             if (running.get()) {
-                String ext = Utils.getExt(path).toLowerCase();
+                String ext = EmuUtils.getExt(path).toLowerCase();
                 if (ext.equals("zip")) {
                     zips.add(file);
                     try {

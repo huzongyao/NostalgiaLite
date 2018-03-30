@@ -1,1 +1,1 @@
-include ':libnes', ':framework', ':appnes', ':libgbc', ':appgbc', ':libgg', ':appgg'
+include ':framework', ':appnes', ':appgbc', ':appgg'

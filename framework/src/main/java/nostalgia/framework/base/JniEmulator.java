@@ -26,7 +26,7 @@ import nostalgia.framework.R;
 import nostalgia.framework.SfxProfile;
 import nostalgia.framework.ui.gamegallery.GameDescription;
 import nostalgia.framework.utils.NLog;
-import nostalgia.framework.utils.Utils;
+import nostalgia.framework.utils.EmuUtils;
 
 public abstract class JniEmulator implements Emulator {
     private static final String TAG = "JniEmulator";
@@ -492,7 +492,7 @@ public abstract class JniEmulator implements Emulator {
             path = getLoadedGame().path;
         }
         if (!md5s.containsKey(path)) {
-            String md5 = Utils.getMD5Checksum(new File(path));
+            String md5 = EmuUtils.getMD5Checksum(new File(path));
             md5s.put(path, md5);
         }
         return md5s.get(path);

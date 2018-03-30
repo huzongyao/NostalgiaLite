@@ -7,7 +7,7 @@ import android.os.FileObserver;
 import java.util.HashSet;
 
 import nostalgia.framework.utils.NLog;
-import nostalgia.framework.utils.Utils;
+import nostalgia.framework.utils.EmuUtils;
 
 public class FilePathWacher extends FileObserver {
     private static final String TAG = "ui.gamegallery.FilePathWacher";
@@ -45,7 +45,7 @@ public class FilePathWacher extends FileObserver {
         NLog.i(TAG, Integer.toBinaryString(event) + " " + path);
 
         if (path != null) {
-            String ext = Utils.getExt(path);
+            String ext = EmuUtils.getExt(path);
 
             if (exts.contains(ext)) {
                 NLog.i(TAG, "SD card filesystem change");
