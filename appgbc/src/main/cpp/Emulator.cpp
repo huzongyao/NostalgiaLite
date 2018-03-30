@@ -3,6 +3,7 @@
 #include <android/bitmap.h>
 #include <stdio.h>
 #include <GLES/gl.h>
+#include <cstring>
 
 using namespace emudroid;
 

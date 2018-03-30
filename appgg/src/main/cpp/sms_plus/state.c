@@ -9,8 +9,6 @@
 #include <android/log.h>
 #include <android/bitmap.h>
 
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR  ,"NOSTALGIA.SMS", __VA_ARGS__)
-
 void system_save_state(void *fd)
 {
     char *tmp = malloc(57815);

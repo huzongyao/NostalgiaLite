@@ -7,7 +7,7 @@
 * For more information, you can visit their official website: http://nostalgiaemulators.com/
 * I have changed and simplified some code and compiled it on android studio
 * If you want to compile it, you will need android ndk: https://developer.android.com/ndk/index.html
-* And you will need gradle-experimental: http://tools.android.com/tech-docs/new-build-system/gradle-experimental
+* Now I compile native code with android cmake
 * ic_launcher art: font: Lakki Reddy, padding: 15%. Generate with Android Asset Studio
 
 #### 详情

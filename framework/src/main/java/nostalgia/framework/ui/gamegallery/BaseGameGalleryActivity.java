@@ -2,6 +2,7 @@ package nostalgia.framework.ui.gamegallery;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,6 +14,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.PermissionUtils;
 
 import java.io.File;
@@ -104,6 +106,12 @@ abstract public class BaseGameGalleryActivity extends ControllableActivity
             reloading = searchNew;
             romsFinder = new RomsFinder(exts, inZipExts, this, this, searchNew, selectedFolder);
             PermissionUtils.permission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                    .theme(new PermissionUtils.ThemeCallback() {
+                        @Override
+                        public void onActivityCreate(Activity activity) {
+                            BarUtils.setStatusBarAlpha(activity, 0);
+                        }
+                    })
                     .callback(new PermissionUtils.FullCallback() {
                         @Override
                         public void onGranted(List<String> list) {

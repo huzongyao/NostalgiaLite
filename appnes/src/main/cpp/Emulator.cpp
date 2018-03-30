@@ -2,6 +2,8 @@
 #include <android/bitmap.h>
 #include <stdio.h>
 #include <GLES/gl.h>
+#include <cstring>
+#include <malloc.h>
 
 using namespace emudroid;
 

@@ -6,7 +6,7 @@
 cmake_minimum_required(VERSION 3.4.1)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPSS_STYLE=1  -DHAVE_ASPRINTF  -DLSB_FIRST  -DFRAMESKIP -D_STLP_HAS_WCHAR_T  -D_GLIBCXX_USE_WCHAR_T  -fexceptions -frtti")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -frtti")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -frtti -Wreturn-type")
 
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.

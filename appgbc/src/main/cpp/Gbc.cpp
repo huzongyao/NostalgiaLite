@@ -5,6 +5,7 @@
 #include <list>
 #include <fstream>
 #include <sstream>
+#include <cstring>
 
 #include "Emulator.h"
 #include "Bridge.h"

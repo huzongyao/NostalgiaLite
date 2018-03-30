@@ -4,7 +4,6 @@
 #include "jni.h"
 #include "settings.h"
 #include <pthread.h>
-#include <malloc.h>
 
 namespace emudroid {
 

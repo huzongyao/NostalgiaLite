@@ -1,5 +1,6 @@
 package nostalgia.framework.base;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -21,6 +22,7 @@ import nostalgia.framework.Emulator;
 import nostalgia.framework.GfxProfile;
 import nostalgia.framework.utils.NLog;
 
+@SuppressLint("ViewConstructor")
 class OpenGLView extends GLSurfaceView implements EmulatorView {
     private static final String TAG = "base.OpenGLView";
     private final Renderer renderer;
