@@ -28,7 +28,6 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,7 +39,6 @@ import java.util.TimerTask;
 import nostalgia.framework.EmulatorController;
 import nostalgia.framework.R;
 import nostalgia.framework.base.EmulatorHolder;
-import nostalgia.framework.base.Migrator;
 import nostalgia.framework.base.ViewPort;
 import nostalgia.framework.base.ViewUtils;
 import nostalgia.framework.ui.preferences.PreferenceUtil;
@@ -1241,29 +1239,6 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
 
     private interface OnEditItemClickListener {
         void onClick();
-    }
-
-    public static class PreferenceMigrator implements Migrator {
-
-        @Override
-        public void doExport(Context context, String baseDir) {
-            migrate(PreferenceUtil.EXPORT, context, baseDir);
-        }
-
-        @Override
-        public void doImport(Context context, String baseDir) {
-            migrate(PreferenceUtil.IMPORT, context, baseDir);
-        }
-
-        private void migrate(int type, Context context, String baseDir) {
-            SharedPreferences pref1 = context.getSharedPreferences(getPrefName(0), Context.MODE_PRIVATE);
-            SharedPreferences pref2 = context.getSharedPreferences(getPrefName(1), Context.MODE_PRIVATE);
-            PreferenceUtil.migratePreferences(type, pref1, new File(baseDir, getPrefName(0)),
-                    PreferenceUtil.NotFoundHandling.IGNORE);
-            PreferenceUtil.migratePreferences(type, pref2, new File(baseDir, getPrefName(1)),
-                    PreferenceUtil.NotFoundHandling.IGNORE);
-        }
-
     }
 
     private class EditElement {

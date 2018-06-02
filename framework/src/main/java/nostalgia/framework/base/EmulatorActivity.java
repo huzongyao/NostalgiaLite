@@ -1,5 +1,6 @@
 package nostalgia.framework.base;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -8,6 +9,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.os.Bundle;
 import android.os.Environment;
@@ -22,6 +24,8 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
+
+import com.blankj.utilcode.util.PermissionUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -704,6 +708,18 @@ public abstract class EmulatorActivity extends Activity
                         GeneralPreferenceFragment.class.getName());
                 startActivity(i);
             } else if (item.id == R.string.game_menu_screenshot) {
+                saveGameScreenshot();
+            }
+        } catch (EmulatorException e) {
+            handleException(e);
+        }
+    }
+
+    private void saveGameScreenshot() {
+        PermissionUtils.permission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .callback(new PermissionUtils.SimpleCallback() {
+            @Override
+            public void onGranted() {
                 String name = game.getCleanName() + "-screenshot";
                 File dir = new File(
                         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
@@ -720,18 +736,23 @@ public abstract class EmulatorActivity extends Activity
                 }
                 try {
                     FileOutputStream fos = new FileOutputStream(to);
-                    EmuUtils.createScreenshotBitmap(this, game).compress(CompressFormat.PNG, 90, fos);
+                    EmuUtils.createScreenshotBitmap(EmulatorActivity.this, game)
+                            .compress(CompressFormat.PNG, 90, fos);
                     fos.close();
-                    Toast.makeText(this, getString(R.string.act_game_screenshot_saved,
+                    Toast.makeText(EmulatorActivity.this,
+                            getString(R.string.act_game_screenshot_saved,
                             to.getAbsolutePath()), Toast.LENGTH_LONG).show();
                 } catch (IOException e) {
                     NLog.e(TAG, "", e);
                     throw new EmulatorException(getString(R.string.act_game_screenshot_failed));
                 }
             }
-        } catch (EmulatorException e) {
-            handleException(e);
-        }
+
+            @Override
+            public void onDenied() {
+
+            }
+        }).request();
     }
 
     @Override

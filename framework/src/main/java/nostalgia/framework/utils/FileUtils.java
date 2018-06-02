@@ -53,7 +53,7 @@ public class FileUtils {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(to);
-            int count = 0;
+            int count;
             byte[] buffer = new byte[1024];
             while ((count = is.read(buffer)) != -1) {
                 fos.write(buffer, 0, count);
@@ -86,7 +86,7 @@ public class FileUtils {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(file));
             StringBuilder sb = new StringBuilder();
-            String line = null;
+            String line;
             while ((line = reader.readLine()) != null) {
                 sb.append(line);
             }

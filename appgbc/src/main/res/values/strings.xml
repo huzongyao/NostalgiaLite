@@ -1,4 +1,9 @@
 <resources>
 
     <string name="app_name">GBCEmu</string>
+
+    <string name="action_general_pref" translatable="false">nostalgia.gbc.GENERALPREF</string>
+    <string name="action_keyboard_pref" translatable="false">nostalgia.gbc.KEYBOARDPREF</string>
+    <string name="action_touch_pref" translatable="false">nostalgia.gbc.TOUCHPREF</string>
+    <string name="action_screen_pref" translatable="false">nostalgia.gbc.SCREENPREF</string>
 </resources>

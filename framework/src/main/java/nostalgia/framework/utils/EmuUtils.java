@@ -293,8 +293,8 @@ public class EmuUtils {
         int newH = h * 2;
         Rect from = new Rect(0, 0, w, h);
         Rect to = new Rect(0, 0, newW, newH);
-        Bitmap largeBitmap =
-                Bitmap.createBitmap(bitmap.getWidth() * 2, bitmap.getHeight() * 2, Config.ARGB_8888);
+        Bitmap largeBitmap = Bitmap.createBitmap(bitmap.getWidth() * 2,
+                bitmap.getHeight() * 2, Config.ARGB_8888);
         Canvas c = new Canvas(largeBitmap);
         Paint p = new Paint();
         p.setDither(false);

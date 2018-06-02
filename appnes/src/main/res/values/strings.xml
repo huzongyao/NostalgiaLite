@@ -2,4 +2,8 @@
 
     <string name="app_name">FCEmu</string>
 
+    <string name="action_general_pref" translatable="false">nostalgia.nes.GENERALPREF</string>
+    <string name="action_keyboard_pref" translatable="false">nostalgia.nes.KEYBOARDPREF</string>
+    <string name="action_touch_pref" translatable="false">nostalgia.nes.TOUCHPREF</string>
+    <string name="action_screen_pref" translatable="false">nostalgia.nes.SCREENPREF</string>
 </resources>

@@ -18,6 +18,7 @@ import nostalgia.framework.utils.FileUtils;
 import nostalgia.framework.utils.NLog;
 
 public class EmulatorRunner {
+
     private static final String TAG = "EmulatorRunner";
     private static final int AUTO_SAVE_SLOT = 0;
     protected final Object lock = new Object();
@@ -144,19 +145,15 @@ public class EmulatorRunner {
         }
 
         synchronized (lock) {
-            GfxProfile gfx = PreferenceUtil.getVideoProfile(context, emulator,
-                    game);
+            GfxProfile gfx = PreferenceUtil.getVideoProfile(context, emulator, game);
             PreferenceUtil.setLastGfxProfile(context, gfx);
             EmulatorSettings settings = new EmulatorSettings();
-            settings.zapperEnabled = PreferenceUtil.isZapperEnabled(context,
-                    game.checksum);
-            settings.historyEnabled = PreferenceUtil
-                    .isTimeshiftEnabled(context);
+            settings.zapperEnabled = PreferenceUtil.isZapperEnabled(context, game.checksum);
+            settings.historyEnabled = PreferenceUtil.isTimeshiftEnabled(context);
             settings.loadSavFiles = PreferenceUtil.isLoadSavFiles(context);
             settings.saveSavFiles = PreferenceUtil.isSaveSavFiles(context);
-            List<SfxProfile> profiles = emulator.getInfo()
-                    .getAvailableSfxProfiles();
-            SfxProfile sfx = null;
+            List<SfxProfile> profiles = emulator.getInfo().getAvailableSfxProfiles();
+            SfxProfile sfx;
             int desiredQuality = PreferenceUtil.getEmulationQuality(context);
             settings.quality = desiredQuality;
             desiredQuality = Math.min(profiles.size() - 1, desiredQuality);
@@ -171,8 +168,7 @@ public class EmulatorRunner {
             String battery = context.getExternalCacheDir().getAbsolutePath();
             NLog.e("bat", battery);
             BatterySaveUtils.createSavFileCopyIfNeeded(context, game.path);
-            String batteryDir = BatterySaveUtils.getBatterySaveDir(context,
-                    game.path);
+            String batteryDir = BatterySaveUtils.getBatterySaveDir(context, game.path);
             String possibleBatteryFileFullPath = batteryDir + "/"
                     + FileUtils.getFileNameWithoutExt(new File(game.path))
                     + ".sav";

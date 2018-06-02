@@ -8,15 +8,12 @@ import android.preference.PreferenceManager;
 import android.util.SparseIntArray;
 import android.view.KeyEvent;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import nostalgia.framework.base.Migrator;
 import nostalgia.framework.controllers.KeyboardController;
-import nostalgia.framework.ui.preferences.PreferenceUtil;
 import nostalgia.framework.utils.NLog;
 
 public class KeyboardProfile implements Serializable {
@@ -222,36 +219,6 @@ public class KeyboardProfile implements Serializable {
         }
 
         return true;
-    }
-
-    public static class PreferenceMigrator implements Migrator {
-
-        @Override
-        public void doExport(Context context, String baseDir) {
-            migrate(PreferenceUtil.EXPORT, context, baseDir);
-        }
-
-        @Override
-        public void doImport(Context context, String baseDir) {
-            migrate(PreferenceUtil.IMPORT, context, baseDir);
-        }
-
-        private void migrate(int type, Context context, String baseDir) {
-            File file = new File(baseDir, KEYBOARD_PROFILES_SETTINGS);
-            SharedPreferences pref =
-                    context.getSharedPreferences(KEYBOARD_PROFILES_SETTINGS, Context.MODE_PRIVATE);
-            PreferenceUtil.migratePreferences(type, pref, file, PreferenceUtil.NotFoundHandling.IGNORE);
-            ArrayList<String> names = getProfilesNames(context);
-
-            for (String name : names) {
-                SharedPreferences keyPref =
-                        context.getSharedPreferences(name + KEYBOARD_PROFILE_POSTFIX, Context.MODE_PRIVATE);
-                PreferenceUtil.migratePreferences(type, keyPref,
-                        new File(baseDir, name + KEYBOARD_PROFILE_POSTFIX),
-                        PreferenceUtil.NotFoundHandling.IGNORE);
-            }
-        }
-
     }
 
 }

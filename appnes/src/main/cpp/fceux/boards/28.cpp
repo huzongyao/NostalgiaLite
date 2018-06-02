@@ -69,18 +69,18 @@ static void Sync()
 		break;
 	case 0x10:
 	case 0x14:
-		prglo = outb & ~2 | prg << 1 & 2;
-		prghi = outb & ~2 | prg << 1 & 2 | 1;
+		prglo = (outb & ~2) | (prg << 1 & 2);
+		prghi = (outb & ~2) | (prg << 1 & 2) | 1;
 		break;
 	case 0x20:
 	case 0x24:
-		prglo = outb & ~6 | prg << 1 & 6;
-		prghi = outb & ~6 | prg << 1 & 6 | 1;
+		prglo = (outb & ~6) | (prg << 1 & 6);
+		prghi = (outb & ~6) | (prg << 1 & 6) | 1;
 		break;
 	case 0x30:
 	case 0x34:
-		prglo = outb & ~14 | prg << 1 & 14;
-		prghi = outb & ~14 | prg << 1 & 14 | 1;
+		prglo = (outb & ~14) | (prg << 1 & 14);
+		prghi = (outb & ~14) | (prg << 1 & 14) | 1;
 		break;
 		//bottom fixed modes
 	case 0x08:

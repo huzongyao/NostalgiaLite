@@ -53,7 +53,7 @@ static void StateRestore(int version) {
 
 static DECLFR(ReadLow) {
 	switch (A & 0x7700) {
-	case 0x5100: return reg[2] | reg[0] | reg[1] | reg[3] ^ 0xff; break;
+	case 0x5100: return reg[2] | reg[0] | reg[1] | (reg[3] ^ 0xff); break;
 	case 0x5500:
 		if (trigger)
 			return reg[2] | reg[1];   // Lei Dian Huang Bi Ka Qiu Chuan Shuo (NJ046) may broke other games
