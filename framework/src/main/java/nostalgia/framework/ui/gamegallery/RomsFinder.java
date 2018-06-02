@@ -105,22 +105,12 @@ public class RomsFinder extends Thread {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
         running.set(true);
         NLog.i(TAG, "start");
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                listener.onRomsFinderStart(searchNew);
-            }
-        });
+        activity.runOnUiThread(() -> listener.onRomsFinderStart(searchNew));
         ArrayList<GameDescription> oldRoms = getAllGames(dbHelper);
         oldRoms = removeNonExistRoms(oldRoms);
         final ArrayList<GameDescription> roms = oldRoms;
         NLog.i(TAG, "old games " + oldRoms.size());
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                listener.onRomsFinderFoundGamesInCache(roms);
-            }
-        });
+        activity.runOnUiThread(() -> listener.onRomsFinderFoundGamesInCache(roms));
 
         if (searchNew) {
             for (GameDescription desc : oldRoms) {
@@ -128,12 +118,7 @@ public class RomsFinder extends Thread {
             }
             startFileSystemMode(oldRoms);
         } else {
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    listener.onRomsFinderEnd(false);
-                }
-            });
+            activity.runOnUiThread(() -> listener.onRomsFinderEnd(false));
         }
     }
 
@@ -292,12 +277,9 @@ public class RomsFinder extends Thread {
         NLog.i(TAG, "compute checksum- done");
 
         if (running.get()) {
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    listener.onRomsFinderNewGames(games);
-                    listener.onRomsFinderEnd(true);
-                }
+            activity.runOnUiThread(() -> {
+                listener.onRomsFinderNewGames(games);
+                listener.onRomsFinderEnd(true);
             });
         }
 

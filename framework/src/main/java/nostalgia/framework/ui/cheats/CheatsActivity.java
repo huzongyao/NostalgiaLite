@@ -4,13 +4,13 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -20,10 +20,9 @@ import java.util.Locale;
 
 import nostalgia.framework.R;
 import nostalgia.framework.base.EmulatorHolder;
-import nostalgia.framework.remote.ControllableActivity;
 
 
-public class CheatsActivity extends ControllableActivity {
+public class CheatsActivity extends AppCompatActivity {
 
     public static final String EXTRA_IN_GAME_HASH = "EXTRA_IN_GAME_HASH";
     Button save;
@@ -43,7 +42,7 @@ public class CheatsActivity extends ControllableActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         gameHash = getIntent().getStringExtra(EXTRA_IN_GAME_HASH);
-        list = (ListView) findViewById(R.id.act_cheats_list);
+        list = findViewById(R.id.act_cheats_list);
         cheats = Cheat.getAllCheats(this, gameHash);
         adapter = new CheatsListAdapter(this, cheats);
         list.setAdapter(adapter);
@@ -83,9 +82,9 @@ public class CheatsActivity extends ControllableActivity {
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View content = inflater.inflate(R.layout.dialog_new_cheat, null);
         dialog.setContentView(content);
-        final EditText chars = (EditText) content.findViewById(R.id.dialog_new_cheat_chars);
-        final EditText desc = (EditText) content.findViewById(R.id.dialog_new_cheat_desc);
-        save = (Button) content.findViewById(R.id.dialog_new_cheat_save);
+        final EditText chars = content.findViewById(R.id.dialog_new_cheat_chars);
+        final EditText desc = content.findViewById(R.id.dialog_new_cheat_desc);
+        save = content.findViewById(R.id.dialog_new_cheat_save);
 
         if (idx >= 0) {
             Cheat cheat = cheats.get(idx);
@@ -132,20 +131,17 @@ public class CheatsActivity extends ControllableActivity {
                 }
             }
         });
-        save.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (idx == -1) {
-                    cheats.add(new Cheat(chars.getText().toString(), desc.getText().toString(), true));
-                } else {
-                    Cheat cheat = cheats.get(idx);
-                    cheat.chars = chars.getText().toString();
-                    cheat.desc = desc.getText().toString();
-                }
-                adapter.notifyDataSetChanged();
-                Cheat.saveCheats(CheatsActivity.this, gameHash, cheats);
-                dialog.cancel();
+        save.setOnClickListener(v -> {
+            if (idx == -1) {
+                cheats.add(new Cheat(chars.getText().toString(), desc.getText().toString(), true));
+            } else {
+                Cheat cheat = cheats.get(idx);
+                cheat.chars = chars.getText().toString();
+                cheat.desc = desc.getText().toString();
             }
+            adapter.notifyDataSetChanged();
+            Cheat.saveCheats(this, gameHash, cheats);
+            dialog.cancel();
         });
         dialog.show();
     }
@@ -153,7 +149,7 @@ public class CheatsActivity extends ControllableActivity {
     public void removeCheat(int idx) {
         cheats.remove(idx);
         adapter.notifyDataSetChanged();
-        Cheat.saveCheats(CheatsActivity.this, gameHash, cheats);
+        Cheat.saveCheats(this, gameHash, cheats);
     }
 
     public void editCheat(int idx) {
@@ -161,7 +157,7 @@ public class CheatsActivity extends ControllableActivity {
     }
 
     public void saveCheats() {
-        Cheat.saveCheats(CheatsActivity.this, gameHash, cheats);
+        Cheat.saveCheats(this, gameHash, cheats);
     }
 
 }

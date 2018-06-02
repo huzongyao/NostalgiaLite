@@ -38,37 +38,24 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
     private int sumRuns = 0;
     private int sortType = SORT_BY_NAME_ALPHA;
 
-    private Comparator<GameDescription> nameComparator = new Comparator<GameDescription>() {
-        @Override
-        public int compare(GameDescription lhs, GameDescription rhs) {
-            return lhs.getSortName().compareTo(rhs.getSortName());
+    private Comparator<GameDescription> nameComparator = (lhs, rhs) ->
+            lhs.getSortName().compareTo(rhs.getSortName());
+
+    private Comparator<GameDescription> insertDateComparator = (lhs, rhs) ->
+            (int) (-lhs.inserTime + rhs.inserTime);
+
+    private Comparator<GameDescription> lastPlayedDateComparator = (lhs, rhs) -> {
+        long dif = lhs.lastGameTime - rhs.lastGameTime;
+        if (dif == 0) {
+            return 0;
+        } else if (dif < 0) {
+            return 1;
+        } else {
+            return -1;
         }
     };
-    private Comparator<GameDescription> insertDateComparator = new Comparator<GameDescription>() {
-        @Override
-        public int compare(GameDescription lhs, GameDescription rhs) {
-            return (int) (-lhs.inserTime + rhs.inserTime);
-        }
-    };
-    private Comparator<GameDescription> lastPlayedDateComparator = new Comparator<GameDescription>() {
-        @Override
-        public int compare(GameDescription lhs, GameDescription rhs) {
-            long dif = lhs.lastGameTime - rhs.lastGameTime;
-            if (dif == 0) {
-                return 0;
-            } else if (dif < 0) {
-                return 1;
-            } else {
-                return -1;
-            }
-        }
-    };
-    private Comparator<GameDescription> playedCountComparator = new Comparator<GameDescription>() {
-        @Override
-        public int compare(GameDescription lhs, GameDescription rhs) {
-            return -lhs.runCount + rhs.runCount;
-        }
-    };
+    private Comparator<GameDescription> playedCountComparator = (lhs, rhs) ->
+            -lhs.runCount + rhs.runCount;
 
     public GalleryAdapter(Context context) {
         this.context = context;
@@ -98,10 +85,10 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
             convertView = inflater.inflate(R.layout.row_game_list, null);
         }
         GameDescription game = item.game;
-        TextView name = (TextView) convertView.findViewById(R.id.row_game_item_name);
-        ImageView arrowIcon = (ImageView) convertView.findViewById(R.id.game_item_arrow);
-        ImageView bck = (ImageView) convertView.findViewById(R.id.game_item_bck);
-        ProgressBar runIndicator = (ProgressBar) convertView.findViewById(R.id.row_game_item_progressBar);
+        TextView name = convertView.findViewById(R.id.row_game_item_name);
+        ImageView arrowIcon = convertView.findViewById(R.id.game_item_arrow);
+        ImageView bck = convertView.findViewById(R.id.game_item_bck);
+        ProgressBar runIndicator = convertView.findViewById(R.id.row_game_item_progressBar);
         runIndicator.setMax(sumRuns);
         name.setText(game.getCleanName());
         arrowIcon.setImageResource(R.drawable.ic_next_arrow);
@@ -216,12 +203,7 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
         Set<Character> keyset = alphaIndexer.keySet();
         sections = new Character[keyset.size()];
         keyset.toArray(sections);
-        Arrays.sort(sections, new Comparator<Character>() {
-            @Override
-            public int compare(Character lhs, Character rhs) {
-                return lhs.compareTo(rhs);
-            }
-        });
+        Arrays.sort(sections, Character::compareTo);
         for (int i = 0; i < sections.length; i++)
             sections[i] = Character.toUpperCase(sections[i]);
         return sections;

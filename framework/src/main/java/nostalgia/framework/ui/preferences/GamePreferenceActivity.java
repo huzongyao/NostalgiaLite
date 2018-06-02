@@ -13,7 +13,6 @@ import java.util.List;
 import nostalgia.framework.GfxProfile;
 import nostalgia.framework.R;
 import nostalgia.framework.base.EmulatorHolder;
-import nostalgia.framework.remote.VirtualDPad;
 import nostalgia.framework.ui.gamegallery.GameDescription;
 
 public class GamePreferenceActivity extends AppCompatPreferenceActivity {
@@ -79,13 +78,11 @@ public class GamePreferenceActivity extends AppCompatPreferenceActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        VirtualDPad.getInstance().onResume(getWindow());
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        VirtualDPad.getInstance().onPause();
     }
 
 

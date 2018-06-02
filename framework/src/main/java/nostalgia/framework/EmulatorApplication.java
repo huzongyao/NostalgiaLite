@@ -13,10 +13,10 @@ abstract public class EmulatorApplication extends Application {
     private static final String TAG = EmulatorApplication.class.getName();
 
     public void onCreate() {
+        super.onCreate();
         Utils.init(this);
         boolean debug = EmuUtils.isDebuggable(this);
         NLog.setDebugMode(debug);
-        super.onCreate();
     }
 
     public abstract boolean hasGameMenu();

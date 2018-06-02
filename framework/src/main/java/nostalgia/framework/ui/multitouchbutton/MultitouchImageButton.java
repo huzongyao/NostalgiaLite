@@ -4,12 +4,13 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-public class MultitouchImageButton extends android.support.v7.widget.AppCompatImageButton implements MultitouchBtnInterface {
+public class MultitouchImageButton extends android.support.v7.widget.AppCompatImageButton
+        implements MultitouchBtnInterface {
+
     protected boolean repaint = true;
     OnMultitouchEventListener listener;
 
-    public MultitouchImageButton(Context context, AttributeSet attrs,
-                                 int defStyle) {
+    public MultitouchImageButton(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
@@ -19,14 +20,12 @@ public class MultitouchImageButton extends android.support.v7.widget.AppCompatIm
 
     public void onTouchEnter(MotionEvent event) {
         setPressed(true);
-
         if (listener != null)
             listener.onMultitouchEnter(this);
     }
 
     public void onTouchExit(MotionEvent event) {
         setPressed(false);
-
         if (listener != null)
             listener.onMultitouchExit(this);
     }

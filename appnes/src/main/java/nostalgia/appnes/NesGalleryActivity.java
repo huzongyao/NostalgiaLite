@@ -40,7 +40,8 @@ public class NesGalleryActivity extends GalleryActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (PreferenceUtil.getFragmentShader(this) == -1 && EmuUtils.checkGL20Support(this)) {
+        if (PreferenceUtil.getFragmentShader(this) == -1
+                && EmuUtils.checkGL20Support(this)) {
             Intent intent = new Intent(this, OpenGLTestActivity.class);
             startActivityForResult(intent, REQUEST_CHECK_OPENGL);
         }

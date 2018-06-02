@@ -63,14 +63,9 @@ public class Manager extends EmulatorRunner {
                         throw new EmulatorException(
                                 R.string.act_emulator_invalid_cheat, cheatChars);
                     }
-
-                    if (rawValues != null) {
-                        enableRawCheat(rawValues[0], rawValues[1], rawValues[2]);
-                    }
-
+                    enableRawCheat(rawValues[0], rawValues[1], rawValues[2]);
                 } else {
-                    throw new EmulatorException(
-                            R.string.act_emulator_invalid_cheat, cheatChars);
+                    throw new EmulatorException(R.string.act_emulator_invalid_cheat, cheatChars);
                 }
 
             } else {

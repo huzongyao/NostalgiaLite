@@ -6,7 +6,6 @@ import android.os.Vibrator;
 import android.util.AttributeSet;
 import android.widget.SeekBar;
 
-import nostalgia.framework.remote.VirtualDPad;
 import nostalgia.framework.ui.widget.SeekBarPreference;
 
 public class SeekBarVibrationPreference extends SeekBarPreference {
@@ -29,7 +28,6 @@ public class SeekBarVibrationPreference extends SeekBarPreference {
     @Override
     protected void showDialog(Bundle state) {
         super.showDialog(state);
-        VirtualDPad.getInstance().onResume(getDialog().getWindow());
     }
 
 }

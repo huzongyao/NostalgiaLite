@@ -224,8 +224,8 @@ public class EmuUtils {
     }
 
     public static boolean isWifiAvailable(Context context) {
-        WifiManager manager =
-                (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiManager manager = (WifiManager)
+                context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInfo = manager.getConnectionInfo();
         return (manager.getWifiState() == WifiManager.WIFI_STATE_ENABLED) & (wifiInfo.getIpAddress() != 0);
     }

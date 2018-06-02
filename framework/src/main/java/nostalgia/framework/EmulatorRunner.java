@@ -51,12 +51,8 @@ public class EmulatorRunner {
             return;
         }
 
-        FilenameFilter filter = new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String filename) {
-                return filename.toLowerCase().endsWith(".sav");
-            }
-        };
+        FilenameFilter filter = (dir1, filename) ->
+                filename.toLowerCase().endsWith(".sav");
         String cacheDir = context.getExternalCacheDir().getAbsolutePath();
         String baseDir = EmulatorUtils.getBaseDir(context);
         String[] fileNames = dir.list(filter);

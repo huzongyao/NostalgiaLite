@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.preference.ListPreference;
 import android.util.AttributeSet;
 
-import nostalgia.framework.remote.VirtualDPad;
 
 public class ControllableListPreference extends ListPreference {
 
@@ -20,7 +19,6 @@ public class ControllableListPreference extends ListPreference {
     @Override
     protected void showDialog(Bundle state) {
         super.showDialog(state);
-        VirtualDPad.getInstance().onResume(getDialog().getWindow());
     }
 
 }

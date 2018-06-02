@@ -63,12 +63,9 @@ public class GalleryPagerAdapter extends PagerAdapter {
         list.setFastScrollEnabled(true);
         list.setSelector(R.drawable.row_game_item_list_selector);
         list.setAdapter(listAdapters[position]);
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-                RowItem item = (RowItem) listAdapters[position].getItem(arg2);
-                listener.onItemClick(item.game);
-            }
+        list.setOnItemClickListener((arg0, arg1, arg2, arg3) -> {
+            RowItem item = (RowItem) listAdapters[position].getItem(arg2);
+            listener.onItemClick(item.game);
         });
         list.setOnScrollListener(new OnScrollListener() {
             @Override

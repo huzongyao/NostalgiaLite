@@ -1,5 +1,6 @@
 package nostalgia.framework.ui.widget;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
@@ -9,12 +10,9 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -41,6 +39,7 @@ public class PopupMenu {
     private int mWidth = 240;
     private float mScale;
 
+    @SuppressLint("ClickableViewAccessibility")
     public PopupMenu(Context context) {
         mContext = context;
         mInflater = (LayoutInflater) context
@@ -54,18 +53,13 @@ public class PopupMenu {
         mItems = new ArrayList<>();
 
         mPopupWindow = new PopupWindow(context);
-        mPopupWindow.setTouchInterceptor(new OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_OUTSIDE) {
-                    mPopupWindow.dismiss();
-                    return true;
-                }
-                return false;
+        mPopupWindow.setTouchInterceptor((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_OUTSIDE) {
+                mPopupWindow.dismiss();
+                return true;
             }
+            return false;
         });
-
         setContentView(mInflater.inflate(R.layout.popup_menu, null));
     }
 
@@ -76,10 +70,8 @@ public class PopupMenu {
      */
     private void setContentView(View contentView) {
         mContentView = contentView;
-        mItemsView = (ListView) contentView.findViewById(R.id.items);
-        mHeaderTitleView = (TextView) contentView
-                .findViewById(R.id.header_title);
-
+        mItemsView = contentView.findViewById(R.id.items);
+        mHeaderTitleView = contentView.findViewById(R.id.header_title);
         mPopupWindow.setContentView(contentView);
     }
 
@@ -115,16 +107,11 @@ public class PopupMenu {
 
         MenuItemAdapter adapter = new MenuItemAdapter(mContext, mItems);
         mItemsView.setAdapter(adapter);
-        mItemsView.setOnItemClickListener(new OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                if (mListener != null) {
-                    mListener.onItemSelected(mItems.get(position));
-                }
-                mPopupWindow.dismiss();
+        mItemsView.setOnItemClickListener((parent, view, position, id) -> {
+            if (mListener != null) {
+                mListener.onItemSelected(mItems.get(position));
             }
+            mPopupWindow.dismiss();
         });
 
         if (anchor == null) {
@@ -247,14 +234,13 @@ public class PopupMenu {
             if (convertView == null) {
                 convertView = mInflater.inflate(R.layout.menu_list_item, null);
                 holder = new ViewHolder();
-                holder.icon = (ImageView) convertView.findViewById(R.id.icon);
-                holder.title = (TextView) convertView.findViewById(R.id.title);
+                holder.icon = convertView.findViewById(R.id.icon);
+                holder.title = convertView.findViewById(R.id.title);
                 holder.title.setTypeface(font);
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
-
             MenuItem item = getItem(position);
             if (item.getIcon() != null) {
                 holder.icon.setImageDrawable(item.getIcon());

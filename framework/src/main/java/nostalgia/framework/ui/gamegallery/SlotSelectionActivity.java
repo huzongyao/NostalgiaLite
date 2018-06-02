@@ -10,10 +10,9 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,13 +23,10 @@ import java.util.List;
 import nostalgia.framework.R;
 import nostalgia.framework.SlotInfo;
 import nostalgia.framework.base.SlotUtils;
-import nostalgia.framework.remote.ControllableActivity;
-import nostalgia.framework.ui.widget.MenuItem;
 import nostalgia.framework.ui.widget.PopupMenu;
-import nostalgia.framework.ui.widget.PopupMenu.OnItemSelectedListener;
 import nostalgia.framework.utils.NLog;
 
-public class SlotSelectionActivity extends ControllableActivity {
+public class SlotSelectionActivity extends AppCompatActivity {
 
     public static final String EXTRA_GAME = "EXTRA_GAME";
     public static final String EXTRA_BASE_DIRECTORY = "EXTRA_BASE_DIR";
@@ -55,39 +51,28 @@ public class SlotSelectionActivity extends ControllableActivity {
         final View slotView = slots[idx];
         final boolean isUsed = slotInfo.isUsed;
         Bitmap screenshotBitmap = slotInfo.screenShot;
-        TextView label = (TextView) slotView.findViewById(R.id.row_slot_label);
-        TextView message = (TextView) slotView.findViewById(R.id.row_slot_message);
-        TextView date = (TextView) slotView.findViewById(R.id.row_slot_date);
-        TextView time = (TextView) slotView.findViewById(R.id.row_slot_time);
-        ImageView screenshot = (ImageView) slotView.findViewById(R.id.row_slot_screenshot);
+        TextView label = slotView.findViewById(R.id.row_slot_label);
+        TextView message = slotView.findViewById(R.id.row_slot_message);
+        TextView date = slotView.findViewById(R.id.row_slot_date);
+        TextView time = slotView.findViewById(R.id.row_slot_time);
+        ImageView screenshot = slotView.findViewById(R.id.row_slot_screenshot);
         label.setText(labelS);
         message.setText(messageS);
         date.setText(dateS);
         time.setText(timeS);
-        slotView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onSelected(game, idx + 1, isUsed);
-            }
-        });
+        slotView.setOnClickListener(v -> onSelected(game, idx + 1, isUsed));
 
         if (isUsed) {
-            slotView.setOnLongClickListener(new OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    PopupMenu menu = new PopupMenu(SlotSelectionActivity.this);
-                    menu.setHeaderTitle(labelS);
-                    menu.setOnItemSelectedListener(new OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(MenuItem item) {
-                            if (item.getItemId() == SEND_SLOT) {
-                            }
-                        }
-                    });
-                    menu.add(SEND_SLOT, R.string.act_slot_popup_menu_send).setIcon(sendIcon);
-                    menu.show(slotView);
-                    return true;
-                }
+            slotView.setOnLongClickListener(v -> {
+                PopupMenu menu = new PopupMenu(SlotSelectionActivity.this);
+                menu.setHeaderTitle(labelS);
+                menu.setOnItemSelectedListener(item -> {
+                    if (item.getItemId() == SEND_SLOT) {
+                    }
+                });
+                menu.add(SEND_SLOT, R.string.act_slot_popup_menu_send).setIcon(sendIcon);
+                menu.show(slotView);
+                return true;
             });
         }
 

@@ -3,8 +3,6 @@ package nostalgia.framework.base;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
@@ -43,12 +41,8 @@ import nostalgia.framework.base.GameMenu.OnGameMenuListener;
 import nostalgia.framework.controllers.DynamicDPad;
 import nostalgia.framework.controllers.KeyboardController;
 import nostalgia.framework.controllers.QuickSaveController;
-import nostalgia.framework.controllers.RemoteController;
-import nostalgia.framework.controllers.RemoteController.OnRemoteControllerWarningListener;
 import nostalgia.framework.controllers.TouchController;
 import nostalgia.framework.controllers.ZapperGun;
-import nostalgia.framework.remote.VirtualDPad;
-import nostalgia.framework.remote.wifi.WifiServerInfoTransmitter;
 import nostalgia.framework.ui.cheats.CheatsActivity;
 import nostalgia.framework.ui.gamegallery.GameDescription;
 import nostalgia.framework.ui.gamegallery.SlotSelectionActivity;
@@ -85,7 +79,6 @@ public abstract class EmulatorActivity extends Activity
     TimeTravelDialog dialog;
     private GameMenu gameMenu = null;
     private GameDescription game = null;
-    private WifiServerInfoTransmitter infoTransmitter = null;
     private DynamicDPad dynamic;
     private TouchController touchController = null;
     private boolean autoHide;
@@ -215,27 +208,9 @@ public abstract class EmulatorActivity extends Activity
         QuickSaveController qsc = new QuickSaveController(this, touchController);
         controllers.add(qsc);
         KeyboardController kc = new KeyboardController(emulator, getApplicationContext(), game.checksum, this);
-        RemoteController rc1 = new RemoteController(this);
-        RemoteController rc2 = new RemoteController(this);
-        RemoteController rc3 = new RemoteController(this);
-        RemoteController rc4 = new RemoteController(this);
-        rc1.connectToEmulator(0, emulator);
-        rc2.connectToEmulator(1, emulator);
-        rc3.connectToEmulator(2, emulator);
-        rc4.connectToEmulator(3, emulator);
-        rc1.setOnRemoteControllerWarningListener(new OnRemoteControllerWarningListener() {
-            @Override
-            public void onZapperCollision() {
-                showZapperCollisionDialog();
-            }
-        });
         ZapperGun zapper = new ZapperGun(getApplicationContext(), this);
         zapper.connectToEmulator(1, emulator);
         controllers.add(zapper);
-        controllers.add(rc1);
-        controllers.add(rc2);
-        controllers.add(rc3);
-        controllers.add(rc4);
         controllers.add(kc);
         group = new FrameLayout(this);
         Display display = getWindowManager().getDefaultDisplay();
@@ -286,24 +261,15 @@ public abstract class EmulatorActivity extends Activity
             }
         }
 
-        runOnUiThread(new Runnable() {
-            public void run() {
-                AlertDialog.Builder builder = new AlertDialog.Builder(EmulatorActivity.this);
-                AlertDialog dialog = builder.setMessage(
-                        EmulatorActivity.this.getResources().getString(
-                                R.string.too_slow)).create();
-                dialog.setOnDismissListener(new OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        finish();
-                    }
-                });
-                try {
-                    manager.pauseEmulation();
-                } catch (EmulatorException ignored) {
-                }
-                DialogUtils.show(dialog, true);
+        runOnUiThread(() -> {
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setMessage(R.string.too_slow).create();
+            dialog.setOnDismissListener(dialog1 -> finish());
+            try {
+                manager.pauseEmulation();
+            } catch (EmulatorException ignored) {
             }
+            DialogUtils.show(dialog, true);
         });
     }
 
@@ -350,23 +316,13 @@ public abstract class EmulatorActivity extends Activity
     }
 
     private void showZapperCollisionDialog() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                AlertDialog.Builder builder = new AlertDialog.Builder(EmulatorActivity.this);
-                AlertDialog dialog = builder
-                        .setMessage(getString(R.string.game_zapper_collision))
-                        .setTitle(R.string.warning).create();
-                dialog.setOnDismissListener(new OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        manager.resumeEmulation();
-                        VirtualDPad.getInstance().detachFromWindow();
-                    }
-                });
-                manager.pauseEmulation();
-                DialogUtils.show(dialog, true);
-            }
+        runOnUiThread(() -> {
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setMessage(R.string.game_zapper_collision)
+                    .setTitle(R.string.warning).create();
+            dialog.setOnDismissListener(dialog1 -> manager.resumeEmulation());
+            manager.pauseEmulation();
+            DialogUtils.show(dialog, true);
         });
     }
 
@@ -399,7 +355,8 @@ public abstract class EmulatorActivity extends Activity
     }
 
     public boolean shouldPause() {
-        return PreferenceManager.getDefaultSharedPreferences(this).getBoolean("emulator_activity_pause", false);
+        return PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("emulator_activity_pause", false);
     }
 
     @Override
@@ -430,9 +387,6 @@ public abstract class EmulatorActivity extends Activity
             handleException(e);
         } finally {
             emulatorView.onPause();
-            if (infoTransmitter != null) {
-                infoTransmitter.stopSending();
-            }
         }
     }
 
@@ -456,18 +410,9 @@ public abstract class EmulatorActivity extends Activity
     }
 
     private void handleException(EmulatorException e) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        AlertDialog dialog = builder.setMessage(e.getMessage(this)).create();
-        dialog.setOnDismissListener(new OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        finish();
-                    }
-                });
-            }
-        });
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setMessage(e.getMessage(this)).create();
+        dialog.setOnDismissListener(dialog1 -> runOnUiThread(this::finish));
         DialogUtils.show(dialog, true);
     }
 
@@ -500,12 +445,8 @@ public abstract class EmulatorActivity extends Activity
 
     public void quickSave() {
         manager.saveState(10);
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(EmulatorActivity.this, "state saved", Toast.LENGTH_SHORT).show();
-            }
-        });
+        runOnUiThread(() -> Toast.makeText(this,
+                "state saved", Toast.LENGTH_SHORT).show());
     }
 
     public void quickLoad() {
@@ -561,7 +502,6 @@ public abstract class EmulatorActivity extends Activity
         if (PreferenceUtil.isScreenSettingsSaved(this)) {
             PreferenceUtil.setScreenLayoutUsed(this, true);
         }
-        VirtualDPad.getInstance().detachFromWindow();
         pm = getPackageManager();
         pn = getPackageName();
         for (EmulatorController controller : controllers) {
@@ -600,8 +540,6 @@ public abstract class EmulatorActivity extends Activity
             emulatorView.setQuality(quality);
             emulatorView.onResume();
             enableCheats();
-            infoTransmitter = new WifiServerInfoTransmitter(this, game.name);
-            infoTransmitter.startSending();
         } catch (EmulatorException e) {
             handleException(e);
         }
@@ -609,19 +547,12 @@ public abstract class EmulatorActivity extends Activity
 
     private void enableCheats() {
         int numCheats = 0;
-
         try {
             numCheats = manager.enableCheats(this, game);
-
         } catch (final EmulatorException e) {
-            runOnUiThread(new Runnable() {
-                public void run() {
-                    Toast.makeText(EmulatorActivity.this, e.getMessage(EmulatorActivity.this),
-                            Toast.LENGTH_SHORT).show();
-                }
-            });
+            runOnUiThread(() -> Toast.makeText(this, e.getMessage(this),
+                    Toast.LENGTH_SHORT).show());
         }
-
         if (numCheats > 0) {
             Toast.makeText(this, getString(R.string.toast_cheats_enabled, numCheats),
                     Toast.LENGTH_LONG).show();
@@ -727,15 +658,12 @@ public abstract class EmulatorActivity extends Activity
             if (item.id == R.string.game_menu_back_to_past) {
                 if (manager.getHistoryItemCount() > 1) {
                     dialog = new TimeTravelDialog(this, manager, game);
-                    dialog.setOnDismissListener(new OnDismissListener() {
-                        @Override
-                        public void onDismiss(DialogInterface dialog) {
-                            runTimeMachine = false;
-                            try {
-                                manager.resumeEmulation();
-                            } catch (EmulatorException e) {
-                                handleException(e);
-                            }
+                    dialog.setOnDismissListener(dialog -> {
+                        runTimeMachine = false;
+                        try {
+                            manager.resumeEmulation();
+                        } catch (EmulatorException e) {
+                            handleException(e);
                         }
                     });
                     DialogUtils.show(dialog, true);
@@ -809,7 +737,6 @@ public abstract class EmulatorActivity extends Activity
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         NLog.i(TAG, "activity key up event:" + keyCode);
-
         switch (keyCode) {
             case KeyEvent.KEYCODE_MENU:
                 return true;
@@ -832,7 +759,6 @@ public abstract class EmulatorActivity extends Activity
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         NLog.i(TAG, "activity key down event:" + keyCode);
-
         switch (keyCode) {
             case KeyEvent.KEYCODE_MENU:
                 openGameMenu();

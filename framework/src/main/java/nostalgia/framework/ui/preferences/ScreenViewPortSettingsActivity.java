@@ -18,8 +18,8 @@ import nostalgia.framework.ui.multitouchbutton.MultitouchLayer;
 import nostalgia.framework.ui.multitouchbutton.MultitouchLayer.EDIT_MODE;
 import nostalgia.framework.utils.DatabaseHelper;
 
-public class ScreenViewPortSettingsActivity extends AppCompatActivity implements
-        OnGameMenuListener {
+public class ScreenViewPortSettingsActivity extends AppCompatActivity
+        implements OnGameMenuListener {
 
     MultitouchLayer mtLayer;
     String gameHash = "";
@@ -32,7 +32,7 @@ public class ScreenViewPortSettingsActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.controler_layout);
         gameMenu = new GameMenu(this, this);
-        mtLayer = (MultitouchLayer) findViewById(R.id.touch_layer);
+        mtLayer = findViewById(R.id.touch_layer);
         dbHelper = new DatabaseHelper(this);
     }
 
@@ -42,7 +42,7 @@ public class ScreenViewPortSettingsActivity extends AppCompatActivity implements
         mtLayer.setEditMode(EDIT_MODE.SCREEN);
         GameDescription games = dbHelper.selectObjFromDb(GameDescription.class,
                 "where lastGameTime!=0 ORDER BY lastGameTime DESC LIMIT 1");
-        GfxProfile gfxProfile = null;
+        GfxProfile gfxProfile;
         lastGameScreenshot = null;
 
         if (games != null) {
@@ -88,11 +88,7 @@ public class ScreenViewPortSettingsActivity extends AppCompatActivity implements
 
     @Override
     public void onGameMenuItemSelected(GameMenu menu, GameMenuItem item) {
-        runOnUiThread(new Runnable() {
-            public void run() {
-                mtLayer.resetScreenElement();
-            }
-        });
+        runOnUiThread(() -> mtLayer.resetScreenElement());
     }
 
     @Override

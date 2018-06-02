@@ -24,7 +24,6 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.ViewTreeObserver;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -45,10 +44,11 @@ import nostalgia.framework.base.Migrator;
 import nostalgia.framework.base.ViewPort;
 import nostalgia.framework.base.ViewUtils;
 import nostalgia.framework.ui.preferences.PreferenceUtil;
-import nostalgia.framework.utils.NLog;
 import nostalgia.framework.utils.EmuUtils;
+import nostalgia.framework.utils.NLog;
 
 public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
+
     private static final String TAG = "MultitouchLayer";
     private static final int EMPTY_COLOR = 0x00;
     private static final int BUTTON_MIN_SIZE_DP = 20;
@@ -220,16 +220,13 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
         if (!isInEditMode()) {
             ViewTreeObserver vto = getViewTreeObserver();
             touchLayer = new LinearLayout(getContext());
-            vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    int w = getMeasuredWidth();
-                    int h = getMeasuredHeight();
-                    if (w != lastW || h != lastH) {
-                        lastW = w;
-                        lastH = h;
-                        initMultiTouchMap();
-                    }
+            vto.addOnGlobalLayoutListener(() -> {
+                int w = getMeasuredWidth();
+                int h = getMeasuredHeight();
+                if (w != lastW || h != lastH) {
+                    lastW = w;
+                    lastH = h;
+                    initMultiTouchMap();
                 }
             });
             vibrator = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
@@ -320,12 +317,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                 } else {
                     buttonsBitmaps[idx] = null;
                     pressedButtonsBitmaps[idx] = null;
-                    postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            initMultiTouchMap();
-                        }
-                    }, 1000);
+                    postDelayed(this::initMultiTouchMap, 1000);
                 }
             }
             idx++;
@@ -363,12 +355,9 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
         editElements.add(new EditElement(R.id.button_ab, true, buttonMinSizePx).saveHistory());
         editElements.add(new EditElement(R.id.button_fast_forward, true, buttonMinSizePx).saveHistory());
         EditElement menu = new EditElement(R.id.button_menu, false, buttonMinSizePx).saveHistory();
-        menu.setOnClickListener(new OnEditItemClickListener() {
-            @Override
-            public void onClick() {
-                if (editMode != EDIT_MODE.NONE) {
-                    ((Activity) getContext()).openOptionsMenu();
-                }
+        menu.setOnClickListener(() -> {
+            if (editMode != EDIT_MODE.NONE) {
+                ((Activity) getContext()).openOptionsMenu();
             }
         });
         editElements.add(menu);

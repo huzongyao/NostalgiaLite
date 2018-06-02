@@ -8,8 +8,6 @@ import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
-import android.preference.Preference.OnPreferenceChangeListener;
-import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
@@ -23,7 +21,6 @@ import java.util.List;
 import nostalgia.framework.KeyboardProfile;
 import nostalgia.framework.R;
 import nostalgia.framework.base.EmulatorHolder;
-import nostalgia.framework.remote.VirtualDPad;
 
 public class GeneralPreferenceActivity extends AppCompatPreferenceActivity {
 
@@ -42,28 +39,23 @@ public class GeneralPreferenceActivity extends AppCompatPreferenceActivity {
     }
 
     static void initInputMethodPreference(Preference imPreference, final Activity activity) {
-        imPreference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                InputMethodManager imeManager = (InputMethodManager)
-                        activity.getApplicationContext().getSystemService(INPUT_METHOD_SERVICE);
-                if (imeManager != null) {
-                    imeManager.showInputMethodPicker();
-                } else {
-                    Toast.makeText(activity, R.string.pref_keyboard_cannot_change_input_method, Toast.LENGTH_LONG).show();
-                }
-                return false;
+        imPreference.setOnPreferenceClickListener(preference -> {
+            InputMethodManager imeManager = (InputMethodManager)
+                    activity.getApplicationContext().getSystemService(INPUT_METHOD_SERVICE);
+            if (imeManager != null) {
+                imeManager.showInputMethodPicker();
+            } else {
+                Toast.makeText(activity,
+                        R.string.pref_keyboard_cannot_change_input_method, Toast.LENGTH_LONG).show();
             }
+            return false;
         });
     }
 
     static void initAboutGamePreference(Preference pref, final Activity activity) {
-        pref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                activity.startActivity(new Intent(activity, AboutActivity.class));
-                return false;
-            }
+        pref.setOnPreferenceClickListener(preference -> {
+            activity.startActivity(new Intent(activity, AboutActivity.class));
+            return false;
         });
     }
 
@@ -95,21 +87,16 @@ public class GeneralPreferenceActivity extends AppCompatPreferenceActivity {
             selectProfile.setValue("default");
         }
 
-        selectProfile.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference,
-                                              Object newValue) {
-                if (newValue.equals(NEW_PROFILE)) {
-                    Intent i = new Intent(context, KeyboardSettingsActivity.class);
-                    i.putExtra(KeyboardSettingsActivity.EXTRA_PROFILE_NAME, "default");
-                    i.putExtra(KeyboardSettingsActivity.EXTRA_NEW_BOOL, true);
-                    context.startActivityForResult(i, 0);
-                    return false;
-
-                } else {
-                    setNewProfile(selectProfile, editProfile, (String) newValue);
-                    return true;
-                }
+        selectProfile.setOnPreferenceChangeListener((preference, newValue) -> {
+            if (newValue.equals(NEW_PROFILE)) {
+                Intent i = new Intent(context, KeyboardSettingsActivity.class);
+                i.putExtra(KeyboardSettingsActivity.EXTRA_PROFILE_NAME, "default");
+                i.putExtra(KeyboardSettingsActivity.EXTRA_NEW_BOOL, true);
+                context.startActivityForResult(i, 0);
+                return false;
+            } else {
+                setNewProfile(selectProfile, editProfile, (String) newValue);
+                return true;
             }
         });
     }
@@ -148,7 +135,6 @@ public class GeneralPreferenceActivity extends AppCompatPreferenceActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        VirtualDPad.getInstance().onResume(getWindow());
         initKeyboardProfiles();
         boolean found = false;
 
@@ -174,7 +160,6 @@ public class GeneralPreferenceActivity extends AppCompatPreferenceActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        VirtualDPad.getInstance().onPause();
     }
 
     private void initKeyboardProfiles() {

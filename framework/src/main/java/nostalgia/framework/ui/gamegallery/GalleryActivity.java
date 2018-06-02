@@ -1,10 +1,8 @@
 package nostalgia.framework.ui.gamegallery;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
@@ -27,21 +25,16 @@ import nostalgia.framework.ui.gamegallery.GalleryPagerAdapter.OnItemClickListene
 import nostalgia.framework.ui.preferences.GeneralPreferenceActivity;
 import nostalgia.framework.ui.preferences.GeneralPreferenceFragment;
 import nostalgia.framework.ui.preferences.PreferenceUtil;
-import nostalgia.framework.ui.remotecontroller.RemoteControllerActivity;
 import nostalgia.framework.utils.DatabaseHelper;
 import nostalgia.framework.utils.DialogUtils;
 import nostalgia.framework.utils.EmuUtils;
 import nostalgia.framework.utils.NLog;
-import nostalgia.framework.utils.EmuUtils.ServerType;
 
 public abstract class GalleryActivity extends BaseGameGalleryActivity
         implements OnItemClickListener {
 
-    public static final int COMMAND_SEARCHMODE = 1;
     public static final String EXTRA_TABS_IDX = "EXTRA_TABS_IDX";
     private static final String TAG = GalleryActivity.class.getSimpleName();
-    private static final int REQUEST_IMPORT = 2;
-    private static final String importPref = "import_pref";
 
     ProgressDialog searchDialog = null;
     private ViewPager pager = null;
@@ -56,14 +49,14 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
         super.onCreate(savedInstanceState);
         dbHelper = new DatabaseHelper(this);
         setContentView(R.layout.activity_gallery);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         adapter = new GalleryPagerAdapter(this, this);
         adapter.onRestoreInstanceState(savedInstanceState);
-        pager = (ViewPager) findViewById(R.id.game_gallery_pager);
+        pager = findViewById(R.id.game_gallery_pager);
         pager.setAdapter(adapter);
 
-        mTabLayout = (TabLayout) findViewById(R.id.game_gallery_tab);
+        mTabLayout = findViewById(R.id.game_gallery_tab);
         mTabLayout.setupWithViewPager(pager);
         mTabLayout.setTabMode(TabLayout.MODE_FIXED);
 
@@ -85,17 +78,6 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        if (EmuUtils.getDeviceType(this) == ServerType.mobile) {
-            MenuItem item = menu.findItem(R.id.gallery_menu_remote_control);
-            item.setEnabled(EmuUtils.isWifiAvailable(this));
-        } else {
-            menu.removeItem(R.id.gallery_menu_remote_control);
-        }
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.gallery_menu_pref) {
@@ -103,12 +85,6 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
             i.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT, GeneralPreferenceFragment.class.getName());
             i.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
             startActivity(i);
-            return true;
-        } else if (itemId == R.id.gallery_menu_remote_control) {
-            final Intent intent = new Intent(GalleryActivity.this, RemoteControllerActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            startActivity(intent);
-            rotateAnim = true;
             return true;
         } else if (itemId == R.id.gallery_menu_reload) {
             reloadGames(true, null);
@@ -166,24 +142,15 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
             onGameSelected(game, 0);
         } else {
             NLog.w(TAG, "rom file:" + gameFile.getAbsolutePath() + " does not exist");
-            AlertDialog.Builder builder = new AlertDialog.Builder(GalleryActivity.this);
-            AlertDialog dialog = builder.setMessage(getString(R.string.gallery_rom_not_found))
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setMessage(getString(R.string.gallery_rom_not_found))
                     .setTitle(R.string.error)
-                    .setPositiveButton(R.string.gallery_rom_not_found_reload,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog,
-                                                    int which) {
-                                    reloadGames(true, null);
-                                }
-                            }).create();
-            dialog.setCancelable(false);
-            dialog.setOnDismissListener(new OnDismissListener() {
-                @Override
-                public void onDismiss(DialogInterface dialog) {
-                    reloadGames(true, null);
-                }
-            });
+                    .setPositiveButton(R.string.gallery_rom_not_found_reload, (dialog1, which)
+                            -> reloadGames(true, null))
+                    .setCancelable(false)
+                    .create();
+            dialog.setOnDismissListener(dialog12 ->
+                    reloadGames(true, null));
             dialog.show();
         }
     }
@@ -219,35 +186,26 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
             searchDialog.setIndeterminate(true);
             searchDialog.setProgressNumberFormat("");
             searchDialog.setProgressPercentFormat(null);
-            searchDialog.setButton(DialogInterface.BUTTON_NEGATIVE,
-                    getString(R.string.cancel),
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            stopRomsFinding();
-                        }
-                    });
+            searchDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel),
+                    (dialog, which) -> stopRomsFinding());
         }
         searchDialog.setMessage(getString(zipMode ?
-                R.string.gallery_zip_search_label : R.string.gallery_sdcard_search_label));
+                R.string.gallery_zip_search_label
+                : R.string.gallery_sdcard_search_label));
         DialogUtils.show(searchDialog, false);
 
     }
 
     public void onSearchingEnd(final int count, final boolean showToast) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (searchDialog != null) {
-                    searchDialog.dismiss();
-                    searchDialog = null;
-                }
-                if (showToast) {
-                    if (count > 0) {
-                        Snackbar.make(pager,
-                                getString(R.string.gallery_count_of_found_games, count),
-                                Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                    }
+        runOnUiThread(() -> {
+            if (searchDialog != null) {
+                searchDialog.dismiss();
+                searchDialog = null;
+            }
+            if (showToast) {
+                if (count > 0) {
+                    Snackbar.make(pager, getString(R.string.gallery_count_of_found_games, count),
+                            Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 }
             }
         });
@@ -263,17 +221,13 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
     @Override
     public void onRomsFinderZipPartStart(final int countEntries) {
         if (searchDialog != null) {
-            runOnUiThread(new Runnable() {
-                @SuppressLint("NewApi")
-                @Override
-                public void run() {
-                    if (searchDialog != null) {
-                        searchDialog.setProgressNumberFormat("%1d/%2d");
-                        searchDialog.setProgressPercentFormat(NumberFormat.getPercentInstance());
-                        searchDialog.setMessage(getString(R.string.gallery_start_sip_search_label));
-                        searchDialog.setIndeterminate(false);
-                        searchDialog.setMax(countEntries);
-                    }
+            runOnUiThread(() -> {
+                if (searchDialog != null) {
+                    searchDialog.setProgressNumberFormat("%1d/%2d");
+                    searchDialog.setProgressPercentFormat(NumberFormat.getPercentInstance());
+                    searchDialog.setMessage(getString(R.string.gallery_start_sip_search_label));
+                    searchDialog.setIndeterminate(false);
+                    searchDialog.setMax(countEntries);
                 }
             });
         }
@@ -300,13 +254,10 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
     @Override
     public void onRomsFinderFoundZipEntry(final String message, final int skipEntries) {
         if (searchDialog != null) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (searchDialog != null) {
-                        searchDialog.setMessage(message);
-                        searchDialog.setProgress(searchDialog.getProgress() + 1 + skipEntries);
-                    }
+            runOnUiThread(() -> {
+                if (searchDialog != null) {
+                    searchDialog.setMessage(message);
+                    searchDialog.setProgress(searchDialog.getProgress() + 1 + skipEntries);
                 }
             });
         }
@@ -315,12 +266,9 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
     @Override
     public void onRomsFinderFoundFile(final String name) {
         if (searchDialog != null) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (searchDialog != null) {
-                        searchDialog.setMessage(name);
-                    }
+            runOnUiThread(() -> {
+                if (searchDialog != null) {
+                    searchDialog.setMessage(name);
                 }
             });
         }

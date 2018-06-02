@@ -65,10 +65,8 @@ public class MultitouchTwoButtonArea extends MultitouchImageButton {
     }
 
     private void initHolder() {
-        holder.firstButton = (MultitouchBtnInterface) getRootView()
-                .findViewById(firstButtonRID);
-        holder.secondButton = (MultitouchBtnInterface) getRootView()
-                .findViewById(secondButtonRID);
+        holder.firstButton = getRootView().findViewById(firstButtonRID);
+        holder.secondButton = getRootView().findViewById(secondButtonRID);
     }
 
     public int getFirstBtnRID() {

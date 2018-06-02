@@ -11,6 +11,7 @@ import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.SparseArray;
@@ -39,11 +40,10 @@ import nostalgia.framework.KeyboardProfile;
 import nostalgia.framework.R;
 import nostalgia.framework.base.EmulatorHolder;
 import nostalgia.framework.controllers.KeyboardController;
-import nostalgia.framework.remote.ControllableActivity;
 import nostalgia.framework.utils.NLog;
 
-public class KeyboardSettingsActivity extends ControllableActivity implements
-        OnItemClickListener {
+public class KeyboardSettingsActivity extends AppCompatActivity
+        implements OnItemClickListener {
 
     public static final String EXTRA_PROFILE_NAME = "EXTRA_PROFILE_NAME";
     public static final String EXTRA_NEW_BOOL = "EXTRA_NEW_BOOL";
@@ -133,7 +133,7 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         profilesNames = KeyboardProfile.getProfilesNames(this);
-        list = (ListView) findViewById(R.id.act_keyboard_settings_list);
+        list = findViewById(R.id.act_keyboard_settings_list);
         profile = KeyboardProfile.load(this, getIntent().getStringExtra(EXTRA_PROFILE_NAME));
         inverseMap.clear();
 
@@ -155,7 +155,7 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
         adapter = new Adapter();
         list.setAdapter(adapter);
         list.setOnItemClickListener(this);
-        final PlayersLabelView plv = (PlayersLabelView) findViewById(R.id.act_keyboard_settings_plv);
+        final PlayersLabelView plv = findViewById(R.id.act_keyboard_settings_plv);
 
         if (EmulatorHolder.getInfo().isMultiPlayerSupported()) {
             plv.setPlayersOffsets(adapter.getPlayersOffset());
@@ -194,24 +194,20 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
         alertDialogBuilder.setView(editText);
         alertDialogBuilder
                 .setCancelable(false)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        profile.name = editText.getText().toString();
-                        setTitle(String.format(
-                                getText(R.string.key_profile_pref).toString(),
-                                profile.name));
-                        Intent data = new Intent();
-                        data.putExtra(EXTRA_PROFILE_NAME, profile.name);
-                        setResult(RESULT_OK, data);
-                    }
+                .setPositiveButton("OK", (dialog, id1) -> {
+                    profile.name = editText.getText().toString();
+                    setTitle(String.format(
+                            getText(R.string.key_profile_pref).toString(),
+                            profile.name));
+                    Intent data = new Intent();
+                    data.putExtra(EXTRA_PROFILE_NAME, profile.name);
+                    setResult(RESULT_OK, data);
                 })
                 .setNegativeButton("Cancel",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                                setResult(RESULT_NAME_CANCEL);
-                                finish();
-                            }
+                        (dialog, id12) -> {
+                            dialog.cancel();
+                            setResult(RESULT_NAME_CANCEL);
+                            finish();
                         });
         final AlertDialog alertDialog = alertDialogBuilder.create();
         final Pattern pattern = Pattern.compile("[a-zA-Z0-9]");
@@ -240,12 +236,9 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
             public void afterTextChanged(Editable s) {
             }
         });
-        alertDialog.setOnShowListener(new OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialog) {
-                Button ok = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                ok.setEnabled(false);
-            }
+        alertDialog.setOnShowListener(dialog -> {
+            Button ok = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            ok.setEnabled(false);
         });
         return alertDialog;
     }
@@ -299,22 +292,18 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
                 public void afterTextChanged(Editable s) {
                 }
             });
-            d.setOnKeyListener(new OnKeyListener() {
-                @Override
-                public boolean onKey(DialogInterface dialog, int keyCode,
-                                     KeyEvent event) {
-                    if (keyCode == KeyEvent.KEYCODE_BACK) {
-                        if (event.isAltPressed()) {
-                            keyCode = KeyboardController.KEY_XPERIA_CIRCLE;
-                        }
+            d.setOnKeyListener((dialog, keyCode, event) -> {
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    if (event.isAltPressed()) {
+                        keyCode = KeyboardController.KEY_XPERIA_CIRCLE;
                     }
+                }
 
-                    String txt = getKeyLabel(keyCode);
-                    if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                        return proccessKeyEvent(txt, dialog, keyCode, position);
-                    } else {
-                        return false;
-                    }
+                String txt = getKeyLabel(keyCode);
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    return proccessKeyEvent(txt, dialog, keyCode, position);
+                } else {
+                    return false;
                 }
             });
             d.show();
@@ -365,9 +354,9 @@ public class KeyboardSettingsActivity extends ControllableActivity implements
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.row_keyboard_settings, null);
             }
-            TextView name = (TextView) convertView.findViewById(R.id.row_keyboard_name);
-            TextView desc = (TextView) convertView.findViewById(R.id.row_keyboard_desc);
-            TextView keyName = (TextView) convertView.findViewById(R.id.row_keyboard_key_name);
+            TextView name = convertView.findViewById(R.id.row_keyboard_name);
+            TextView desc = convertView.findViewById(R.id.row_keyboard_desc);
+            TextView keyName = convertView.findViewById(R.id.row_keyboard_key_name);
             convertView.setEnabled(true);
             if (position < KeyboardProfile.BUTTON_NAMES.length) {
                 name.setText(KeyboardProfile.BUTTON_NAMES[position]);

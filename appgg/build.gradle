@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.3"
+    compileSdkVersion 27
+    buildToolsVersion "27.0.3"
 
     signingConfigs {
         demokey {
@@ -15,7 +15,7 @@ android {
     defaultConfig {
         applicationId "nostalgia.appgg"
         minSdkVersion 15
-        targetSdkVersion 25
+        targetSdkVersion 27
         versionCode 1200
         versionName "1.2.0"
         resConfigs "zh"
@@ -27,6 +27,10 @@ android {
                 arguments '-DANDROID_STL=gnustl_static', '-DANDROID_PLATFORM=android-15'
             }
         }
+    }
+    compileOptions {
+        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_8
     }
     buildTypes {
         debug {
@@ -56,8 +60,7 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
-    debugCompile project(path: ':framework', configuration: 'debug')
-    releaseCompile project(path: ':framework', configuration: 'release')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    testImplementation 'junit:junit:4.12'
+    implementation project(':framework')
 }

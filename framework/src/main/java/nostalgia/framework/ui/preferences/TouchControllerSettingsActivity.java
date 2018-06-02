@@ -32,7 +32,7 @@ public class TouchControllerSettingsActivity extends AppCompatActivity implement
         super.onCreate(savedInstanceState);
         setContentView(R.layout.controler_layout);
         gameMenu = new GameMenu(this, this);
-        mtLayer = (MultitouchLayer) findViewById(R.id.touch_layer);
+        mtLayer = findViewById(R.id.touch_layer);
         dbHelper = new DatabaseHelper(this);
     }
 
@@ -42,7 +42,7 @@ public class TouchControllerSettingsActivity extends AppCompatActivity implement
         mtLayer.setEditMode(EDIT_MODE.TOUCH);
         GameDescription games = dbHelper.selectObjFromDb(GameDescription.class,
                 "where lastGameTime!=0 ORDER BY lastGameTime DESC LIMIT 1");
-        GfxProfile gfxProfile = null;
+        GfxProfile gfxProfile;
         lastGameScreenshot = null;
 
         if (games != null) {
@@ -88,11 +88,7 @@ public class TouchControllerSettingsActivity extends AppCompatActivity implement
 
     @Override
     public void onGameMenuItemSelected(GameMenu menu, GameMenuItem item) {
-        runOnUiThread(new Runnable() {
-            public void run() {
-                mtLayer.resetEditElement(gameHash);
-            }
-        });
+        runOnUiThread(() -> mtLayer.resetEditElement(gameHash));
     }
 
     @Override

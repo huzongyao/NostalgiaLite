@@ -12,6 +12,8 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
+import java.util.Locale;
+
 import nostalgia.framework.EmulatorException;
 import nostalgia.framework.R;
 import nostalgia.framework.base.Manager;
@@ -36,55 +38,41 @@ public class TimeTravelDialog extends Dialog implements OnSeekBarChangeListener 
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View content = inflater.inflate(R.layout.dialog_time_travel, null);
         setContentView(content);
-        final SeekBar seekBar = (SeekBar) content
-                .findViewById(R.id.dialog_time_seek);
+        final SeekBar seekBar = content.findViewById(R.id.dialog_time_seek);
         seekBar.setOnSeekBarChangeListener(this);
-        Button cancel = (Button) content
-                .findViewById(R.id.dialog_time_btn_cancel);
-        cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cancel();
-            }
-        });
+        Button cancel = content.findViewById(R.id.dialog_time_btn_cancel);
+        cancel.setOnClickListener(v -> cancel());
         cancel.setFocusable(true);
-        img = (ImageView) content.findViewById(R.id.dialog_time_img);
-        label = (TextView) content.findViewById(R.id.dialog_time_label);
+        img = content.findViewById(R.id.dialog_time_img);
+        label = content.findViewById(R.id.dialog_time_label);
         max = manager.getHistoryItemCount() - 1;
         seekBar.setMax(max);
         seekBar.setProgress(max);
-        Button ok = (Button) content
-                .findViewById(R.id.dialog_time_wheel_btn_ok);
-        ok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TimeTravelDialog.this.manager
-                        .startGame(TimeTravelDialog.this.game);
-                TimeTravelDialog.this.manager.loadHistoryState(max
-                        - seekBar.getProgress());
+        Button ok = content.findViewById(R.id.dialog_time_wheel_btn_ok);
+        ok.setOnClickListener(v -> {
+            TimeTravelDialog.this.manager
+                    .startGame(TimeTravelDialog.this.game);
+            TimeTravelDialog.this.manager.loadHistoryState(max
+                    - seekBar.getProgress());
 
-                try {
-                    TimeTravelDialog.this.manager.enableCheats(context,
-                            TimeTravelDialog.this.game);
+            try {
+                TimeTravelDialog.this.manager.enableCheats(context,
+                        TimeTravelDialog.this.game);
 
-                } catch (EmulatorException ignored) {
-                }
-
-                dismiss();
+            } catch (EmulatorException ignored) {
             }
+            dismiss();
         });
         ok.setFocusable(true);
-        TextView title = (TextView) content
-                .findViewById(R.id.dialog_time_title);
         manager.pauseEmulation();
         manager.renderHistoryScreenshot(bitmap, 0);
         img.setImageBitmap(bitmap);
     }
 
     @Override
-    public void onProgressChanged(SeekBar seekBar, int progress,
-                                  boolean fromUser) {
-        label.setText(String.format("-%02.2fs", (max - progress) / 4f));
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        label.setText(String.format(Locale.getDefault(),
+                "-%02.2fs", (max - progress) / 4f));
         manager.renderHistoryScreenshot(bitmap, max - progress);
         img.setImageBitmap(bitmap);
         img.invalidate();

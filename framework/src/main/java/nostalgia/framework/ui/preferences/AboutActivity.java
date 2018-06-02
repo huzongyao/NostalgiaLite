@@ -25,10 +25,10 @@ public class AboutActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        mTextVersion = (TextView) findViewById(R.id.textview_version);
-        mTextAbout = (TextView) findViewById(R.id.textview_about);
+        mTextVersion = findViewById(R.id.textview_version);
+        mTextAbout = findViewById(R.id.textview_about);
         mTextAbout.setAutoLinkMask(Linkify.ALL);
         mTextAbout.setMovementMethod(LinkMovementMethod.getInstance());
         getPackageVersionInfo();

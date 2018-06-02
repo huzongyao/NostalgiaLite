@@ -3,7 +3,8 @@ package nostalgia.framework.base;
 import android.app.Activity;
 import android.os.Bundle;
 
-public class OpenGLTestActivity extends Activity implements OpenGLTestView.Callback {
+public class OpenGLTestActivity extends Activity
+        implements OpenGLTestView.Callback {
 
     OpenGLTestView view;
 
@@ -16,18 +17,15 @@ public class OpenGLTestActivity extends Activity implements OpenGLTestView.Callb
 
     @Override
     public void onDetected(final int i) {
-        runOnUiThread(new Runnable() {
-            public void run() {
-                setResult(i);
-                finish();
-            }
+        runOnUiThread(() -> {
+            setResult(i);
+            finish();
         });
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
         if (view != null) {
             view.onPause();
         }

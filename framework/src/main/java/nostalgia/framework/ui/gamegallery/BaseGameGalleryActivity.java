@@ -2,17 +2,15 @@ package nostalgia.framework.ui.gamegallery;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
-import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.PermissionUtils;
@@ -20,20 +18,18 @@ import com.blankj.utilcode.util.PermissionUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import nostalgia.framework.Emulator;
 import nostalgia.framework.R;
 import nostalgia.framework.base.EmulatorActivity;
-import nostalgia.framework.remote.ControllableActivity;
 import nostalgia.framework.ui.gamegallery.RomsFinder.OnRomsFinderListener;
 import nostalgia.framework.utils.DatabaseHelper;
 import nostalgia.framework.utils.DialogUtils;
 import nostalgia.framework.utils.FileUtils;
 import nostalgia.framework.utils.NLog;
 
-abstract public class BaseGameGalleryActivity extends ControllableActivity
+abstract public class BaseGameGalleryActivity extends AppCompatActivity
         implements OnRomsFinderListener {
 
     private static final String TAG = "BaseGameGalleryActivity";
@@ -67,33 +63,16 @@ abstract public class BaseGameGalleryActivity extends ControllableActivity
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
-
         if (!FileUtils.isSDCardRWMounted()) {
             showSDCardFailed();
         }
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
-
         if (romsFinder != null) {
             romsFinder.stopSearch();
         }
@@ -106,20 +85,15 @@ abstract public class BaseGameGalleryActivity extends ControllableActivity
             reloading = searchNew;
             romsFinder = new RomsFinder(exts, inZipExts, this, this, searchNew, selectedFolder);
             PermissionUtils.permission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                    .theme(new PermissionUtils.ThemeCallback() {
+                    .theme(activity -> BarUtils.setStatusBarAlpha(activity, 0))
+                    .callback(new PermissionUtils.SimpleCallback() {
                         @Override
-                        public void onActivityCreate(Activity activity) {
-                            BarUtils.setStatusBarAlpha(activity, 0);
-                        }
-                    })
-                    .callback(new PermissionUtils.FullCallback() {
-                        @Override
-                        public void onGranted(List<String> list) {
+                        public void onGranted() {
                             romsFinder.start();
                         }
 
                         @Override
-                        public void onDenied(List<String> list, List<String> list1) {
+                        public void onDenied() {
 
                         }
                     }).request();
@@ -155,26 +129,14 @@ abstract public class BaseGameGalleryActivity extends ControllableActivity
     }
 
     public void showSDCardFailed() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Builder builder = new Builder(BaseGameGalleryActivity.this);
-                builder.setTitle(R.string.error);
-                builder.setMessage(R.string.gallery_sd_card_not_mounted);
-                builder.setOnCancelListener(new OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        finish();
-                    }
-                });
-                builder.setPositiveButton(R.string.exit, new OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-                });
-                DialogUtils.show(builder.create(), true);
-            }
+        runOnUiThread(() -> {
+            AlertDialog dialog = new Builder(BaseGameGalleryActivity.this)
+                    .setTitle(R.string.error)
+                    .setMessage(R.string.gallery_sd_card_not_mounted)
+                    .setOnCancelListener(dialog1 -> finish())
+                    .setPositiveButton(R.string.exit, (dialog1, which) -> finish())
+                    .create();
+            DialogUtils.show(dialog, true);
         });
     }
 
