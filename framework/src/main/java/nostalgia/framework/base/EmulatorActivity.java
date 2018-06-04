@@ -9,7 +9,6 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.os.Bundle;
 import android.os.Environment;
@@ -156,8 +155,8 @@ public abstract class EmulatorActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (getIntent().getExtras().getBoolean(EXTRA_FROM_GALLERY)) {
+        Bundle extras = getIntent().getExtras();
+        if (extras != null && extras.getBoolean(EXTRA_FROM_GALLERY)) {
             setShouldPauseOnResume(false);
             getIntent().removeExtra(EXTRA_FROM_GALLERY);
         }
@@ -267,7 +266,8 @@ public abstract class EmulatorActivity extends Activity
 
         runOnUiThread(() -> {
             AlertDialog dialog = new AlertDialog.Builder(this)
-                    .setMessage(R.string.too_slow).create();
+                    .setMessage(R.string.too_slow)
+                    .create();
             dialog.setOnDismissListener(dialog1 -> finish());
             try {
                 manager.pauseEmulation();
@@ -319,17 +319,6 @@ public abstract class EmulatorActivity extends Activity
         }
     }
 
-    private void showZapperCollisionDialog() {
-        runOnUiThread(() -> {
-            AlertDialog dialog = new AlertDialog.Builder(this)
-                    .setMessage(R.string.game_zapper_collision)
-                    .setTitle(R.string.warning).create();
-            dialog.setOnDismissListener(dialog1 -> manager.resumeEmulation());
-            manager.pauseEmulation();
-            DialogUtils.show(dialog, true);
-        });
-    }
-
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         boolean res = super.dispatchTouchEvent(ev);
@@ -342,7 +331,6 @@ public abstract class EmulatorActivity extends Activity
         return res;
     }
 
-    @SuppressLint("HandlerLeak")
     @Override
     public boolean dispatchKeyEvent(KeyEvent ev) {
         boolean res = super.dispatchKeyEvent(ev);
@@ -353,9 +341,9 @@ public abstract class EmulatorActivity extends Activity
     }
 
     public void setShouldPauseOnResume(boolean b) {
-        Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-        editor.putBoolean("emulator_activity_pause", b);
-        editor.apply();
+        PreferenceManager.getDefaultSharedPreferences(this).edit()
+                .putBoolean("emulator_activity_pause", b)
+                .apply();
     }
 
     public boolean shouldPause() {
@@ -462,7 +450,11 @@ public abstract class EmulatorActivity extends Activity
     protected void onResume() {
         super.onResume();
         isRestarting = false;
-        boolean isAfterProcessRestart = getIntent().getExtras().getBoolean(RestarterActivity.EXTRA_AFTER_RESTART);
+        Bundle extras = getIntent().getExtras();
+        boolean isAfterProcessRestart = false;
+        if (extras != null) {
+            isAfterProcessRestart = extras.getBoolean(RestarterActivity.EXTRA_AFTER_RESTART);
+        }
         getIntent().removeExtra(RestarterActivity.EXTRA_AFTER_RESTART);
         boolean shouldRestart = decreaseResumesToRestart() == 0;
         if (!isAfterProcessRestart && shouldRestart && canRestart) {
@@ -587,11 +579,9 @@ public abstract class EmulatorActivity extends Activity
         menu.add(R.string.game_menu_back_to_past, R.drawable.ic_time_machine);
         menu.add(R.string.game_menu_screenshot, R.drawable.ic_make_screenshot);
         EmulatorApplication ea = (EmulatorApplication) getApplication();
-        if (ea.hasGameMenu()) {
-            menu.add(R.string.game_menu_settings, R.drawable.ic_game_settings);
-        } else {
-            menu.add(R.string.gallery_menu_pref, R.drawable.ic_game_settings);
-        }
+        int settingsStringRes = ea.hasGameMenu() ?
+                R.string.game_menu_settings : R.string.gallery_menu_pref;
+        menu.add(settingsStringRes, R.drawable.ic_game_settings);
     }
 
     @Override
@@ -718,41 +708,41 @@ public abstract class EmulatorActivity extends Activity
     private void saveGameScreenshot() {
         PermissionUtils.permission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .callback(new PermissionUtils.SimpleCallback() {
-            @Override
-            public void onGranted() {
-                String name = game.getCleanName() + "-screenshot";
-                File dir = new File(
-                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                        EmulatorHolder.getInfo().getName().replace(' ', '_'));
-                if (!dir.exists()) {
-                    dir.mkdirs();
-                }
-                File to = dir;
-                int counter = 0;
-                while (to.exists()) {
-                    String nn = name + (counter == 0 ? "" : "(" + counter + ")") + ".png";
-                    to = new File(dir, nn);
-                    counter++;
-                }
-                try {
-                    FileOutputStream fos = new FileOutputStream(to);
-                    EmuUtils.createScreenshotBitmap(EmulatorActivity.this, game)
-                            .compress(CompressFormat.PNG, 90, fos);
-                    fos.close();
-                    Toast.makeText(EmulatorActivity.this,
-                            getString(R.string.act_game_screenshot_saved,
-                            to.getAbsolutePath()), Toast.LENGTH_LONG).show();
-                } catch (IOException e) {
-                    NLog.e(TAG, "", e);
-                    throw new EmulatorException(getString(R.string.act_game_screenshot_failed));
-                }
-            }
+                    @Override
+                    public void onGranted() {
+                        String name = game.getCleanName() + "-screenshot";
+                        File dir = new File(
+                                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                                EmulatorHolder.getInfo().getName().replace(' ', '_'));
+                        if (!dir.exists()) {
+                            dir.mkdirs();
+                        }
+                        File to = dir;
+                        int counter = 0;
+                        while (to.exists()) {
+                            String nn = name + (counter == 0 ? "" : "(" + counter + ")") + ".png";
+                            to = new File(dir, nn);
+                            counter++;
+                        }
+                        try {
+                            FileOutputStream fos = new FileOutputStream(to);
+                            EmuUtils.createScreenshotBitmap(EmulatorActivity.this, game)
+                                    .compress(CompressFormat.PNG, 90, fos);
+                            fos.close();
+                            Toast.makeText(EmulatorActivity.this,
+                                    getString(R.string.act_game_screenshot_saved,
+                                            to.getAbsolutePath()), Toast.LENGTH_LONG).show();
+                        } catch (IOException e) {
+                            NLog.e(TAG, "", e);
+                            throw new EmulatorException(getString(R.string.act_game_screenshot_failed));
+                        }
+                    }
 
-            @Override
-            public void onDenied() {
+                    @Override
+                    public void onDenied() {
 
-            }
-        }).request();
+                    }
+                }).request();
     }
 
     @Override

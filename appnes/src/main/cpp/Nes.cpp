@@ -197,11 +197,9 @@ public:
                 buf[i + 1] = s0;
                 j++;
             }
-
         } else {
-            memcpy( buf + (slen << 1), (void *) data, numBytes);
+            memcpy(buf + (slen << 1), (void *) data, numBytes);
         }
-
         sfxLock.Unlock();
     }
 
@@ -218,7 +216,7 @@ public:
             }
             i++;
         }
-        return FCEUI_AddCheat(name, ggAddr, ggVal, ggComp, 1);
+        return (bool) FCEUI_AddCheat(name, ggAddr, ggVal, ggComp, 1);
     }
 
     bool enableRawCheat(int ggAddr, int ggVal, int ggComp) {
@@ -239,7 +237,7 @@ public:
     }
 
     bool disableAllCheats() {
-        int i = 0;
+        uint32 i = 0;
         uint32 cAddr;
         uint8 cVal;
         char *cName;
@@ -249,13 +247,12 @@ public:
             FCEUI_DelCheat(i);
             i++;
         }
-
         return true;
     }
 
 
     bool renderHistory(JNIEnv *env, jobject bitmap, int pos, int w, int h) {
-        this->render(env, bitmap, w, h, travel[posToIdx(pos)]);
+        return this->render(env, bitmap, w, h, travel[posToIdx(pos)]);
     }
 
 
@@ -297,7 +294,6 @@ public:
             GameInterface(GI_RESETSAVE);
             resetSfx();
         }
-
         return true;
     }
 
@@ -309,6 +305,7 @@ public:
 
         FCEUI_Kill();
         inited = false;
+        return true;
     }
 
     bool fireZapper(int x, int y) {
@@ -322,7 +319,6 @@ public:
         } else {
             zapper[2] = 1;
         }
-
         zapperPressed = 7;
         return true;
     }
@@ -353,7 +349,6 @@ public:
 
             resetSfx();
         }
-
         return game != NULL;
     }
 
