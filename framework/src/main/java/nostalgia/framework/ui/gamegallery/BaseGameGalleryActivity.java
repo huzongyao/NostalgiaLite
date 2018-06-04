@@ -1,6 +1,5 @@
 package nostalgia.framework.ui.gamegallery;
 
-import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -11,9 +10,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-
-import com.blankj.utilcode.util.BarUtils;
-import com.blankj.utilcode.util.PermissionUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -41,6 +37,7 @@ abstract public class BaseGameGalleryActivity extends AppCompatActivity
     private RomsFinder romsFinder = null;
     private DatabaseHelper dbHelper = null;
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,19 +81,7 @@ abstract public class BaseGameGalleryActivity extends AppCompatActivity
             reloadGames = false;
             reloading = searchNew;
             romsFinder = new RomsFinder(exts, inZipExts, this, this, searchNew, selectedFolder);
-            PermissionUtils.permission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                    .theme(activity -> BarUtils.setStatusBarAlpha(activity, 0))
-                    .callback(new PermissionUtils.SimpleCallback() {
-                        @Override
-                        public void onGranted() {
-                            romsFinder.start();
-                        }
-
-                        @Override
-                        public void onDenied() {
-
-                        }
-                    }).request();
+            romsFinder.start();
         }
     }
 

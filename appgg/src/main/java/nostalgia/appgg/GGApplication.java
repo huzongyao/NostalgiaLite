@@ -1,9 +1,9 @@
 package nostalgia.appgg;
 
-import nostalgia.framework.EmulatorApplication;
+import nostalgia.framework.BaseApplication;
 import nostalgia.framework.base.EmulatorHolder;
 
-public class GGApplication extends EmulatorApplication {
+public class GGApplication extends BaseApplication {
 
     @Override
     public void onCreate() {

@@ -6,4 +6,5 @@
     <string name="action_keyboard_pref" translatable="false">nostalgia.gbc.KEYBOARDPREF</string>
     <string name="action_touch_pref" translatable="false">nostalgia.gbc.TOUCHPREF</string>
     <string name="action_screen_pref" translatable="false">nostalgia.gbc.SCREENPREF</string>
+    <string name="action_gallery_page" translatable="false">nostalgia.gbc.GALLERY</string>
 </resources>

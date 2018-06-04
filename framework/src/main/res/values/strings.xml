@@ -117,6 +117,8 @@
     <string name="action_keyboard_pref" translatable="false">nostalgia.framework.KEYBOARDPREF</string>
     <string name="action_touch_pref" translatable="false">nostalgia.framework.TOUCHPREF</string>
     <string name="action_screen_pref" translatable="false">nostalgia.framework.SCREENPREF</string>
+    <string name="action_gallery_page" translatable="false">nostalgia.framework.GALLERY</string>
+
     <string name="export_lite_ok">Data from the Lite version successfully imported.</string>
     <string name="export_lite_error">An error has occurred while importing data from the Lite version.</string>
     <string name="export_action" translatable="false">.EXPORT</string>
@@ -158,4 +160,6 @@
     <string name="control_select">SELECT</string>
     <string name="control_start">START</string>
     <string name="control_menu">MENU</string>
+
+    <string name="now_loading">Loading, Please Wait…</string>
 </resources>

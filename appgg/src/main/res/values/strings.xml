@@ -5,4 +5,5 @@
     <string name="action_keyboard_pref" translatable="false">nostalgia.gg.KEYBOARDPREF</string>
     <string name="action_touch_pref" translatable="false">nostalgia.gg.TOUCHPREF</string>
     <string name="action_screen_pref" translatable="false">nostalgia.gg.SCREENPREF</string>
+    <string name="action_gallery_page" translatable="false">nostalgia.gg.GALLERY</string>
 </resources>

@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nostalgia.framework.Emulator;
-import nostalgia.framework.EmulatorApplication;
+import nostalgia.framework.BaseApplication;
 import nostalgia.framework.EmulatorController;
 import nostalgia.framework.EmulatorException;
 import nostalgia.framework.EmulatorRunner;
@@ -578,7 +578,7 @@ public abstract class EmulatorActivity extends Activity
         menu.add(R.string.game_menu_cheats, R.drawable.ic_cheats);
         menu.add(R.string.game_menu_back_to_past, R.drawable.ic_time_machine);
         menu.add(R.string.game_menu_screenshot, R.drawable.ic_make_screenshot);
-        EmulatorApplication ea = (EmulatorApplication) getApplication();
+        BaseApplication ea = (BaseApplication) getApplication();
         int settingsStringRes = ea.hasGameMenu() ?
                 R.string.game_menu_settings : R.string.gallery_menu_pref;
         menu.add(settingsStringRes, R.drawable.ic_game_settings);
@@ -650,19 +650,7 @@ public abstract class EmulatorActivity extends Activity
     public void onGameMenuItemSelected(GameMenu menu, GameMenuItem item) {
         try {
             if (item.id == R.string.game_menu_back_to_past) {
-                if (manager.getHistoryItemCount() > 1) {
-                    dialog = new TimeTravelDialog(this, manager, game);
-                    dialog.setOnDismissListener(dialog -> {
-                        runTimeMachine = false;
-                        try {
-                            manager.resumeEmulation();
-                        } catch (EmulatorException e) {
-                            handleException(e);
-                        }
-                    });
-                    DialogUtils.show(dialog, true);
-                    runTimeMachine = true;
-                }
+                onGameBackToPast();
             } else if (item.id == R.string.game_menu_reset) {
                 manager.resetEmulator();
                 enableCheats();
@@ -698,44 +686,35 @@ public abstract class EmulatorActivity extends Activity
                         GeneralPreferenceFragment.class.getName());
                 startActivity(i);
             } else if (item.id == R.string.game_menu_screenshot) {
-                saveGameScreenshot();
+                saveScreenshotWithPermission();
             }
         } catch (EmulatorException e) {
             handleException(e);
         }
     }
 
-    private void saveGameScreenshot() {
+    private void onGameBackToPast() {
+        if (manager.getHistoryItemCount() > 1) {
+            dialog = new TimeTravelDialog(this, manager, game);
+            dialog.setOnDismissListener(dialog -> {
+                runTimeMachine = false;
+                try {
+                    manager.resumeEmulation();
+                } catch (EmulatorException e) {
+                    handleException(e);
+                }
+            });
+            DialogUtils.show(dialog, true);
+            runTimeMachine = true;
+        }
+    }
+
+    private void saveScreenshotWithPermission() {
         PermissionUtils.permission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .callback(new PermissionUtils.SimpleCallback() {
                     @Override
                     public void onGranted() {
-                        String name = game.getCleanName() + "-screenshot";
-                        File dir = new File(
-                                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                                EmulatorHolder.getInfo().getName().replace(' ', '_'));
-                        if (!dir.exists()) {
-                            dir.mkdirs();
-                        }
-                        File to = dir;
-                        int counter = 0;
-                        while (to.exists()) {
-                            String nn = name + (counter == 0 ? "" : "(" + counter + ")") + ".png";
-                            to = new File(dir, nn);
-                            counter++;
-                        }
-                        try {
-                            FileOutputStream fos = new FileOutputStream(to);
-                            EmuUtils.createScreenshotBitmap(EmulatorActivity.this, game)
-                                    .compress(CompressFormat.PNG, 90, fos);
-                            fos.close();
-                            Toast.makeText(EmulatorActivity.this,
-                                    getString(R.string.act_game_screenshot_saved,
-                                            to.getAbsolutePath()), Toast.LENGTH_LONG).show();
-                        } catch (IOException e) {
-                            NLog.e(TAG, "", e);
-                            throw new EmulatorException(getString(R.string.act_game_screenshot_failed));
-                        }
+                        saveGameScreenshot();
                     }
 
                     @Override
@@ -743,6 +722,35 @@ public abstract class EmulatorActivity extends Activity
 
                     }
                 }).request();
+    }
+
+    private void saveGameScreenshot() {
+        String name = game.getCleanName() + "-screenshot";
+        File dir = new File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                EmulatorHolder.getInfo().getName().replace(' ', '_'));
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        File to = dir;
+        int counter = 0;
+        while (to.exists()) {
+            String nn = name + (counter == 0 ? "" : "(" + counter + ")") + ".png";
+            to = new File(dir, nn);
+            counter++;
+        }
+        try {
+            FileOutputStream fos = new FileOutputStream(to);
+            EmuUtils.createScreenshotBitmap(EmulatorActivity.this, game)
+                    .compress(CompressFormat.PNG, 90, fos);
+            fos.close();
+            Toast.makeText(EmulatorActivity.this,
+                    getString(R.string.act_game_screenshot_saved,
+                            to.getAbsolutePath()), Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            NLog.e(TAG, "", e);
+            throw new EmulatorException(getString(R.string.act_game_screenshot_failed));
+        }
     }
 
     @Override

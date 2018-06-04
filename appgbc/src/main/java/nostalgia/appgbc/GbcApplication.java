@@ -1,10 +1,10 @@
 package nostalgia.appgbc;
 
-import nostalgia.framework.EmulatorApplication;
+import nostalgia.framework.BaseApplication;
 import nostalgia.framework.base.EmulatorHolder;
 
 
-public class GbcApplication extends EmulatorApplication {
+public class GbcApplication extends BaseApplication {
 
     @Override
     public void onCreate() {

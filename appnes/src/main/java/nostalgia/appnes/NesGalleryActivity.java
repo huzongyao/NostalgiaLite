@@ -1,6 +1,8 @@
 package nostalgia.appnes;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 import java.util.HashSet;
@@ -37,6 +39,7 @@ public class NesGalleryActivity extends GalleryActivity {
     }
 
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

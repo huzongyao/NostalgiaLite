@@ -8,8 +8,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 
-import nostalgia.framework.utils.FileUtils;
 import nostalgia.framework.utils.EmuUtils;
+import nostalgia.framework.utils.FileUtils;
 
 
 public class BatterySaveUtils {
@@ -58,7 +58,7 @@ public class BatterySaveUtils {
 
 
     private static boolean needsRewrite(Context context, File sourceBatteryFile, String sourceMD5) {
-        String previousSourceMD5 = null;
+        String previousSourceMD5;
         File metaFile = getMetaFile(context, sourceBatteryFile);
         File targetFile = new File(EmulatorUtils.getBaseDir(context), sourceBatteryFile.getName());
         if (!metaFile.exists() || !targetFile.exists()) {
@@ -96,8 +96,8 @@ public class BatterySaveUtils {
         File f = new File(gameFilePath);
         String directory = f.getParent();
         String batteryPath = directory;
-        boolean isWriteable = new File(batteryPath).canWrite();
-        if (!isWriteable || directory.equals(context.getExternalCacheDir().getAbsolutePath())) {
+        boolean isWritable = new File(batteryPath).canWrite();
+        if (!isWritable || directory.equals(context.getExternalCacheDir().getAbsolutePath())) {
             batteryPath = EmulatorUtils.getBaseDir(context);
         }
         return batteryPath;

@@ -8,9 +8,9 @@ import com.blankj.utilcode.util.Utils;
 import nostalgia.framework.utils.EmuUtils;
 import nostalgia.framework.utils.NLog;
 
-abstract public class EmulatorApplication extends Application {
+abstract public class BaseApplication extends Application {
 
-    private static final String TAG = EmulatorApplication.class.getName();
+    private static final String TAG = BaseApplication.class.getName();
 
     public void onCreate() {
         super.onCreate();
