@@ -20,7 +20,7 @@ android {
         versionName "1.3.0"
         resConfigs "zh"
         ndk {
-            abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'x86'
+            abiFilters 'armeabi', 'x86'//, 'armeabi-v7a', 'arm64-v8a'
         }
         externalNativeBuild {
             cmake {

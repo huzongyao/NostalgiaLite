@@ -81,14 +81,11 @@ public class GameMenu {
         dialog = new Dialog(context, R.style.GameDialogTheme);
         listener.onGameMenuPrepare(this);
         RelativeLayout surroundContainer = (RelativeLayout) inflater.inflate(R.layout.game_menu_surround, null);
-        surroundContainer.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (dialog != null)
-                    dialog.cancel();
-            }
+        surroundContainer.setOnClickListener(v -> {
+            if (dialog != null)
+                dialog.cancel();
         });
-        LinearLayout container = (LinearLayout) surroundContainer.findViewById(R.id.game_menu_container);
+        LinearLayout container = surroundContainer.findViewById(R.id.game_menu_container);
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) container.getLayoutParams();
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
@@ -136,19 +133,13 @@ public class GameMenu {
         }
 
         dialog.setContentView(surroundContainer);
-        dialog.setOnCancelListener(new OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface d) {
-                listener.onGameMenuClosed(GameMenu.this);
-                dialog = null;
-            }
+        dialog.setOnCancelListener(d -> {
+            listener.onGameMenuClosed(GameMenu.this);
+            dialog = null;
         });
-        dialog.setOnDismissListener(new OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface d) {
-                listener.onGameMenuClosed(GameMenu.this);
-                dialog = null;
-            }
+        dialog.setOnDismissListener(d -> {
+            listener.onGameMenuClosed(GameMenu.this);
+            dialog = null;
         });
         DialogUtils.show(dialog, true);
         listener.onGameMenuOpened(this);
@@ -156,16 +147,13 @@ public class GameMenu {
 
     private View createButton(final GameMenuItem item, int margin, final Dialog dialog) {
         View view = inflater.inflate(R.layout.game_menu_item, null);
-        TextView label = (TextView) view.findViewById(R.id.game_menu_item_label);
+        TextView label = view.findViewById(R.id.game_menu_item_label);
         label.setText(item.getTitle());
-        ImageView iconView = (ImageView) view.findViewById(R.id.game_menu_item_icon);
-        view.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.onGameMenuItemSelected(GameMenu.this, item);
-                dialog.dismiss();
-                listener.onGameMenuClosed(GameMenu.this);
-            }
+        ImageView iconView = view.findViewById(R.id.game_menu_item_icon);
+        view.setOnClickListener(v -> {
+            listener.onGameMenuItemSelected(GameMenu.this, item);
+            dialog.dismiss();
+            listener.onGameMenuClosed(GameMenu.this);
         });
         int iconRID = item.iconRID;
 
