@@ -32,8 +32,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import nostalgia.framework.Emulator;
 import nostalgia.framework.BaseApplication;
+import nostalgia.framework.Emulator;
 import nostalgia.framework.EmulatorController;
 import nostalgia.framework.EmulatorException;
 import nostalgia.framework.EmulatorRunner;

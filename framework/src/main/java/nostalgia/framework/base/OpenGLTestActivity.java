@@ -16,7 +16,7 @@ public class OpenGLTestActivity extends Activity
     }
 
     @Override
-    public void onDetected(final int i) {
+    public void onDetected(int i) {
         runOnUiThread(() -> {
             setResult(i);
             finish();

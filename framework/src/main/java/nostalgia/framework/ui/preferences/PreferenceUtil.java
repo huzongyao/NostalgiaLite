@@ -124,7 +124,7 @@ public class PreferenceUtil {
         try {
             FileReader r = new FileReader(file);
             reader = new BufferedReader(r);
-            String line = null;
+            String line;
             Editor editor = pref.edit();
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split("\\|");

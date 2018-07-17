@@ -1,7 +1,8 @@
 package nostalgia.framework.utils;
 
-public class NLog {
+import android.util.Log;
 
+public class NLog {
 
     private static boolean WTF = true;
     private static boolean E = true;
@@ -23,41 +24,41 @@ public class NLog {
 
     public static void e(String tag, String msg) {
         if (E)
-            android.util.Log.e(tag, msg);
+            Log.e(tag, msg);
     }
 
     public static void e(String tag, String msg, Throwable e) {
         if (E)
-            android.util.Log.e(tag, msg, e);
+            Log.e(tag, msg, e);
     }
 
     public static void d(String tag, String msg) {
         if (D)
-            android.util.Log.d(tag, msg);
+            Log.d(tag, msg);
     }
 
     public static void w(String tag, String msg) {
         if (W)
-            android.util.Log.w(tag, msg);
+            Log.w(tag, msg);
     }
 
     public static void i(String tag, String msg) {
         if (I)
-            android.util.Log.i(tag, msg);
+            Log.i(tag, msg);
     }
 
     public static void v(String tag, String msg) {
         if (V)
-            android.util.Log.i(tag, msg);
+            Log.i(tag, msg);
     }
 
     public static void wtf(String tag, String msg) {
         if (WTF)
-            android.util.Log.wtf(tag, msg);
+            Log.wtf(tag, msg);
     }
 
     public static void wtf(String tag, String msg, Throwable th) {
         if (WTF)
-            android.util.Log.wtf(tag, msg, th);
+            Log.wtf(tag, msg, th);
     }
 }

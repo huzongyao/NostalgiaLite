@@ -85,19 +85,21 @@ public class RestarterActivity extends Activity {
                     .getSystemService(ACTIVITY_SERVICE);
             boolean killed = false;
             while (!killed) {
-                List<RunningAppProcessInfo> appProcesses = activityManager
-                        .getRunningAppProcesses();
-                killed = true;
-                for (RunningAppProcessInfo info : appProcesses) {
-                    if (info.pid == pid) {
-                        killed = false;
-                        break;
+                List<RunningAppProcessInfo> appProcesses;
+                if (activityManager != null) {
+                    appProcesses = activityManager.getRunningAppProcesses();
+                    killed = true;
+                    for (RunningAppProcessInfo info : appProcesses) {
+                        if (info.pid == pid) {
+                            killed = false;
+                            break;
+                        }
                     }
-                }
-                if (!killed) {
-                    try {
-                        Thread.sleep(30);
-                    } catch (Exception ignored) {
+                    if (!killed) {
+                        try {
+                            Thread.sleep(30);
+                        } catch (Exception ignored) {
+                        }
                     }
                 }
             }

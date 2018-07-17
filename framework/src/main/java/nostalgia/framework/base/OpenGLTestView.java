@@ -1,5 +1,6 @@
 package nostalgia.framework.base;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -19,6 +20,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import nostalgia.framework.utils.NLog;
 
+@SuppressLint("ViewConstructor")
 public class OpenGLTestView extends GLSurfaceView {
 
     private Renderer renderer;
@@ -135,7 +137,8 @@ public class OpenGLTestView extends GLSurfaceView {
 
         @Override
         public void onSurfaceChanged(GL10 gl, int width, int height) {
-            Matrix.orthoM(projMatrix, 0, -width / 2, +width / 2, -height / 2, +height / 2, -2f, 2f);
+            Matrix.orthoM(projMatrix, 0, -width / 2, +width / 2,
+                    -height / 2, +height / 2, -2f, 2f);
             screenWidth = width;
             screenHeight = height;
             GLES20.glViewport(0, 0, width, height);
