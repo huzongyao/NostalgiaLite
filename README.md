@@ -14,7 +14,7 @@
 * 主要代码是从这儿下载的：http://nostalgiaemulators.com/
 * 我做了一些修改，使工程可以在android studio中编译
 * 编译需要使用NDK： https://developer.android.com/ndk/index.html
-* 由于编译需要，使用了gradle-experimental: http://tools.android.com/tech-docs/new-build-system/gradle-experimental
+* 使用CMake编译本地代码
 
 #### screenshot
 | Nes        	| GBC           | GG  	|
