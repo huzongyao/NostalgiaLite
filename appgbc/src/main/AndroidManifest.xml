@@ -10,6 +10,7 @@
             android:name=".GbcGalleryActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
                 <action android:name="nostalgia.gbc.GALLERY" />
 
                 <category android:name="android.intent.category.DEFAULT" />

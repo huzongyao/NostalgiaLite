@@ -7,6 +7,8 @@ cmake_minimum_required(VERSION 3.4.1)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -fno-rtti -DINLINE=inline -DHAVE_STDINT_H -DINT_LEAST_32 -DHAVE_INTTYPES_H -DLSB_FIRST -Wreturn-type")
 
+add_definitions(-Wno-narrowing)
+
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds it for you.

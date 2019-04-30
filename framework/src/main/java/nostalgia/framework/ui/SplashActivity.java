@@ -1,6 +1,5 @@
 package nostalgia.framework.ui;
 
-import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
@@ -8,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
+import com.blankj.utilcode.constant.PermissionConstants;
 import com.blankj.utilcode.util.PermissionUtils;
 
 import java.util.Timer;
@@ -36,8 +36,7 @@ public class SplashActivity extends Activity {
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private void startWithPermission() {
-        PermissionUtils.permission(Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE)
+        PermissionUtils.permission(PermissionConstants.STORAGE)
                 .callback(new PermissionUtils.SimpleCallback() {
                     @Override
                     public void onGranted() {

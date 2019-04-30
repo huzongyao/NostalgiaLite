@@ -13,6 +13,7 @@
             android:name=".NesGalleryActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
                 <action android:name="nostalgia.nes.GALLERY" />
 
                 <category android:name="android.intent.category.DEFAULT" />

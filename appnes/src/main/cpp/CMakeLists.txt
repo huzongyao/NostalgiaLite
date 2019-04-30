@@ -9,6 +9,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPSS_STYLE=1 -DHAVE_ASPRINTF -DLSB_FIRS
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-write-strings -Ofast -fexceptions -frtti -fno-builtin-sin -fno-builtin-cos -Wpointer-arith")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmerge-all-constants -fvisibility=hidden -fvisibility-inlines-hidden -funroll-loops  -ffast-math")
 
+add_definitions(-Wno-narrowing)
+
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds it for you.
