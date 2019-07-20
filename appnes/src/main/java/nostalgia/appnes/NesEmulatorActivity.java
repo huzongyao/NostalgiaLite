@@ -5,7 +5,12 @@ import nostalgia.framework.base.EmulatorActivity;
 import nostalgia.framework.ui.preferences.PreferenceUtil;
 
 public class NesEmulatorActivity extends EmulatorActivity {
-
+    private boolean isLastOfStack = false;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        isLastOfStack = checkLastStack();
+    }
     String shader1 = "precision mediump float;"
             + "varying vec2 v_texCoord;"
             + "uniform sampler2D s_texture;"
@@ -43,5 +48,23 @@ public class NesEmulatorActivity extends EmulatorActivity {
             return shader2;
         }
         return shader1;
+    }
+    
+        @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (isLastOfStack) {
+            Intent intent = new Intent(this, NesGalleryActivity.class);
+            startActivity(intent);
+        }
+    }
+
+    private boolean checkLastStack() {
+        ActivityManager mngr = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+
+        List<ActivityManager.RunningTaskInfo> taskList = mngr.getRunningTasks(10);
+
+        return taskList.get(0).numActivities == 1 &&
+                taskList.get(0).topActivity.getClassName().equals(this.getClass().getName());
     }
 }
