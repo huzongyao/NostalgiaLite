@@ -59,7 +59,7 @@
     <string name="pref_keyboard_settings_restore_def">（重置为默认值）</string>
     <string name="pref_keyboard_settings_delete_prof">（删除这个配置）</string>
     <string name="general_pref_wifi_controlable_desc">允许通过wifi控制应用程序</string>
-    <string name="general_pref_quality_desc">如果遇到卡顿，请设置为“低”</string>
+    <string name="general_pref_quality_desc">如果遇到卡顿，请设置为“低”(%s)</string>
     <string name="general_pref_load_sav_files_desc">请参阅帮助了解更多信息</string>
     <string name="game_zapper_collision">Zapper与遥控器发生碰撞！</string>
     <string name="game_pref_zapper">Zapper枪</string>

@@ -1,6 +1,11 @@
-# NostalgiaLite(游戏模拟器)
-* Three game emulation FC(Nes), GG, GBC for Android.
+NostalgiaLite(游戏模拟器)
+==================
+Three game emulation FC(Nes), GG, GBC for Android.
+
+[![Travis](https://img.shields.io/appveyor/ci/gruntjs/grunt.svg)](https://github.com/huzongyao/NostalgiaLite/releases/latest)
+
 * 工程包含三个运行在安卓平台的游戏模拟器，FC(Nes)模拟器，GG模拟器，GBC模拟器
+* 直接下载体验：[下载APK](https://github.com/huzongyao/NostalgiaLite/releases/latest)
 
 #### Detail
 * The code are from Nostalgia.NES, and it's an open source project
@@ -8,7 +13,6 @@
 * I have changed and simplified some code and compiled it on android studio
 * If you want to compile it, you will need android ndk: https://developer.android.com/ndk/index.html
 * Now I compile native code with android cmake
-* ic_launcher art: font: Lakki Reddy, padding: 15%. Generate with Android Asset Studio
 
 #### 详情
 * 主要代码是从这儿下载的：http://nostalgiaemulators.com/
@@ -24,10 +28,16 @@
 
 ### About Me
  * GitHub: [https://huzongyao.github.io/](https://huzongyao.github.io/)
- * ITEye博客：[http://hzy3774.iteye.com/](http://hzy3774.iteye.com/)
- * 新浪微博: [http://weibo.com/hzy3774](http://weibo.com/hzy3774)
+ * ITEye博客：[https://hzy3774.iteye.com/](https://hzy3774.iteye.com/)
+ * 新浪微博: [https://weibo.com/hzy3774](https://weibo.com/hzy3774)
 
 ### Contact To Me
- * QQ: [377406997](http://wpa.qq.com/msgrd?v=3&uin=377406997&site=qq&menu=yes)
+ * QQ: [377406997](https://wpa.qq.com/msgrd?v=3&uin=377406997&site=qq&menu=yes)
  * Gmail: [hzy3774@gmail.com](mailto:hzy3774@gmail.com)
  * Foxmail: [hzy3774@qq.com](mailto:hzy3774@qq.com)
+ * WeChat: hzy3774
+
+### Others
+ * 想捐钱我喝杯热水(¥0.01起捐)
+ * Donate me to buy a cup of hot water(Start from ¥0.01)</br>
+ ![donate](https://github.com/huzongyao/JChineseChess/blob/master/misc/donate.png?raw=true)

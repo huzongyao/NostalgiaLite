@@ -1,5 +1,11 @@
 package nostalgia.appnes;
 
+import android.app.ActivityManager;
+import android.content.Intent;
+import android.os.Bundle;
+
+import java.util.List;
+
 import nostalgia.framework.Emulator;
 import nostalgia.framework.base.EmulatorActivity;
 import nostalgia.framework.ui.preferences.PreferenceUtil;

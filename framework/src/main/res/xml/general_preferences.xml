@@ -92,7 +92,6 @@
 
         <nostalgia.framework.ui.preferences.SeekBarVibrationPreference
             android:defaultValue="0"
-            android:dialogMessage=""
             android:key="game_pref_ui_strong_vibration"
             android:max="100"
             android:summary="@string/game_pref_ui_vibration_desc"
@@ -101,7 +100,6 @@
 
         <nostalgia.framework.ui.widget.SeekBarPreference
             android:defaultValue="100"
-            android:dialogMessage=""
             android:key="general_pref_ui_opacity"
             android:max="100"
             android:summary="@string/game_pref_ui_opacity_desc"
