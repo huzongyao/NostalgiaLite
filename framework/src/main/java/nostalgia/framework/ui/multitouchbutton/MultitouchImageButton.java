@@ -4,7 +4,9 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-public class MultitouchImageButton extends android.support.v7.widget.AppCompatImageButton
+import androidx.appcompat.widget.AppCompatImageButton;
+
+public class MultitouchImageButton extends AppCompatImageButton
         implements MultitouchBtnInterface {
 
     protected boolean repaint = true;

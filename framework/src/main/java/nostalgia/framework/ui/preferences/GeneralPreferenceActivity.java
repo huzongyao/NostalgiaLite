@@ -10,10 +10,11 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
+
+import androidx.appcompat.app.ActionBar;
 
 import java.util.ArrayList;
 import java.util.List;

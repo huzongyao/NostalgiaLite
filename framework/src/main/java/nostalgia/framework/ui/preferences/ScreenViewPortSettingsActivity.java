@@ -2,8 +2,9 @@ package nostalgia.framework.ui.preferences;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import nostalgia.framework.GfxProfile;
 import nostalgia.framework.R;

@@ -8,10 +8,13 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.widget.SeekBar;
 
-public class VerticalSeekBar extends android.support.v7.widget.AppCompatSeekBar {
+import androidx.appcompat.widget.AppCompatSeekBar;
 
-    private OnSeekBarChangeListener onChangeListener;
+public class VerticalSeekBar extends AppCompatSeekBar {
+
+    private SeekBar.OnSeekBarChangeListener onChangeListener;
     private int lastProgress = 0;
 
     public VerticalSeekBar(Context context) {

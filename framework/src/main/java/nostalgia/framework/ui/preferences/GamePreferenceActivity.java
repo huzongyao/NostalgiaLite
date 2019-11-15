@@ -5,8 +5,9 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
-import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
+
+import androidx.appcompat.app.ActionBar;
 
 import java.util.List;
 

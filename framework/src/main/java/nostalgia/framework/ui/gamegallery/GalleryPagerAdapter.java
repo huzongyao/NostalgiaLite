@@ -2,13 +2,13 @@ package nostalgia.framework.ui.gamegallery;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.AdapterView;
 import android.widget.ListView;
+
+import androidx.viewpager.widget.PagerAdapter;
 
 import java.util.ArrayList;
 

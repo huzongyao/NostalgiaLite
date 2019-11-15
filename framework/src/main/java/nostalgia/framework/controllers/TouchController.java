@@ -80,33 +80,33 @@ public class TouchController implements EmulatorController, OnMultitouchEventLis
         LayoutInflater inflater = (LayoutInflater)
                 emulatorActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View layout = inflater.inflate(R.layout.controler_layout, null);
-        multitouchLayer = (MultitouchLayer) layout.findViewById(R.id.touch_layer);
-        MultitouchImageButton up = (MultitouchImageButton) multitouchLayer.findViewById(R.id.button_up);
+        multitouchLayer = layout.findViewById(R.id.touch_layer);
+        MultitouchImageButton up = multitouchLayer.findViewById(R.id.button_up);
         up.setOnMultitouchEventlistener(this);
         resIdMapping.put(R.id.button_up, mapping.get(EmulatorController.KEY_UP));
-        MultitouchImageButton down = (MultitouchImageButton) multitouchLayer.findViewById(R.id.button_down);
+        MultitouchImageButton down = multitouchLayer.findViewById(R.id.button_down);
         down.setOnMultitouchEventlistener(this);
         resIdMapping.put(R.id.button_down, mapping.get(EmulatorController.KEY_DOWN));
-        MultitouchImageButton left = (MultitouchImageButton) multitouchLayer.findViewById(R.id.button_left);
+        MultitouchImageButton left = multitouchLayer.findViewById(R.id.button_left);
         left.setOnMultitouchEventlistener(this);
         resIdMapping.put(R.id.button_left, mapping.get(EmulatorController.KEY_LEFT));
-        MultitouchImageButton right = (MultitouchImageButton) multitouchLayer.findViewById(R.id.button_right);
+        MultitouchImageButton right = multitouchLayer.findViewById(R.id.button_right);
         right.setOnMultitouchEventlistener(this);
         resIdMapping.put(R.id.button_right, mapping.get(EmulatorController.KEY_RIGHT));
-        MultitouchImageButton a = (MultitouchImageButton) multitouchLayer.findViewById(R.id.button_a);
+        MultitouchImageButton a = multitouchLayer.findViewById(R.id.button_a);
         a.setOnMultitouchEventlistener(this);
         resIdMapping.put(R.id.button_a, mapping.get(EmulatorController.KEY_A));
-        MultitouchImageButton b = (MultitouchImageButton) multitouchLayer.findViewById(R.id.button_b);
+        MultitouchImageButton b = multitouchLayer.findViewById(R.id.button_b);
         b.setOnMultitouchEventlistener(this);
         resIdMapping.put(R.id.button_b, mapping.get(EmulatorController.KEY_B));
-        aTurbo = (MultitouchImageButton) multitouchLayer.findViewById(R.id.button_a_turbo);
+        aTurbo = multitouchLayer.findViewById(R.id.button_a_turbo);
         aTurbo.setOnMultitouchEventlistener(this);
         resIdMapping.put(R.id.button_a_turbo, mapping.get(EmulatorController.KEY_A_TURBO));
-        bTurbo = (MultitouchImageButton) multitouchLayer.findViewById(R.id.button_b_turbo);
+        bTurbo = multitouchLayer.findViewById(R.id.button_b_turbo);
         bTurbo.setOnMultitouchEventlistener(this);
         resIdMapping.put(R.id.button_b_turbo, mapping.get(EmulatorController.KEY_B_TURBO));
-        abButton = (MultitouchImageButton) multitouchLayer.findViewById(R.id.button_ab);
-        fastForward = (MultitouchImageButton) multitouchLayer.findViewById(R.id.button_fast_forward);
+        abButton = multitouchLayer.findViewById(R.id.button_ab);
+        fastForward = multitouchLayer.findViewById(R.id.button_fast_forward);
         fastForward.setOnMultitouchEventlistener(new OnMultitouchEventListener() {
             @Override
             public void onMultitouchExit(MultitouchBtnInterface btn) {
@@ -118,7 +118,7 @@ public class TouchController implements EmulatorController, OnMultitouchEventLis
                 emulatorActivity.onFastForwardDown();
             }
         });
-        MultitouchButton select = (MultitouchButton) layout.findViewById(R.id.button_select);
+        MultitouchButton select = layout.findViewById(R.id.button_select);
         if (select != null) {
             select.setOnMultitouchEventlistener(new OnMultitouchEventListener() {
                 @Override
@@ -132,7 +132,7 @@ public class TouchController implements EmulatorController, OnMultitouchEventLis
             });
         }
 
-        MultitouchButton start = (MultitouchButton) layout.findViewById(R.id.button_start);
+        MultitouchButton start = layout.findViewById(R.id.button_start);
         start.setOnMultitouchEventlistener(new OnMultitouchEventListener() {
             @Override
             public void onMultitouchExit(MultitouchBtnInterface btn) {
@@ -143,7 +143,7 @@ public class TouchController implements EmulatorController, OnMultitouchEventLis
                 sendKey(EmulatorController.KEY_START);
             }
         });
-        MultitouchImageButton menu = (MultitouchImageButton) layout.findViewById(R.id.button_menu);
+        MultitouchImageButton menu = layout.findViewById(R.id.button_menu);
         menu.setOnMultitouchEventlistener(new OnMultitouchEventListener() {
             @Override
             public void onMultitouchExit(MultitouchBtnInterface btn) {
@@ -162,11 +162,11 @@ public class TouchController implements EmulatorController, OnMultitouchEventLis
             }
         }
 
-        remoteIc = (ImageView) layout.findViewById(R.id.ic_game_remote);
-        zapperIc = (ImageView) layout.findViewById(R.id.ic_game_zapper);
-        palIc = (ImageView) layout.findViewById(R.id.ic_game_pal);
-        ntscIc = (ImageView) layout.findViewById(R.id.ic_game_ntsc);
-        muteIc = (ImageView) layout.findViewById(R.id.ic_game_muted);
+        remoteIc = layout.findViewById(R.id.ic_game_remote);
+        zapperIc = layout.findViewById(R.id.ic_game_zapper);
+        palIc = layout.findViewById(R.id.ic_game_pal);
+        ntscIc = layout.findViewById(R.id.ic_game_ntsc);
+        muteIc = layout.findViewById(R.id.ic_game_muted);
         return layout;
     }
 
@@ -248,24 +248,14 @@ public class TouchController implements EmulatorController, OnMultitouchEventLis
 
     public void hide() {
         if (!hidden) {
-            emulatorActivity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    view.setVisibility(View.GONE);
-                }
-            });
+            emulatorActivity.runOnUiThread(() -> view.setVisibility(View.GONE));
             hidden = true;
         }
     }
 
     public void show() {
         if (hidden) {
-            emulatorActivity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    view.setVisibility(View.VISIBLE);
-                }
-            });
+            emulatorActivity.runOnUiThread(() -> view.setVisibility(View.VISIBLE));
             hidden = false;
         }
     }
