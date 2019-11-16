@@ -1,6 +1,5 @@
 package nostalgia.framework.base;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -24,6 +23,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.blankj.utilcode.constant.PermissionConstants;
 import com.blankj.utilcode.util.PermissionUtils;
 
 import java.io.File;
@@ -710,7 +710,7 @@ public abstract class EmulatorActivity extends Activity
     }
 
     private void saveScreenshotWithPermission() {
-        PermissionUtils.permission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        PermissionUtils.permission(PermissionConstants.STORAGE)
                 .callback(new PermissionUtils.SimpleCallback() {
                     @Override
                     public void onGranted() {

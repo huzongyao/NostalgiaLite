@@ -178,8 +178,8 @@ class OpenGLView extends GLSurfaceView implements EmulatorView {
             ViewPort vp = ViewUtils.loadOrComputeViewPort(context, emulator, width, height,
                     paddingLeft, paddingTop, false);
             viewPort = vp;
-            Matrix.orthoM(projMatrix, 0, -vp.width / 2, +vp.width / 2, -vp.height / 2,
-                    +vp.height / 2, -2f, 2f);
+            Matrix.orthoM(projMatrix, 0, -vp.width / 2f, +vp.width / 2f, -vp.height / 2f,
+                    +vp.height / 2f, -2f, 2f);
             int nvpy = (height - vp.y - vp.height);
             GLES20.glViewport(vp.x, nvpy, vp.width, vp.height);
             initQuadCoordinates(emulator, vp.width, vp.height);

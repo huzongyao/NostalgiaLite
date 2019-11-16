@@ -78,13 +78,9 @@ public class SlotUtils {
                                 bitmap.getConfig());
                         Canvas c = new Canvas(newScreenshot);
                         float[] matrix = new float[]{
-
                                 0.299f, 0.587f, 0.114f, 0, 0,
-
                                 0.299f, 0.587f, 0.114f, 0, 0,
-
                                 0.299f, 0.587f, 0.114f, 0, 0,
-
                                 0, 0, 0, 0.5f, 0
                         };
                         Paint paint = new Paint();

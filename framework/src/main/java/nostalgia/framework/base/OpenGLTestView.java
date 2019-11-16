@@ -137,8 +137,8 @@ public class OpenGLTestView extends GLSurfaceView {
 
         @Override
         public void onSurfaceChanged(GL10 gl, int width, int height) {
-            Matrix.orthoM(projMatrix, 0, -width / 2, +width / 2,
-                    -height / 2, +height / 2, -2f, 2f);
+            Matrix.orthoM(projMatrix, 0, -width / 2f, +width / 2f,
+                    -height / 2f, +height / 2f, -2f, 2f);
             screenWidth = width;
             screenHeight = height;
             GLES20.glViewport(0, 0, width, height);
