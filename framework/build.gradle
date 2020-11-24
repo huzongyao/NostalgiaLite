@@ -20,7 +20,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    api 'androidx.appcompat:appcompat:1.1.0'
-    api 'com.google.android.material:material:1.0.0'
-    api 'com.blankj:utilcode:1.25.9'
+    api 'androidx.appcompat:appcompat:1.2.0'
+    api 'com.google.android.material:material:1.2.1'
+    api 'com.blankj:utilcode:1.26.0'
 }
