@@ -8,6 +8,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".GbcGalleryActivity"
+            android:exported="true"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -23,6 +24,7 @@
 
         <activity
             android:name="nostalgia.framework.ui.preferences.GeneralPreferenceActivity"
+            android:exported="true"
             android:label="@string/general_pref"
             android:theme="@style/PrefTheme">
             <intent-filter>
@@ -34,6 +36,7 @@
 
         <activity
             android:name="nostalgia.framework.ui.preferences.KeyboardSettingsActivity"
+            android:exported="true"
             android:label="@string/key_pref"
             android:theme="@style/PrefTheme">
             <intent-filter>
@@ -44,6 +47,7 @@
         </activity>
         <activity
             android:name="nostalgia.framework.ui.preferences.TouchControllerSettingsActivity"
+            android:exported="true"
             android:label="@string/game_pref"
             android:theme="@style/AppTheme.FullScreen">
             <intent-filter>
@@ -54,6 +58,7 @@
         </activity>
         <activity
             android:name="nostalgia.framework.ui.preferences.ScreenViewPortSettingsActivity"
+            android:exported="true"
             android:label="@string/game_pref"
             android:theme="@style/AppTheme.FullScreen">
             <intent-filter>
