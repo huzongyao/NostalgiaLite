@@ -10,6 +10,7 @@
         <activity
             android:name=".GGGalleryActivity"
             android:exported="true"
+            android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -48,6 +49,7 @@
 
         <activity
             android:name=".GGEmulatorActivity"
+            android:launchMode="singleTask"
             android:theme="@style/AppTheme.FullScreen" />
         <activity
             android:name="nostalgia.framework.ui.preferences.GeneralPreferenceActivity"

@@ -10,5 +10,8 @@
     <color name="select_bck_color">#2233b5e5</color>
     <color name="press_bck_color">#8833b5e5</color>
     <color name="hint_bck_color">#db33b5e5</color>
+    <color name="secondary_text">#757575</color>
+    <color name="hint_text">#9e9e9e</color>
+    <color name="primary_text">#212121</color>
 
 </resources>

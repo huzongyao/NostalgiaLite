@@ -12,6 +12,7 @@
         <activity
             android:name=".NesGalleryActivity"
             android:exported="true"
+            android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -47,6 +48,7 @@
 
         <activity
             android:name=".NesEmulatorActivity"
+            android:launchMode="singleTask"
             android:theme="@style/AppTheme.FullScreen" />
 
         <activity

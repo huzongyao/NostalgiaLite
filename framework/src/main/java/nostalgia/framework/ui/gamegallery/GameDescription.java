@@ -89,6 +89,22 @@ public class GameDescription implements Serializable, Comparable<GameDescription
         }
         return sortNameCache;
     }
+    
+    public long getFileSize() {
+        File file = new File(path);
+        return file.exists() ? file.length() : 0;
+    }
+    
+    public String getFileSizeFormatted() {
+        long size = getFileSize();
+        if (size < 1024) {
+            return size + " B";
+        } else if (size < 1024 * 1024) {
+            return String.format("%.1f KB", size / 1024.0);
+        } else {
+            return String.format("%.1f MB", size / (1024.0 * 1024));
+        }
+    }
 
     @Override
     public int compareTo(@NonNull GameDescription another) {

@@ -1,66 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/row_game_list"
-    android:layout_width="fill_parent"
-    android:layout_height="50dp"
-    android:orientation="horizontal">
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:orientation="horizontal"
+    android:padding="8dp">
 
-    <ImageView
-        android:id="@+id/game_item_bck"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_gravity="center_vertical"
-        android:layout_margin="5dp"
-        android:contentDescription="@string/empty_desc"
-        android:src="@drawable/game_item_small_bck" />
+    <FrameLayout
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="@drawable/game_item_small_bck"
+        android:gravity="center">
 
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+        <ImageView
+            android:id="@+id/game_item_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center|top"
+            android:layout_marginTop="7dp"
+            android:contentDescription="@string/empty_desc"
+            android:src="@drawable/ic_gamepad"
+            app:tint="@color/colorPrimary" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="12dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/row_game_item_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@drawable/row_game_item_text_selector"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
-
-            <View
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_weight="1" />
-
-            <ProgressBar
-                android:id="@+id/row_game_item_progressBar"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_weight="1"
-                android:progress="100"
-                android:progressDrawable="@drawable/row_gallery_item_progress"
-                android:visibility="gone" />
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/row_game_item_name"
-                android:layout_width="0dp"
-                android:layout_height="fill_parent"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:gravity="center_vertical"
-                android:maxLines="2"
-                android:textColor="@drawable/row_game_item_text_selector"
-                android:textSize="18sp" />
-
-            <ImageView
-                android:id="@+id/game_item_arrow"
+                android:id="@+id/row_game_item_size"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/secondary_text"
+                android:textSize="12sp" />
+
+            <View
+                android:layout_width="4dp"
+                android:layout_height="4dp"
                 android:layout_gravity="center_vertical"
-                android:src="@drawable/ic_next_arrow" />
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:background="@drawable/blue_boundary_shape" />
+
+            <TextView
+                android:id="@+id/row_game_item_runs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/secondary_text"
+                android:textSize="12sp" />
         </LinearLayout>
-    </RelativeLayout>
+
+        <TextView
+            android:id="@+id/row_game_item_last_played"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/hint_text"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/row_game_item_ext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/slot_bck_shape"
+            android:paddingLeft="8dp"
+            android:paddingTop="2dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="2dp"
+            android:textColor="@color/primary_text"
+            android:textSize="10sp" />
+
+        <ImageView
+            android:id="@+id/game_item_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/ic_next_arrow" />
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/row_game_item_progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginTop="4dp"
+        android:progress="100"
+        android:progressDrawable="@drawable/row_gallery_item_progress"
+        android:visibility="gone" />
 
 </LinearLayout>

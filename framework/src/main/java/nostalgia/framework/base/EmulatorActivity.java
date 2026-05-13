@@ -3,16 +3,19 @@ package nostalgia.framework.base;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Bitmap.CompressFormat;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -23,12 +26,9 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import com.blankj.utilcode.constant.PermissionConstants;
-import com.blankj.utilcode.util.PermissionUtils;
-
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -686,7 +686,7 @@ public abstract class EmulatorActivity extends Activity
                         GeneralPreferenceFragment.class.getName());
                 startActivity(i);
             } else if (item.id == R.string.game_menu_screenshot) {
-                saveScreenshotWithPermission();
+                saveGameScreenshot();
             }
         } catch (EmulatorException e) {
             handleException(e);
@@ -709,47 +709,45 @@ public abstract class EmulatorActivity extends Activity
         }
     }
 
-    private void saveScreenshotWithPermission() {
-        PermissionUtils.permission(PermissionConstants.STORAGE)
-                .callback(new PermissionUtils.SimpleCallback() {
-                    @Override
-                    public void onGranted() {
-                        saveGameScreenshot();
-                    }
-
-                    @Override
-                    public void onDenied() {
-
-                    }
-                }).request();
-    }
-
     private void saveGameScreenshot() {
         String name = game.getCleanName() + "-screenshot";
-        File dir = new File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                EmulatorHolder.getInfo().getName().replace(' ', '_'));
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
-        File to = dir;
-        int counter = 0;
-        while (to.exists()) {
-            String nn = name + (counter == 0 ? "" : "(" + counter + ")") + ".png";
-            to = new File(dir, nn);
-            counter++;
-        }
-        try {
-            FileOutputStream fos = new FileOutputStream(to);
-            EmuUtils.createScreenshotBitmap(EmulatorActivity.this, game)
-                    .compress(CompressFormat.PNG, 90, fos);
-            fos.close();
+        String emulatorName = EmulatorHolder.getInfo().getName().replace(' ', '_');
+        
+        Bitmap bitmap = EmuUtils.createScreenshotBitmap(EmulatorActivity.this, game);
+        if (bitmap == null) {
             Toast.makeText(EmulatorActivity.this,
-                    getString(R.string.act_game_screenshot_saved,
-                            to.getAbsolutePath()), Toast.LENGTH_LONG).show();
+                    getString(R.string.act_game_screenshot_failed), Toast.LENGTH_LONG).show();
+            return;
+        }
+        
+        ContentResolver resolver = getContentResolver();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, name + ".png");
+        contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
+        contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, 
+                "Pictures/" + emulatorName);
+        
+        Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+        
+        if (imageUri == null) {
+            Toast.makeText(EmulatorActivity.this,
+                    getString(R.string.act_game_screenshot_failed), Toast.LENGTH_LONG).show();
+            return;
+        }
+        
+        try (OutputStream fos = resolver.openOutputStream(imageUri)) {
+            if (fos != null) {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 90, fos);
+                Toast.makeText(EmulatorActivity.this,
+                        getString(R.string.act_game_screenshot_saved), Toast.LENGTH_LONG).show();
+            }
         } catch (IOException e) {
-            NLog.e(TAG, "", e);
-            throw new EmulatorException(getString(R.string.act_game_screenshot_failed));
+            NLog.e(TAG, "Failed to save screenshot", e);
+            resolver.delete(imageUri, null, null);
+            Toast.makeText(EmulatorActivity.this,
+                    getString(R.string.act_game_screenshot_failed), Toast.LENGTH_LONG).show();
+        } finally {
+            bitmap.recycle();
         }
     }
 

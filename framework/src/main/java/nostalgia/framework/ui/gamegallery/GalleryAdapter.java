@@ -1,7 +1,6 @@
 package nostalgia.framework.ui.gamegallery;
 
 import android.content.Context;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +9,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,8 +41,9 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
     private int sumRuns = 0;
     private int sortType = SORT_BY_NAME_ALPHA;
 
-    private Comparator<GameDescription> nameComparator = (lhs, rhs) ->
-            lhs.getSortName().compareTo(rhs.getSortName());
+    private Comparator<GameDescription> nameComparator = (lhs, rhs) -> {
+        return lhs.getSortName().compareTo(rhs.getSortName());
+    };
 
     private Comparator<GameDescription> insertDateComparator = (lhs, rhs) ->
             (int) (-lhs.inserTime + rhs.inserTime);
@@ -85,18 +89,47 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
             convertView = inflater.inflate(R.layout.row_game_list, null);
         }
         GameDescription game = item.game;
+        
         TextView name = convertView.findViewById(R.id.row_game_item_name);
+        TextView size = convertView.findViewById(R.id.row_game_item_size);
+        TextView runs = convertView.findViewById(R.id.row_game_item_runs);
+        TextView lastPlayed = convertView.findViewById(R.id.row_game_item_last_played);
+        TextView ext = convertView.findViewById(R.id.row_game_item_ext);
         ImageView arrowIcon = convertView.findViewById(R.id.game_item_arrow);
-        ImageView bck = convertView.findViewById(R.id.game_item_bck);
         ProgressBar runIndicator = convertView.findViewById(R.id.row_game_item_progressBar);
+        
         runIndicator.setMax(sumRuns);
+        
         name.setText(game.getCleanName());
+        name.setTextColor(mainColor);
+        
+        size.setText(game.getFileSizeFormatted());
+        
+        runs.setText(String.format(context.getString(R.string.gallery_play_count), game.runCount));
+        
+        if (game.lastGameTime > 0) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+            lastPlayed.setText(String.format(context.getString(R.string.gallery_last_played), 
+                    sdf.format(new Date(game.lastGameTime))));
+        } else {
+            lastPlayed.setText(context.getString(R.string.gallery_never_played));
+        }
+        
+        String extension = getFileExtension(game.name);
+        ext.setText(extension.toUpperCase());
+        
         arrowIcon.setImageResource(R.drawable.ic_next_arrow);
         arrowIcon.clearAnimation();
-        name.setTextColor(mainColor);
-        name.setGravity(Gravity.CENTER_VERTICAL);
-        bck.setImageResource(R.drawable.game_item_small_bck);
+        
         return convertView;
+    }
+    
+    private String getFileExtension(String filename) {
+        int lastDot = filename.lastIndexOf('.');
+        if (lastDot > 0 && lastDot < filename.length() - 1) {
+            return filename.substring(lastDot + 1);
+        }
+        return "";
     }
 
     public void setFilter(String filter) {
