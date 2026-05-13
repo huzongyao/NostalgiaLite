@@ -15,6 +15,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.view.Display;
@@ -82,6 +83,52 @@ public class EmuUtils {
 
     public static String getMD5Checksum(InputStream zis) throws IOException {
         return countMD5(zis);
+    }
+
+    public static String getMD5Checksum(Context context, Uri uri) {
+        InputStream is = null;
+        try {
+            is = context.getContentResolver().openInputStream(uri);
+            return countMD5(is);
+        } catch (IOException e) {
+            NLog.e(TAG, "", e);
+        } finally {
+            try {
+                if (is != null)
+                    is.close();
+            } catch (IOException ignored) {
+            }
+        }
+        return "";
+    }
+    
+    public static File copyUriToFile(Context context, Uri uri, File destination) {
+        InputStream is = null;
+        FileOutputStream os = null;
+        try {
+            is = context.getContentResolver().openInputStream(uri);
+            if (is == null) return null;
+            
+            os = new FileOutputStream(destination);
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = is.read(buffer)) != -1) {
+                os.write(buffer, 0, bytesRead);
+            }
+            return destination;
+        } catch (IOException e) {
+            NLog.e(TAG, "Failed to copy file", e);
+            if (destination.exists()) {
+                destination.delete();
+            }
+            return null;
+        } finally {
+            try {
+                if (is != null) is.close();
+                if (os != null) os.close();
+            } catch (IOException ignored) {
+            }
+        }
     }
 
     private static String countMD5(InputStream is) {

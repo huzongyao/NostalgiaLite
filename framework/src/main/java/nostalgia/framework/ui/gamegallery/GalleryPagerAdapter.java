@@ -106,6 +106,13 @@ public class GalleryPagerAdapter extends PagerAdapter {
         }
         return result;
     }
+    
+    public ArrayList<GameDescription> getAllGames() {
+        if (listAdapters.length > 0) {
+            return listAdapters[0].getGames();
+        }
+        return new ArrayList<>();
+    }
 
     public void setFilter(String filter) {
         for (GalleryAdapter adapter : listAdapters) {

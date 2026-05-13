@@ -9,6 +9,7 @@ import android.preference.PreferenceActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
@@ -40,6 +41,7 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
 
     ProgressDialog searchDialog = null;
     private ViewPager pager = null;
+    private TextView noGamesTextView = null;
     private DatabaseHelper dbHelper;
     private GalleryPagerAdapter adapter;
     private boolean importing = false;
@@ -57,6 +59,8 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
         adapter.onRestoreInstanceState(savedInstanceState);
         pager = findViewById(R.id.game_gallery_pager);
         pager.setAdapter(adapter);
+        
+        noGamesTextView = findViewById(R.id.no_games_text);
 
         mTabLayout = findViewById(R.id.game_gallery_tab);
         mTabLayout.setupWithViewPager(pager);
@@ -71,6 +75,9 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
         exts = getRomExtensions();
         exts.addAll(getArchiveExtensions());
         inZipExts = getRomExtensions();
+        
+        // 调用基类，通知初始化完成，可以处理分享了
+        onExtensionsInitialized();
     }
 
     @Override
@@ -88,8 +95,8 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
             i.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
             startActivity(i);
             return true;
-        } else if (itemId == R.id.gallery_menu_reload) {
-            reloadGames(true, null);
+        } else if (itemId == R.id.gallery_menu_select_rom) {
+            openFilePicker();
             return true;
         } else if (itemId == R.id.gallery_menu_exit) {
             finish();
@@ -105,9 +112,9 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
             rotateAnim = false;
         }
         adapter.notifyDataSetChanged();
+        // 不再自动搜索ROM，只在首次加载已有游戏
         if (reloadGames && !importing) {
-            boolean isDBEmpty = dbHelper.countObjsInDb(GameDescription.class, null) == 0;
-            reloadGames(isDBEmpty, null);
+            reloadGames(false, null);
         }
     }
 
@@ -147,12 +154,16 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
             AlertDialog dialog = new AlertDialog.Builder(this)
                     .setMessage(getString(R.string.gallery_rom_not_found))
                     .setTitle(R.string.error)
-                    .setPositiveButton(R.string.gallery_rom_not_found_reload, (dialog1, which)
-                            -> reloadGames(true, null))
+                    .setPositiveButton(R.string.ok, (dialog1, which)
+                            -> {
+                        // 删除不存在的ROM记录
+                        dbHelper.deleteObjFromDb(game);
+                        // 刷新显示
+                        ArrayList<GameDescription> games = RomsFinder.getAllGames(dbHelper);
+                        setLastGames(games);
+                    })
                     .setCancelable(false)
                     .create();
-            dialog.setOnDismissListener(dialog12 ->
-                    reloadGames(true, null));
             dialog.show();
         }
     }
@@ -169,14 +180,23 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
     @Override
     public void setLastGames(ArrayList<GameDescription> games) {
         adapter.setGames(games);
-        pager.setVisibility(games.isEmpty() ? View.INVISIBLE : View.VISIBLE);
-
+        updateGameVisibility(games);
     }
 
     @Override
     public void setNewGames(ArrayList<GameDescription> games) {
         boolean isListEmpty = adapter.addGames(games) == 0;
-        pager.setVisibility(isListEmpty ? View.INVISIBLE : View.VISIBLE);
+        updateGameVisibility(adapter.getAllGames());
+    }
+    
+    private void updateGameVisibility(ArrayList<GameDescription> games) {
+        if (games.isEmpty()) {
+            pager.setVisibility(View.GONE);
+            noGamesTextView.setVisibility(View.VISIBLE);
+        } else {
+            pager.setVisibility(View.VISIBLE);
+            noGamesTextView.setVisibility(View.GONE);
+        }
     }
 
     private void showSearchProgressDialog(boolean zipMode) {
@@ -191,7 +211,9 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
             searchDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel),
                     (dialog, which) -> stopRomsFinding());
         }
-        searchDialog.setMessage(getString(zipMode ?
+        searchDialog.setMessage(getString(importingRom ?
+                R.string.gallery_importing_rom
+                : zipMode ?
                 R.string.gallery_zip_search_label
                 : R.string.gallery_sdcard_search_label));
         DialogUtils.show(searchDialog, false);
@@ -206,7 +228,10 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
             }
             if (showToast) {
                 if (count > 0) {
-                    Snackbar.make(pager, getString(R.string.gallery_count_of_found_games, count),
+                    Snackbar.make(pager, getString(R.string.gallery_rom_import_success),
+                            Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                } else if (importingRom) {
+                    Snackbar.make(pager, getString(R.string.gallery_rom_import_failed),
                             Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 }
             }

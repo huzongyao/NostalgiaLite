@@ -2,10 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/gallery_menu_reload"
-        android:icon="@drawable/ic_reload"
-        android:title="@string/gallery_menu_reload"
-        app:showAsAction="never" />
+        android:id="@+id/gallery_menu_select_rom"
+        android:icon="@drawable/ic_folder"
+        android:title="@string/gallery_menu_select_rom"
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/gallery_menu_pref"
         android:icon="@drawable/ic_game_settings"

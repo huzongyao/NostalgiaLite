@@ -1,5 +1,6 @@
 package nostalgia.framework.ui.gamegallery;
 
+import android.net.Uri;
 import android.os.Environment;
 
 import java.io.File;
@@ -34,10 +35,14 @@ public class RomsFinder extends Thread {
     private BaseGameGalleryActivity activity;
     private boolean searchNew = true;
     private File selectedFolder;
+    private File singleFileToImport;
+    private Uri singleUriToImport;
+    private boolean importSingleFile = false;
+    private boolean importSingleUri = false;
     private AtomicBoolean running = new AtomicBoolean(false);
 
     public RomsFinder(Set<String> exts, Set<String> inZipExts, BaseGameGalleryActivity activity,
-                      OnRomsFinderListener listener, boolean searchNew, File selectedFolder) {
+            OnRomsFinderListener listener, boolean searchNew, File selectedFolder) {
         this.listener = listener;
         this.activity = activity;
         this.searchNew = searchNew;
@@ -46,6 +51,22 @@ public class RomsFinder extends Thread {
         inZipFileNameExtFilter = new FilenameExtFilter(inZipExts, true, false);
         androidAppDataFolder = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android";
         dbHelper = new DatabaseHelper(activity);
+    }
+    
+    // Constructor for importing a single file
+    public RomsFinder(Set<String> exts, Set<String> inZipExts, BaseGameGalleryActivity activity,
+            OnRomsFinderListener listener, File singleFile) {
+        this(exts, inZipExts, activity, listener, true, null);
+        this.singleFileToImport = singleFile;
+        this.importSingleFile = true;
+    }
+    
+    // Constructor for importing a single Uri
+    public RomsFinder(Set<String> exts, Set<String> inZipExts, BaseGameGalleryActivity activity,
+            OnRomsFinderListener listener, Uri singleUri) {
+        this(exts, inZipExts, activity, listener, true, null);
+        this.singleUriToImport = singleUri;
+        this.importSingleUri = true;
     }
 
     public static ArrayList<GameDescription> getAllGames(DatabaseHelper helper) {
@@ -116,10 +137,165 @@ public class RomsFinder extends Thread {
             for (GameDescription desc : oldRoms) {
                 oldGames.put(desc.path, desc);
             }
-            startFileSystemMode(oldRoms);
+            if (importSingleUri && singleUriToImport != null) {
+                importSingleUri(singleUriToImport);
+            } else if (importSingleFile && singleFileToImport != null) {
+                importSingleFile(singleFileToImport);
+            } else {
+                startFileSystemMode(oldRoms);
+            }
         } else {
             activity.runOnUiThread(() -> listener.onRomsFinderEnd(false));
         }
+    }
+    
+    private void importSingleFile(File file) {
+        if (!running.get()) return;
+        
+        try {
+            String path = file.getCanonicalPath();
+            NLog.i(TAG, "Importing file: " + path);
+            
+            // Check if file already exists in database
+            if (oldGames.containsKey(path)) {
+                NLog.i(TAG, "File already exists in library");
+                games.add(oldGames.get(path));
+                activity.runOnUiThread(() -> {
+                    listener.onRomsFinderNewGames(games);
+                    listener.onRomsFinderEnd(true);
+                });
+                return;
+            }
+            
+            String ext = EmuUtils.getExt(path).toLowerCase();
+            if (ext.equals("zip")) {
+                checkZip(file);
+            } else if (filenameExtFilter.accept(null, file.getName())) {
+                GameDescription game = new GameDescription(file);
+                game.inserTime = System.currentTimeMillis();
+                dbHelper.insertObjToDb(game);
+                games.add(game);
+                activity.runOnUiThread(() -> listener.onRomsFinderFoundFile(game.name));
+            } else {
+                NLog.e(TAG, "Unsupported file type: " + ext);
+            }
+            
+            if (running.get()) {
+                NLog.i(TAG, "Imported " + games.size() + " games from file");
+                activity.runOnUiThread(() -> {
+                    listener.onRomsFinderNewGames(games);
+                    listener.onRomsFinderEnd(true);
+                });
+            }
+        } catch (IOException e) {
+            NLog.e(TAG, "Error importing file", e);
+            activity.runOnUiThread(() -> listener.onRomsFinderEnd(true));
+        }
+    }
+    
+    private void importSingleUri(Uri uri) {
+        if (!running.get()) return;
+        
+        try {
+            NLog.i(TAG, "Importing file from Uri: " + uri.toString());
+            
+            // Get filename from Uri
+            String filename = getFilenameFromUri(uri);
+            if (filename == null) {
+                filename = "rom_" + System.currentTimeMillis();
+            }
+            
+            // Get external files directory to copy to
+            File destDir = activity.getExternalFilesDir(null);
+            if (destDir == null) {
+                destDir = activity.getFilesDir();
+            }
+            
+            // Copy Uri to app private directory
+            File destFile = new File(destDir, filename);
+            File copiedFile = EmuUtils.copyUriToFile(activity, uri, destFile);
+            
+            if (copiedFile == null) {
+                NLog.e(TAG, "Failed to copy file");
+                activity.runOnUiThread(() -> listener.onRomsFinderEnd(true));
+                return;
+            }
+            
+            String path = copiedFile.getAbsolutePath();
+            
+            // Compute MD5 first to check if already exists
+            String checksum = EmuUtils.getMD5Checksum(copiedFile);
+            
+            // Check if game already exists in library by checksum
+            GameDescription existingGame = findGameByChecksum(checksum);
+            if (existingGame != null) {
+                NLog.i(TAG, "Game already exists in library");
+                // Delete the copied file since we don't need it
+                copiedFile.delete();
+                games.add(existingGame);
+                activity.runOnUiThread(() -> {
+                    listener.onRomsFinderNewGames(games);
+                    listener.onRomsFinderEnd(true);
+                });
+                return;
+            }
+            
+            // Check file extension
+            String ext = EmuUtils.getExt(filename).toLowerCase();
+            if (ext.equals("zip")) {
+                checkZip(copiedFile);
+            } else if (filenameExtFilter.accept(null, filename)) {
+                GameDescription game = new GameDescription(copiedFile, checksum);
+                game.inserTime = System.currentTimeMillis();
+                dbHelper.insertObjToDb(game);
+                games.add(game);
+                activity.runOnUiThread(() -> listener.onRomsFinderFoundFile(game.name));
+            } else {
+                NLog.e(TAG, "Unsupported file type: " + ext);
+                // Delete the copied file since it's not supported
+                copiedFile.delete();
+            }
+            
+            if (running.get()) {
+                NLog.i(TAG, "Imported " + games.size() + " games from Uri");
+                activity.runOnUiThread(() -> {
+                    listener.onRomsFinderNewGames(games);
+                    listener.onRomsFinderEnd(true);
+                });
+            }
+        } catch (Exception e) {
+            NLog.e(TAG, "Error importing Uri", e);
+            activity.runOnUiThread(() -> listener.onRomsFinderEnd(true));
+        }
+    }
+    
+    private String getFilenameFromUri(Uri uri) {
+        String result = null;
+        try {
+            // Try to get filename from last path segment
+            String lastSegment = uri.getLastPathSegment();
+            if (lastSegment != null) {
+                // If path has '/', use the last part
+                int lastSlash = lastSegment.lastIndexOf('/');
+                if (lastSlash >= 0) {
+                    result = lastSegment.substring(lastSlash + 1);
+                } else {
+                    result = lastSegment;
+                }
+            }
+        } catch (Exception e) {
+            NLog.e(TAG, "Failed to get filename from Uri", e);
+        }
+        return result;
+    }
+    
+    private GameDescription findGameByChecksum(String checksum) {
+        for (GameDescription game : oldGames.values()) {
+            if (game.checksum.equals(checksum)) {
+                return game;
+            }
+        }
+        return null;
     }
 
     private void checkZip(File zipFile) {

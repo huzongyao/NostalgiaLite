@@ -162,4 +162,17 @@
     <string name="control_menu">MENU</string>
 
     <string name="now_loading">Loading, Please Wait…</string>
+    
+    <!-- File picker -->
+    <string name="gallery_menu_select_rom">SELECT ROM FILE</string>
+    <string name="gallery_select_rom_title">Select ROM File</string>
+    <string name="gallery_importing_rom">Importing ROM…</string>
+    <string name="gallery_rom_import_success">ROM imported successfully!</string>
+    <string name="gallery_rom_import_failed">Failed to import ROM</string>
+    <string name="gallery_rom_already_exists">ROM already exists in library</string>
+    <string name="gallery_unsupported_file_type">Unsupported file type</string>
+    <string name="gallery_select_rom_hint">Select a ROM file to add to your library</string>
+    <string name="gallery_permission_required">Storage permission is required to select ROM files</string>
+    <string name="gallery_request_permission">Grant Permission</string>
+    <string name="gallery_no_games_found">No games found. Tap SELECT ROM FILE to add games.</string>
 </resources>

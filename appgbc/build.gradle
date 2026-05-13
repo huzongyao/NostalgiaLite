@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace 'nostalgia.appgbc'
-    compileSdkVersion 33
+    compileSdkVersion 36
 
     signingConfigs {
         demokey {
@@ -17,9 +17,9 @@ android {
     defaultConfig {
         applicationId "nostalgia.appgbc"
         minSdkVersion 15
-        targetSdkVersion 33
-        versionCode 1401
-        versionName "1.4.1"
+        targetSdkVersion 36
+        versionCode 1501
+        versionName "1.5.1"
         resConfigs "zh"
         ndk {
             abiFilters 'armeabi-v7a', 'x86', 'arm64-v8a'

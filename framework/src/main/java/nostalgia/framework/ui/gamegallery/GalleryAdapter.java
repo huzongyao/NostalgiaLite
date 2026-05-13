@@ -118,6 +118,10 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
         filterGames();
         return games.size();
     }
+    
+    public ArrayList<GameDescription> getGames() {
+        return new ArrayList<>(games);
+    }
 
     private void filterGames() {
         filterGames.clear();

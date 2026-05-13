@@ -115,4 +115,17 @@
     <string name="control_start">START</string>
     <string name="control_menu">MENU</string>
     <string name="now_loading">正在加载,请稍后…</string>
+
+    <!-- File picker -->
+    <string name="gallery_menu_select_rom">选择ROM文件</string>
+    <string name="gallery_select_rom_title">选择ROM文件</string>
+    <string name="gallery_importing_rom">正在导入ROM…</string>
+    <string name="gallery_rom_import_success">ROM导入成功！</string>
+    <string name="gallery_rom_import_failed">ROM导入失败</string>
+    <string name="gallery_rom_already_exists">ROM已在库中</string>
+    <string name="gallery_unsupported_file_type">不支持的文件类型</string>
+    <string name="gallery_select_rom_hint">选择一个ROM文件添加到您的库中</string>
+    <string name="gallery_permission_required">需要存储权限才能选择ROM文件</string>
+    <string name="gallery_request_permission">授予权限</string>
+    <string name="gallery_no_games_found">未找到游戏。点击“选择ROM文件”添加游戏。</string>
 </resources>
