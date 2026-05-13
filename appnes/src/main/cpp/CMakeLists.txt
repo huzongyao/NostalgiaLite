@@ -23,6 +23,8 @@ include_directories(./ fceux/
 
 add_library(nes SHARED ${NATIVE_SRCS})
 
+set_target_properties(nes PROPERTIES LINK_FLAGS "-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384")
+
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in the
 # build script, prebuilt third-party libraries, or system libraries.

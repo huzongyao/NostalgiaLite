@@ -27,6 +27,8 @@ include_directories(./ common/
 
 add_library(gbc SHARED ${NATIVE_SRCS})
 
+set_target_properties(gbc PROPERTIES LINK_FLAGS "-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384")
+
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in the
 # build script, prebuilt third-party libraries, or system libraries.
