@@ -11,6 +11,7 @@ import nostalgia.framework.EmulatorException;
 import nostalgia.framework.EmulatorInfo;
 import nostalgia.framework.GfxProfile;
 import nostalgia.framework.KeyboardProfile;
+import nostalgia.framework.R;
 import nostalgia.framework.SfxProfile;
 import nostalgia.framework.SfxProfile.SoundEncoding;
 import nostalgia.framework.base.JniBridge;

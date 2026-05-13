@@ -113,7 +113,7 @@ bool GB::load(const std::string &romfile, const unsigned flags) {
 			p_->cpu.loadSavedata();
 		}
 		p_->stateNo = 1;
-		p_->cpu.setOsdElement(std::auto_ptr<OsdElement>());
+		p_->cpu.setOsdElement(std::unique_ptr<OsdElement>());
 	}
 	
 	return failed;

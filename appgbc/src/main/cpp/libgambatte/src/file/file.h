@@ -36,7 +36,7 @@ public:
 	virtual bool fail() const = 0;
 };
 
-std::auto_ptr<File> newFileInstance(const std::string &filepath);
+std::unique_ptr<File> newFileInstance(const std::string &filepath);
 
 }
 

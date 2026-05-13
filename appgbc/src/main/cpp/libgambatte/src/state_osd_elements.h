@@ -24,9 +24,9 @@
 #include <string>
 
 namespace gambatte {
-std::auto_ptr<OsdElement> newStateLoadedOsdElement(unsigned stateNo);
-std::auto_ptr<OsdElement> newStateSavedOsdElement(unsigned stateNo);
-std::auto_ptr<OsdElement> newSaveStateOsdElement(const std::string &fileName, unsigned stateNo);
+std::unique_ptr<OsdElement> newStateLoadedOsdElement(unsigned stateNo);
+std::unique_ptr<OsdElement> newStateSavedOsdElement(unsigned stateNo);
+std::unique_ptr<OsdElement> newSaveStateOsdElement(const std::string &fileName, unsigned stateNo);
 }
 
 #endif

@@ -128,7 +128,7 @@ class LCD {
 	LycIrq lycIrq;
 	NextM0Time nextM0Time_;
 
-	std::auto_ptr<OsdElement> osdElement;
+	std::unique_ptr<OsdElement> osdElement;
 
 	unsigned char statReg;
 	unsigned char m2IrqStatReg_;
@@ -159,7 +159,7 @@ public:
 	void setDmgPaletteColor(unsigned palNum, unsigned colorNum, unsigned long rgb32);
 	void setVideoBuffer(uint_least32_t *videoBuf, int pitch);
 
-	void setOsdElement(std::auto_ptr<OsdElement> osdElement) { this->osdElement = osdElement; }
+	void setOsdElement(std::unique_ptr<OsdElement> osdElement) { this->osdElement = std::move(osdElement); }
 
 	void dmgBgPaletteChange(const unsigned data, const unsigned long cycleCounter) {
 		update(cycleCounter);

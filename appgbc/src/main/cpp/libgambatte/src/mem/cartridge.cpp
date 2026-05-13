@@ -304,7 +304,7 @@ static unsigned pow2ceil(unsigned n) {
 }
 
 bool Cartridge::loadROM(const std::string &romfile, const bool forceDmg, const bool multicartCompat) {
-	const std::auto_ptr<File> rom(newFileInstance(romfile));
+	const std::unique_ptr<File> rom(newFileInstance(romfile));
 
 	if (rom->fail())
 		return 1;

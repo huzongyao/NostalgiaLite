@@ -1,25 +1,6 @@
-buildscript {
-    repositories {
-        jcenter()
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
-        }
-        google()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.0'
-    }
-}
-
-allprojects {
-    repositories {
-        jcenter()
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
-        }
-    }
+plugins {
+    id 'com.android.application' version '8.9.1' apply false
+    id 'com.android.library' version '8.9.1' apply false
 }
 
 task clean(type: Delete) {

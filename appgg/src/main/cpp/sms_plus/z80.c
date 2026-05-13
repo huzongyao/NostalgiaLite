@@ -95,7 +95,9 @@ int z80_exec = 0;               // 1= in exec loop, 0= out of
 int z80_cycle_count = 0;        // running total of cycles executed
 int z80_requested_cycles = 0;   // requested cycles to execute this timeslice
 
-extern void (*cpu_writemem16)(int address, int data);
+void (*cpu_writemem16)(int address, int data);
+void (*cpu_writeport16)(uint16 port, uint8 data);
+uint8 (*cpu_readport16)(uint16 port);
 extern void (*cpu_writeport)(int port, int data);
 extern int (*cpu_readport)(int port);
 unsigned char *cpu_readmap[64];

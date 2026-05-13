@@ -158,26 +158,26 @@ const uint_least32_t* SaveStateOsdElement::update() {
 
 namespace gambatte {
 
-std::auto_ptr<OsdElement> newStateLoadedOsdElement(unsigned stateNo) {
+std::unique_ptr<OsdElement> newStateLoadedOsdElement(unsigned stateNo) {
 	char txt[sizeof stateLoadedTxt];
 	
 	std::memcpy(txt, stateLoadedTxt, sizeof stateLoadedTxt);
 	utoa(stateNo, txt + 6);
 	
-	return std::auto_ptr<OsdElement>(new ShadedTextOsdElment(stateLoadedTxtWidth, txt));
+	return std::unique_ptr<OsdElement>(new ShadedTextOsdElment(stateLoadedTxtWidth, txt));
 }
 
-std::auto_ptr<OsdElement> newStateSavedOsdElement(unsigned stateNo) {
+std::unique_ptr<OsdElement> newStateSavedOsdElement(unsigned stateNo) {
 	char txt[sizeof stateSavedTxt];
 	
 	std::memcpy(txt, stateSavedTxt, sizeof stateSavedTxt);
 	utoa(stateNo, txt + 6);
 	
-	return std::auto_ptr<OsdElement>(new ShadedTextOsdElment(stateSavedTxtWidth, txt));
+	return std::unique_ptr<OsdElement>(new ShadedTextOsdElment(stateSavedTxtWidth, txt));
 }
 
-std::auto_ptr<OsdElement> newSaveStateOsdElement(const std::string &fileName, unsigned stateNo) {
-	return std::auto_ptr<OsdElement>(new SaveStateOsdElement(fileName, stateNo));
+std::unique_ptr<OsdElement> newSaveStateOsdElement(const std::string &fileName, unsigned stateNo) {
+	return std::unique_ptr<OsdElement>(new SaveStateOsdElement(fileName, stateNo));
 }
 
 }

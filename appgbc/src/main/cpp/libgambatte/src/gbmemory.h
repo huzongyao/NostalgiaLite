@@ -83,8 +83,8 @@ public:
 	void saveSavedata() { cart.saveSavedata(); }
 	const std::string saveBasePath() const { return cart.saveBasePath(); }
 	
-	void setOsdElement(std::auto_ptr<OsdElement> osdElement) {
-		display.setOsdElement(osdElement);
+	void setOsdElement(std::unique_ptr<OsdElement> osdElement) {
+		display.setOsdElement(std::move(osdElement));
 	}
 
 	unsigned long stop(unsigned long cycleCounter);

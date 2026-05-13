@@ -1,6 +1,9 @@
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
+}
 
 android {
+    namespace 'nostalgia.appgg'
     compileSdkVersion 33
 
     signingConfigs {

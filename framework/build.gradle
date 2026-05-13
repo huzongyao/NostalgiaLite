@@ -1,6 +1,9 @@
-apply plugin: 'com.android.library'
+plugins {
+    id 'com.android.library'
+}
 
 android {
+    namespace 'nostalgia.framework'
     compileSdkVersion 33
 
     defaultConfig {

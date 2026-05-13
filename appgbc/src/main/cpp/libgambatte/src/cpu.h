@@ -70,8 +70,8 @@ public:
 		return memory.saveBasePath();
 	}
 	
-	void setOsdElement(std::auto_ptr<OsdElement> osdElement) {
-		memory.setOsdElement(osdElement);
+	void setOsdElement(std::unique_ptr<OsdElement> osdElement) {
+		memory.setOsdElement(std::move(osdElement));
 	}
 	
 	bool load(const std::string &romfile, bool forceDmg, bool multicartCompat) {

@@ -21,6 +21,6 @@ Free Software Foundation, Inc.,
 ***************************************************************************/
 #include "stdfile.h"
 
-std::auto_ptr<gambatte::File> gambatte::newFileInstance(const std::string &filepath) {
-	return std::auto_ptr<File>(new StdFile(filepath.c_str()));
+std::unique_ptr<gambatte::File> gambatte::newFileInstance(const std::string &filepath) {
+	return std::unique_ptr<File>(new StdFile(filepath.c_str()));
 }
