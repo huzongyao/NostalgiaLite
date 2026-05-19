@@ -5,8 +5,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,8 +19,8 @@ import java.util.Set;
 import nostalgia.framework.Emulator;
 import nostalgia.framework.R;
 import nostalgia.framework.base.EmulatorActivity;
+import nostalgia.framework.data.GameRepository;
 import nostalgia.framework.ui.gamegallery.RomsFinder.OnRomsFinderListener;
-import nostalgia.framework.utils.DatabaseHelper;
 import nostalgia.framework.utils.DialogUtils;
 import nostalgia.framework.utils.FileUtils;
 import nostalgia.framework.utils.NLog;
@@ -39,30 +37,22 @@ abstract public class BaseGameGalleryActivity extends AppCompatActivity
     protected boolean reloading = false;
     protected boolean importingRom = false;
     private RomsFinder romsFinder = null;
-    private DatabaseHelper dbHelper = null;
+    private GameRepository gameRepository = null;
     private Intent pendingShareIntent = null;
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        dbHelper = new DatabaseHelper(this);
-        SharedPreferences pref = getSharedPreferences("android50comp", Context.MODE_PRIVATE);
-        String androidVersion = Build.VERSION.RELEASE;
-
-        if (!pref.getString("androidVersion", "").equals(androidVersion)) {
-            SQLiteDatabase db = dbHelper.getWritableDatabase();
-            dbHelper.onUpgrade(db, Integer.MAX_VALUE - 1, Integer.MAX_VALUE);
-            db.close();
-            Editor editor = pref.edit();
-            editor.putString("androidVersion", androidVersion);
-            editor.apply();
-            NLog.i(TAG, "Reinit DB " + androidVersion);
-        }
+        gameRepository = GameRepository.getInstance(this);
         reloadGames = true;
         
         // 暂存分享Intent，等子类初始化完exts和inZipExts后再处理
         pendingShareIntent = getIntent();
+    }
+    
+    public GameRepository getGameRepository() {
+        return gameRepository;
     }
     
     protected void onExtensionsInitialized() {
@@ -170,8 +160,6 @@ abstract public class BaseGameGalleryActivity extends AppCompatActivity
         }
     }
     
-
-
     @Override
     public void onRomsFinderFoundGamesInCache(ArrayList<GameDescription> oldRoms) {
         setLastGames(oldRoms);

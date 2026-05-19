@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import nostalgia.framework.utils.DatabaseHelper;
+import nostalgia.framework.data.GameRepository;
 import nostalgia.framework.utils.EmuUtils;
 import nostalgia.framework.utils.NLog;
 import nostalgia.framework.utils.SDCardUtil;
@@ -29,7 +29,7 @@ public class RomsFinder extends Thread {
     private FilenameExtFilter inZipFileNameExtFilter;
     private String androidAppDataFolder = "";
     private HashMap<String, GameDescription> oldGames = new HashMap<>();
-    private DatabaseHelper dbHelper;
+    private GameRepository gameRepository;
     private ArrayList<GameDescription> games = new ArrayList<>();
     private OnRomsFinderListener listener;
     private BaseGameGalleryActivity activity;
@@ -47,10 +47,10 @@ public class RomsFinder extends Thread {
         this.activity = activity;
         this.searchNew = searchNew;
         this.selectedFolder = selectedFolder;
+        this.gameRepository = activity.getGameRepository();
         filenameExtFilter = new FilenameExtFilter(exts, true, false);
         inZipFileNameExtFilter = new FilenameExtFilter(inZipExts, true, false);
         androidAppDataFolder = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android";
-        dbHelper = new DatabaseHelper(activity);
     }
     
     // Constructor for importing a single file
@@ -69,8 +69,8 @@ public class RomsFinder extends Thread {
         this.importSingleUri = true;
     }
 
-    public static ArrayList<GameDescription> getAllGames(DatabaseHelper helper) {
-        return helper.selectObjsFromDb(GameDescription.class, false, "GROUP BY checksum", null);
+    private ArrayList<GameDescription> getAllGames() {
+        return gameRepository.getAllGamesSortedByName();
     }
 
     private void getRomAndPackedFiles(File root, List<File> result, HashSet<String> usedPaths) {
@@ -127,7 +127,7 @@ public class RomsFinder extends Thread {
         running.set(true);
         NLog.i(TAG, "start");
         activity.runOnUiThread(() -> listener.onRomsFinderStart(searchNew));
-        ArrayList<GameDescription> oldRoms = getAllGames(dbHelper);
+        ArrayList<GameDescription> oldRoms = getAllGames();
         oldRoms = removeNonExistRoms(oldRoms);
         final ArrayList<GameDescription> roms = oldRoms;
         NLog.i(TAG, "old games " + oldRoms.size());
@@ -173,7 +173,7 @@ public class RomsFinder extends Thread {
             } else if (filenameExtFilter.accept(null, file.getName())) {
                 GameDescription game = new GameDescription(file);
                 game.inserTime = System.currentTimeMillis();
-                dbHelper.insertObjToDb(game);
+                gameRepository.insertGame(game);
                 games.add(game);
                 activity.runOnUiThread(() -> listener.onRomsFinderFoundFile(game.name));
             } else {
@@ -247,7 +247,7 @@ public class RomsFinder extends Thread {
             } else if (filenameExtFilter.accept(null, filename)) {
                 GameDescription game = new GameDescription(copiedFile, checksum);
                 game.inserTime = System.currentTimeMillis();
-                dbHelper.insertObjToDb(game);
+                gameRepository.insertGame(game);
                 games.add(game);
                 activity.runOnUiThread(() -> listener.onRomsFinderFoundFile(game.name));
             } else {
@@ -305,8 +305,7 @@ public class RomsFinder extends Thread {
             String cacheDir = externalCache.getAbsolutePath();
             NLog.i(TAG, "check zip" + zipFile.getAbsolutePath());
             String hash = ZipRomFile.computeZipHash(zipFile);
-            ZipRomFile zipRomFile = dbHelper.selectObjFromDb(ZipRomFile.class,
-                    "WHERE hash=\"" + hash + "\"");
+            ZipRomFile zipRomFile = gameRepository.getZipFileByHash(hash);
             ZipFile zip = null;
 
             if (zipRomFile == null) {
@@ -341,6 +340,7 @@ public class RomsFinder extends Thread {
                                 }
                                 GameDescription game = new GameDescription(ze.getName(), "", checksum);
                                 game.inserTime = System.currentTimeMillis();
+                                game.zipfile_id = zipRomFile._id;
                                 zipRomFile.games.add(game);
                                 games.add(game);
                             }
@@ -364,7 +364,7 @@ public class RomsFinder extends Thread {
                         }
                     }
                     if (running.get()) {
-                        dbHelper.insertObjToDb(zipRomFile);
+                        gameRepository.insertZipFile(zipRomFile);
                     }
                 } catch (Exception e) {
                     NLog.e(TAG, "", e);
@@ -431,7 +431,7 @@ public class RomsFinder extends Thread {
                 } else {
                     game = new GameDescription(file);
                     game.inserTime = System.currentTimeMillis();
-                    dbHelper.insertObjToDb(game);
+                    gameRepository.insertGame(game);
                     listener.onRomsFinderFoundFile(game.name);
                 }
                 games.add(game);
@@ -476,16 +476,13 @@ public class RomsFinder extends Thread {
         ArrayList<GameDescription> newRoms = new ArrayList<>(roms.size());
         Map<Long, ZipRomFile> zipsMap = new HashMap<>();
 
-        for (ZipRomFile zip : dbHelper.selectObjsFromDb(ZipRomFile.class,
-                false, null, null)) {
+        for (ZipRomFile zip : gameRepository.getAllZipFiles()) {
             File zipFile = new File(zip.path);
 
             if (zipFile.exists()) {
                 zipsMap.put(zip._id, zip);
-
             } else {
-                dbHelper.deleteObjFromDb(zip);
-                dbHelper.deleteObjsFromDb(GameDescription.class, "where zipfile_id=" + zip._id);
+                gameRepository.deleteZipFile(zip);
             }
         }
 
@@ -500,9 +497,8 @@ public class RomsFinder extends Thread {
                     }
 
                 } else {
-                    dbHelper.deleteObjFromDb(game);
+                    gameRepository.deleteGame(game);
                 }
-
             } else {
                 ZipRomFile zip = zipsMap.get(game.zipfile_id);
 

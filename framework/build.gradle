@@ -26,4 +26,9 @@ dependencies {
     api 'androidx.appcompat:appcompat:1.4.0'
     api 'com.google.android.material:material:1.4.0'
     api 'com.blankj:utilcodex:1.31.1'
+    
+    // Room Database
+    def room_version = "2.5.2"
+    api "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
 }

@@ -5,6 +5,8 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,14 +23,16 @@ import java.io.File;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import nostalgia.framework.R;
 import nostalgia.framework.base.EmulatorActivity;
+import nostalgia.framework.data.GameRepository;
 import nostalgia.framework.ui.gamegallery.GalleryPagerAdapter.OnItemClickListener;
 import nostalgia.framework.ui.preferences.GeneralPreferenceActivity;
 import nostalgia.framework.ui.preferences.GeneralPreferenceFragment;
 import nostalgia.framework.ui.preferences.PreferenceUtil;
-import nostalgia.framework.utils.DatabaseHelper;
 import nostalgia.framework.utils.DialogUtils;
 import nostalgia.framework.utils.EmuUtils;
 import nostalgia.framework.utils.NLog;
@@ -42,16 +46,17 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
     ProgressDialog searchDialog = null;
     private ViewPager pager = null;
     private TextView noGamesTextView = null;
-    private DatabaseHelper dbHelper;
     private GalleryPagerAdapter adapter;
     private boolean importing = false;
     private boolean rotateAnim = false;
     private TabLayout mTabLayout;
+    
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        dbHelper = new DatabaseHelper(this);
         setContentView(R.layout.activity_gallery);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -78,6 +83,12 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
         
         // 调用基类，通知初始化完成，可以处理分享了
         onExtensionsInitialized();
+    }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        executor.shutdown();
     }
 
     @Override
@@ -128,27 +139,76 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
     public void onItemClick(GameDescription game) {
         File gameFile = new File(game.path);
         NLog.i(TAG, "select " + game);
+        GameRepository repository = getGameRepository();
 
         if (game.isInArchive()) {
-            gameFile = new File(getExternalCacheDir(), game.checksum);
-            game.path = gameFile.getAbsolutePath();
-            ZipRomFile zipRomFile = dbHelper.selectObjFromDb(ZipRomFile.class,
-                    "WHERE _id=" + game.zipfile_id, false);
-            File zipFile = new File(zipRomFile.path);
-            if (!gameFile.exists()) {
-                try {
-                    EmuUtils.extractFile(zipFile, game.name, gameFile);
-                } catch (IOException e) {
-                    NLog.e(TAG, "", e);
+            final File cacheFile = new File(getExternalCacheDir(), game.checksum);
+            final String cachePath = cacheFile.getAbsolutePath();
+            game.path = cachePath;
+            
+            // 在后台线程获取ZipRomFile
+            executor.execute(() -> {
+                ZipRomFile zipRomFile = repository.getZipFileById(game.zipfile_id);
+                if (zipRomFile != null) {
+                    File zipFile = new File(zipRomFile.path);
+                    if (!cacheFile.exists()) {
+                        try {
+                            EmuUtils.extractFile(zipFile, game.name, cacheFile);
+                        } catch (IOException e) {
+                            NLog.e(TAG, "", e);
+                        }
+                    }
                 }
+                
+                // 返回主线程处理
+                mainHandler.post(() -> handleGameSelected(game, cacheFile));
+            });
+        } else {
+            if (gameFile.exists()) {
+                game.lastGameTime = System.currentTimeMillis();
+                game.runCount++;
+                
+                // 在后台线程更新数据库
+                executor.execute(() -> {
+                    repository.updateGame(game);
+                    
+                    // 返回主线程启动游戏
+                    mainHandler.post(() -> onGameSelected(game, 0));
+                });
+            } else {
+                NLog.w(TAG, "rom file:" + gameFile.getAbsolutePath() + " does not exist");
+                AlertDialog dialog = new AlertDialog.Builder(this)
+                        .setMessage(getString(R.string.gallery_rom_not_found))
+                        .setTitle(R.string.error)
+                        .setPositiveButton(R.string.ok, (dialog1, which)
+                                -> {
+                            // 在后台线程删除不存在的ROM记录
+                            executor.execute(() -> {
+                                repository.deleteGame(game);
+                                ArrayList<GameDescription> games = repository.getAllGamesSortedByName();
+                                // 返回主线程刷新显示
+                                mainHandler.post(() -> setLastGames(games));
+                            });
+                        })
+                        .setCancelable(false)
+                        .create();
+                dialog.show();
             }
         }
-
+    }
+    
+    private void handleGameSelected(GameDescription game, File gameFile) {
         if (gameFile.exists()) {
             game.lastGameTime = System.currentTimeMillis();
             game.runCount++;
-            dbHelper.updateObjToDb(game, new String[]{"lastGameTime", "runCount"});
-            onGameSelected(game, 0);
+            
+            // 在后台线程更新数据库
+            executor.execute(() -> {
+                getGameRepository().updateGame(game);
+                
+                // 返回主线程启动游戏
+                mainHandler.post(() -> onGameSelected(game, 0));
+            });
         } else {
             NLog.w(TAG, "rom file:" + gameFile.getAbsolutePath() + " does not exist");
             AlertDialog dialog = new AlertDialog.Builder(this)
@@ -156,11 +216,13 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
                     .setTitle(R.string.error)
                     .setPositiveButton(R.string.ok, (dialog1, which)
                             -> {
-                        // 删除不存在的ROM记录
-                        dbHelper.deleteObjFromDb(game);
-                        // 刷新显示
-                        ArrayList<GameDescription> games = RomsFinder.getAllGames(dbHelper);
-                        setLastGames(games);
+                        // 在后台线程删除不存在的ROM记录
+                        executor.execute(() -> {
+                            getGameRepository().deleteGame(game);
+                            ArrayList<GameDescription> games = getGameRepository().getAllGamesSortedByName();
+                            // 返回主线程刷新显示
+                            mainHandler.post(() -> setLastGames(games));
+                        });
                     })
                     .setCancelable(false)
                     .create();
