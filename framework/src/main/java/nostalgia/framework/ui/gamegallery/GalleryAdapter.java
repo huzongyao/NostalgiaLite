@@ -10,6 +10,8 @@ import android.widget.ProgressBar;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
 
+import android.widget.CheckBox;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -19,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 import nostalgia.framework.R;
@@ -40,6 +43,8 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
     private ArrayList<RowItem> filterGames = new ArrayList<>();
     private int sumRuns = 0;
     private int sortType = SORT_BY_NAME_ALPHA;
+    private boolean isMultiSelectMode = false;
+    private HashSet<String> selectedGameIds = new HashSet<>();
 
     private Comparator<GameDescription> nameComparator = (lhs, rhs) -> {
         return lhs.getSortName().compareTo(rhs.getSortName());
@@ -97,6 +102,7 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
         TextView ext = convertView.findViewById(R.id.row_game_item_ext);
         ImageView arrowIcon = convertView.findViewById(R.id.game_item_arrow);
         ProgressBar runIndicator = convertView.findViewById(R.id.row_game_item_progressBar);
+        CheckBox checkBox = convertView.findViewById(R.id.game_item_checkbox);
         
         runIndicator.setMax(sumRuns);
         
@@ -120,6 +126,16 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
         
         arrowIcon.setImageResource(R.drawable.ic_next_arrow);
         arrowIcon.clearAnimation();
+        
+        // 处理多选模式
+        if (isMultiSelectMode) {
+            checkBox.setVisibility(View.VISIBLE);
+            checkBox.setChecked(selectedGameIds.contains(game.checksum));
+            arrowIcon.setVisibility(View.GONE);
+        } else {
+            checkBox.setVisibility(View.GONE);
+            arrowIcon.setVisibility(View.VISIBLE);
+        }
         
         return convertView;
     }
@@ -175,13 +191,16 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
         String containsFilter = " " + filter;
         sumRuns = 0;
         for (GameDescription game : games) {
+            if (game == null || game.getCleanName() == null || game.getCleanName().isEmpty()) {
+                continue;
+            }
             sumRuns = game.runCount > sumRuns ? game.runCount : sumRuns;
             String name = game.getCleanName().toLowerCase();
             boolean secondCondition = true;
             if (sortType == SORT_BY_LAST_PLAYED || sortType == SORT_BY_MOST_PLAYED) {
                 secondCondition = game.lastGameTime != 0;
             }
-            if ((name.startsWith(filter) || name.contains(containsFilter)) & secondCondition) {
+            if ((name.startsWith(filter) || name.contains(containsFilter)) && secondCondition) {
                 RowItem item = new RowItem();
                 item.game = game;
                 item.firstLetter = name.charAt(0);
@@ -254,6 +273,59 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
     public class RowItem {
         GameDescription game;
         char firstLetter;
+    }
+    
+    // 多选模式相关方法
+    public void setMultiSelectMode(boolean isMultiSelect) {
+        boolean wasMultiSelect = this.isMultiSelectMode;
+        this.isMultiSelectMode = isMultiSelect;
+        if (!isMultiSelect && wasMultiSelect) {
+            selectedGameIds.clear();
+        }
+        super.notifyDataSetChanged();
+    }
+    
+    public boolean isMultiSelectMode() {
+        return isMultiSelectMode;
+    }
+    
+    public void toggleSelection(GameDescription game) {
+        if (selectedGameIds.contains(game.checksum)) {
+            selectedGameIds.remove(game.checksum);
+        } else {
+            selectedGameIds.add(game.checksum);
+        }
+        super.notifyDataSetChanged();
+    }
+    
+    public HashSet<String> getSelectedGameIds() {
+        return new HashSet<>(selectedGameIds);
+    }
+    
+    public ArrayList<GameDescription> getSelectedGames() {
+        ArrayList<GameDescription> result = new ArrayList<>();
+        for (GameDescription game : games) {
+            if (selectedGameIds.contains(game.checksum)) {
+                result.add(game);
+            }
+        }
+        return result;
+    }
+    
+    public void selectAll() {
+        for (GameDescription game : games) {
+            selectedGameIds.add(game.checksum);
+        }
+        super.notifyDataSetChanged();
+    }
+    
+    public void clearSelection() {
+        selectedGameIds.clear();
+        super.notifyDataSetChanged();
+    }
+    
+    public int getSelectedCount() {
+        return selectedGameIds.size();
     }
 
 }

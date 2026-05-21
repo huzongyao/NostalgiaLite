@@ -81,6 +81,9 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
         exts.addAll(getArchiveExtensions());
         inZipExts = getRomExtensions();
         
+        // 设置长按监听器
+        adapter.setOnItemLongClickListener(this::updateActionMode);
+        
         // 调用基类，通知初始化完成，可以处理分享了
         onExtensionsInitialized();
     }
@@ -94,7 +97,35 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.gallery_main_menu, menu);
+        updateMenuVisibility(menu);
         return super.onCreateOptionsMenu(menu);
+    }
+    
+    private void updateMenuVisibility(Menu menu) {
+        boolean isMultiSelect = adapter.isMultiSelectMode();
+        if (menu != null) {
+            MenuItem deleteItem = menu.findItem(R.id.gallery_menu_delete);
+            MenuItem selectAllItem = menu.findItem(R.id.gallery_menu_select_all);
+            MenuItem selectRomItem = menu.findItem(R.id.gallery_menu_select_rom);
+            MenuItem prefItem = menu.findItem(R.id.gallery_menu_pref);
+            MenuItem exitItem = menu.findItem(R.id.gallery_menu_exit);
+            
+            if (deleteItem != null) {
+                deleteItem.setVisible(isMultiSelect);
+            }
+            if (selectAllItem != null) {
+                selectAllItem.setVisible(isMultiSelect);
+            }
+            if (selectRomItem != null) {
+                selectRomItem.setVisible(!isMultiSelect);
+            }
+            if (prefItem != null) {
+                prefItem.setVisible(!isMultiSelect);
+            }
+            if (exitItem != null) {
+                exitItem.setVisible(!isMultiSelect);
+            }
+        }
     }
 
     @Override
@@ -112,8 +143,86 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
         } else if (itemId == R.id.gallery_menu_exit) {
             finish();
             return true;
+        } else if (itemId == R.id.gallery_menu_delete) {
+            deleteSelectedGames();
+            return true;
+        } else if (itemId == R.id.gallery_menu_select_all) {
+            adapter.selectAll();
+            updateActionMode();
+            return true;
+        } else if (itemId == android.R.id.home) {
+            exitMultiSelectMode();
+            return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+    
+    private void updateActionMode() {
+        boolean isMultiSelect = adapter.isMultiSelectMode();
+        int selectedCount = adapter.getSelectedCount();
+        
+        if (isMultiSelect) {
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                getSupportActionBar().setTitle(String.format(getString(R.string.selected_games), selectedCount));
+            }
+        } else {
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                getSupportActionBar().setTitle(R.string.app_name);
+            }
+        }
+        
+        invalidateOptionsMenu();
+    }
+    
+    private void exitMultiSelectMode() {
+        adapter.setMultiSelectMode(false);
+        adapter.clearSelection();
+        updateActionMode();
+    }
+    
+    private void deleteSelectedGames() {
+        ArrayList<GameDescription> selectedGames = adapter.getSelectedGames();
+        if (selectedGames.isEmpty()) {
+            exitMultiSelectMode();
+            return;
+        }
+        
+        new AlertDialog.Builder(this)
+            .setTitle(String.format(getString(R.string.gallery_delete_confirm_title), selectedGames.size()))
+            .setMessage(R.string.gallery_delete_confirm_message)
+            .setPositiveButton(R.string.delete, (dialog, which) -> {
+                executor.execute(() -> {
+                    GameRepository repository = getGameRepository();
+                    for (GameDescription game : selectedGames) {
+                        repository.deleteGame(game);
+                        if (game.path != null) {
+                            try {
+                                new java.io.File(game.path).delete();
+                            } catch (Exception e) {
+                                NLog.e(TAG, "Failed to delete file: " + game.path, e);
+                            }
+                        }
+                    }
+                    ArrayList<GameDescription> allGames = repository.getAllGamesSortedByName();
+                    mainHandler.post(() -> {
+                        exitMultiSelectMode();
+                        setLastGames(allGames);
+                    });
+                });
+            })
+            .setNegativeButton(R.string.cancel, null)
+            .show();
+    }
+    
+    @Override
+    public void onBackPressed() {
+        if (adapter.isMultiSelectMode()) {
+            exitMultiSelectMode();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override

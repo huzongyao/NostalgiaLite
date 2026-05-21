@@ -178,4 +178,10 @@
     <string name="gallery_play_count">Played %d times</string>
     <string name="gallery_last_played">Last played: %s</string>
     <string name="gallery_never_played">Never played</string>
+    <string name="gallery_menu_delete">DELETE</string>
+    <string name="gallery_menu_select_all">SELECT ALL</string>
+    <string name="gallery_delete_confirm_title">Delete %d Game(s)?</string>
+    <string name="gallery_delete_confirm_message">This action cannot be undone. Are you sure you want to delete the selected games from your library?</string>
+    <string name="delete">Delete</string>
+    <string name="selected_games">Selected: %d</string>
 </resources>

@@ -30,6 +30,7 @@ public class GalleryPagerAdapter extends PagerAdapter {
     private GalleryAdapter[] listAdapters = new GalleryAdapter[SORT_TYPES.length];
     private Activity activity;
     private OnItemClickListener listener;
+    private OnItemLongClickListener longClickListener;
 
     public GalleryPagerAdapter(Activity activity, OnItemClickListener listener) {
         this.activity = activity;
@@ -39,6 +40,10 @@ public class GalleryPagerAdapter extends PagerAdapter {
             GalleryAdapter adapter = listAdapters[i] = new GalleryAdapter(activity);
             adapter.setSortType(SORT_TYPES[i]);
         }
+    }
+    
+    public void setOnItemLongClickListener(OnItemLongClickListener listener) {
+        this.longClickListener = listener;
     }
 
     @Override
@@ -65,7 +70,29 @@ public class GalleryPagerAdapter extends PagerAdapter {
         list.setAdapter(listAdapters[position]);
         list.setOnItemClickListener((arg0, arg1, arg2, arg3) -> {
             RowItem item = (RowItem) listAdapters[position].getItem(arg2);
-            listener.onItemClick(item.game);
+            if (listAdapters[position].isMultiSelectMode()) {
+                // 多选模式下点击切换选中状态
+                listAdapters[position].toggleSelection(item.game);
+                if (longClickListener != null) {
+                    longClickListener.onSelectionChanged();
+                }
+            } else {
+                // 普通模式下启动游戏
+                listener.onItemClick(item.game);
+            }
+        });
+        list.setOnItemLongClickListener((arg0, arg1, arg2, arg3) -> {
+            RowItem item = (RowItem) listAdapters[position].getItem(arg2);
+            if (!listAdapters[position].isMultiSelectMode()) {
+                // 长按进入多选模式
+                setMultiSelectMode(true);
+                listAdapters[position].toggleSelection(item.game);
+                if (longClickListener != null) {
+                    longClickListener.onSelectionChanged();
+                }
+                return true;
+            }
+            return false;
         });
         list.setOnScrollListener(new OnScrollListener() {
             @Override
@@ -96,6 +123,7 @@ public class GalleryPagerAdapter extends PagerAdapter {
         for (GalleryAdapter adapter : listAdapters) {
             adapter.setGames(new ArrayList<>(games));
         }
+        notifyDataSetChanged();
     }
 
 
@@ -145,6 +173,50 @@ public class GalleryPagerAdapter extends PagerAdapter {
 
     public interface OnItemClickListener {
         void onItemClick(GameDescription game);
+    }
+    
+    public interface OnItemLongClickListener {
+        void onSelectionChanged();
+    }
+    
+    // 多选模式相关方法
+    public void setMultiSelectMode(boolean isMultiSelect) {
+        for (GalleryAdapter adapter : listAdapters) {
+            adapter.setMultiSelectMode(isMultiSelect);
+        }
+    }
+    
+    public boolean isMultiSelectMode() {
+        if (listAdapters.length > 0) {
+            return listAdapters[0].isMultiSelectMode();
+        }
+        return false;
+    }
+    
+    public ArrayList<GameDescription> getSelectedGames() {
+        if (listAdapters.length > 0) {
+            return listAdapters[0].getSelectedGames();
+        }
+        return new ArrayList<>();
+    }
+    
+    public int getSelectedCount() {
+        if (listAdapters.length > 0) {
+            return listAdapters[0].getSelectedCount();
+        }
+        return 0;
+    }
+    
+    public void selectAll() {
+        for (GalleryAdapter adapter : listAdapters) {
+            adapter.selectAll();
+        }
+    }
+    
+    public void clearSelection() {
+        for (GalleryAdapter adapter : listAdapters) {
+            adapter.clearSelection();
+        }
     }
 
 }

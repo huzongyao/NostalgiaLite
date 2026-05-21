@@ -128,4 +128,13 @@
     <string name="gallery_permission_required">需要存储权限才能选择ROM文件</string>
     <string name="gallery_request_permission">授予权限</string>
     <string name="gallery_no_games_found">未找到游戏。点击“选择ROM文件”添加游戏。</string>
+    <string name="gallery_menu_delete">删除</string>
+    <string name="gallery_menu_select_all">全选</string>
+    <string name="gallery_delete_confirm_title">删除 %d 个游戏？</string>
+    <string name="gallery_delete_confirm_message">此操作无法撤销。您确定要从库中删除选定的游戏吗？</string>
+    <string name="delete">删除</string>
+    <string name="selected_games">已选择：%d</string>
+    <string name="gallery_play_count">已玩 %d 次</string>
+    <string name="gallery_last_played">最后玩过：%s</string>
+    <string name="gallery_never_played">从未玩过</string>
 </resources>

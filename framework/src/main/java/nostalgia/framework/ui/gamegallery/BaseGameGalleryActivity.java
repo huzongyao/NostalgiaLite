@@ -132,12 +132,23 @@ abstract public class BaseGameGalleryActivity extends AppCompatActivity
         }
     }
     
+    protected void importRoms(ArrayList<Uri> uris) {
+        if (romsFinder == null) {
+            importingRom = true;
+            reloading = true;
+            romsFinder = new RomsFinder(exts, inZipExts, this, this, uris);
+            romsFinder.start();
+        }
+    }
+    
     protected void openFilePicker() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("*/*");
         
-        // Create a mime type filter for common ROM formats
+        // Enable multiple file selection
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        
         String[] mimeTypes = {
             "application/octet-stream",
             "application/zip",
@@ -153,9 +164,25 @@ abstract public class BaseGameGalleryActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_SELECT_FILE && resultCode == RESULT_OK && data != null) {
-            Uri uri = data.getData();
-            if (uri != null) {
-                importRom(uri);
+            if (data.getClipData() != null) {
+                // Handle multiple file selection
+                ArrayList<Uri> uris = new ArrayList<>();
+                int count = data.getClipData().getItemCount();
+                for (int i = 0; i < count; i++) {
+                    Uri uri = data.getClipData().getItemAt(i).getUri();
+                    if (uri != null) {
+                        uris.add(uri);
+                    }
+                }
+                if (!uris.isEmpty()) {
+                    importRoms(uris);
+                }
+            } else if (data.getData() != null) {
+                // Handle single file selection
+                Uri uri = data.getData();
+                if (uri != null) {
+                    importRom(uri);
+                }
             }
         }
     }

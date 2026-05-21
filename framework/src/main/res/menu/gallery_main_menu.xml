@@ -7,6 +7,16 @@
         android:title="@string/gallery_menu_select_rom"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/gallery_menu_delete"
+        android:icon="@drawable/ic_delete"
+        android:title="@string/gallery_menu_delete"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/gallery_menu_select_all"
+        android:icon="@drawable/ic_select_all"
+        android:title="@string/gallery_menu_select_all"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/gallery_menu_pref"
         android:icon="@drawable/ic_game_settings"
         android:title="@string/gallery_menu_pref"
