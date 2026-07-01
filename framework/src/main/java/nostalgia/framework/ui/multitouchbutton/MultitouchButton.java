@@ -6,6 +6,13 @@ import android.view.MotionEvent;
 
 import androidx.appcompat.widget.AppCompatButton;
 
+/**
+ * 支持多点触控的按钮控件。
+ * <p>
+ * 继承自 AppCompatButton，实现 MultitouchBtnInterface 接口，
+ * 支持触摸进入/退出事件和重绘状态管理。
+ * </p>
+ */
 public class MultitouchButton extends AppCompatButton
         implements MultitouchBtnInterface {
 

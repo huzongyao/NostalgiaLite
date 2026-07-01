@@ -16,17 +16,26 @@ import nostalgia.framework.R;
 import nostalgia.framework.base.EmulatorHolder;
 import nostalgia.framework.ui.gamegallery.GameDescription;
 
+/**
+ * 游戏偏好设置 Activity。
+ * <p>
+ * 针对单个游戏的设置页面，包括视频模式、光枪等游戏特定配置。
+ * 每个游戏使用独立的 SharedPreferences 文件存储设置。
+ * </p>
+ */
 public class GamePreferenceActivity extends AppCompatPreferenceActivity {
 
     public static final String EXTRA_GAME = "EXTRA_GAME";
     private GameDescription game;
 
+    /** 初始化光枪设置（仅当模拟器支持时显示） */
     static void initZapper(Preference zapper, PreferenceCategory zapperCategory) {
         if (!EmulatorHolder.getInfo().hasZapper()) {
             zapperCategory.removePreference(zapper);
         }
     }
 
+    /** 初始化视频模式偏好设置（根据可用的图像配置动态生成选项） */
     static void initVideoPreference(ListPreference preference,
                                     PreferenceCategory category, PreferenceScreen screen) {
         List<GfxProfile> profiles = EmulatorHolder.getInfo().getAvailableGfxProfiles();

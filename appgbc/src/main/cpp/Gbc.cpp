@@ -1,3 +1,9 @@
+/**
+ * GBC 模拟器 C++ 实现。
+ * <p>继承 Emulator 基类，封装 libgambatte 核心引擎。
+ * 实现 GameBoy Color 平台特有的帧模拟、音频重采样、
+ * 金手指、存档和历史状态管理功能。</p>
+ */
 #include "gambatte.h"
 #include "resamplerinfo.h"
 #include <GLES/gl.h>
@@ -25,11 +31,20 @@ public:
     }
 };
 
+/** 屏幕宽度（像素） */
 #define WIDTH 160
+/** 屏幕高度（像素） */
 #define HEIGHT 144
+/** 音频缓冲区大小 */
 #define SFX_BUF_SIZE 2048 * 8
+/** 图形缓冲填充行数（用于着色器对齐） */
 #define PADDING 26
 
+/**
+ * GameBoy Color 模拟器实现类。
+ * <p>封装 libgambatte 的 GB 核心，管理图形/音频缓冲、
+ * 金手指、存档和历史状态。</p>
+ */
 class GameBoyEmulator : public Emulator {
 public:
 
@@ -37,6 +52,7 @@ public:
     short *sfxBuf;
     std::stringstream historyItems[40];
 
+    /** 构造 GBC 模拟器，初始化 gambatte 引擎和缓冲区 */
     GameBoyEmulator() {
         lastPath = (char *) malloc(1);
         ok = false;
@@ -51,10 +67,12 @@ public:
         gb.setInputGetter(&input);
     }
 
+    /** 获取音频缓冲区大小 */
     int getSfxBufferSize() {
         return SFX_BUF_SIZE;
     }
 
+    /** 获取图形缓冲区大小 */
     int getGfxBufferSize() {
         return WIDTH * (HEIGHT + PADDING) * 3;
     }
@@ -62,6 +80,10 @@ public:
 
     bool ok;
 
+    /**
+     * 启动模拟器。
+     * <p>解析通用参数，设置电池存档和历史状态开关。</p>
+     */
     bool start(int gfxInit, int sfxInit, int generalInit) {
         soundEnabled = sfxInit != -1;
         saveSavFiles = generalInit >= 1000;
@@ -92,6 +114,11 @@ public:
     bool saveSavFiles;
     int counter;
 
+    /**
+     * 执行一帧模拟。
+     * <p>先执行跳帧，再渲染一帧。将 RGB 分离存储到三行 Alpha 纹理，
+     * 定期保存历史状态，重采样音频并写入缓冲。</p>
+     */
     bool emulate(int keys, int turbos, int numFramesToSkip) {
         input.bits = keys;
         unsigned int samples = 35112;
@@ -152,6 +179,7 @@ public:
 
     std::string cheats;
 
+    /** 加载游戏 ROM */
     bool doLoadGame(const char *path, const char *batterySaveDir, const char *strippedName) {
         int size = 0;
         cheats.clear();
@@ -166,6 +194,7 @@ public:
         return true;
     }
 
+    /** 启用金手指（支持 GameGenie 和 GameShark） */
     bool enableCheat(const char *cheat, int type) {
         bool first = cheats.size() == 0;
         cheats += (first ? "" : ";") + string(cheat);
@@ -181,6 +210,7 @@ public:
         return true;
     }
 
+    /** 保存状态到文件 */
     bool saveState(const char *state, int slot) {
         std::string filename = std::string(state, strlen(state));
         std::ofstream stream(filename.c_str(), std::ios_base::binary);
@@ -188,10 +218,12 @@ public:
         return true;
     }
 
+    /** 渲染历史状态帧 */
     bool renderHistory(JNIEnv *env, jobject bitmap, int pos, int w, int h) {
         this->render(env, bitmap, w, h, travel[posToIdx(pos)]);
     }
 
+    /** 从内存流加载历史状态 */
     bool doLoadHistoryState(int idx) {
         std::string str = historyItems[idx].str();
         std::stringstream stream;
@@ -202,6 +234,7 @@ public:
         return true;
     }
 
+    /** 从文件加载状态 */
     bool doLoadState(const char *state, int slot) {
         std::string filename = std::string(state, strlen(state));
         std::ifstream stream(filename.c_str(), std::ios_base::binary);
@@ -212,6 +245,7 @@ public:
         return true;
     }
 
+    /** 重置模拟器 */
     bool reset() {
         gb.reset();
         return true;
@@ -220,6 +254,7 @@ public:
 
     BUFFER_TYPE travel[40][160 * (144 + PADDING) * 3];
 
+    /** 保存历史状态到内存流和旅行缓冲 */
     bool doSaveHistoryState(int idx) {
         std::stringstream *stream = &historyItems[idx];
         stream->clear();
@@ -230,10 +265,12 @@ public:
         return true;
     }
 
+    /** 停止模拟器 */
     bool stop() {
         return true;
     }
 
+    /** OpenGL 纹理渲染 */
     bool renderGL() {
         int stable = swapBuffersBeforeRead();
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 160, (144 + PADDING) * 3, GL_ALPHA,
@@ -249,7 +286,9 @@ private:
     short resampledSfxBuf[SFX_BUF_SIZE];
 };
 
+/** 全局 GBC 模拟器实例 */
 GameBoyEmulator emulator;
+/** 全局桥接对象 */
 Bridge bridge(&emulator);
 
 }

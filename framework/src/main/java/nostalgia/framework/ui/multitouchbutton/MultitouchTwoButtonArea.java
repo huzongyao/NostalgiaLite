@@ -8,6 +8,13 @@ import android.view.View;
 
 import nostalgia.framework.R;
 
+/**
+ * 双按钮触摸区域。
+ * <p>
+ * 定义一个不可见的触摸区域，触摸时同时触发两个关联按钮的事件。
+ * 与 MultitouchTwoButton 类似，但本身不显示任何内容。
+ * </p>
+ */
 public class MultitouchTwoButtonArea extends MultitouchImageButton {
 
     protected int firstButtonRID = -1;

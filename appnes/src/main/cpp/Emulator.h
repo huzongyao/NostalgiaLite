@@ -1,3 +1,9 @@
+/**
+ * 模拟器基类头文件。
+ * <p>定义 Emulator 抽象基类和 CThreadLock 线程锁工具类。
+ * Emulator 封装了帧渲染、音频缓冲、历史状态管理、双缓冲交换等通用逻辑，
+ * 具体平台（NES/GBC/GG）通过继承实现平台特有的模拟功能。</p>
+ */
 #ifndef EMULATOR_H_
 #define EMULATOR_H_
 
@@ -7,6 +13,10 @@
 
 namespace emudroid {
 
+    /**
+     * 线程互斥锁封装。
+     * <p>基于 pthread_mutex 实现，用于保护图形和音频缓冲区的并发访问。</p>
+     */
     class CThreadLock {
     public:
         CThreadLock();
@@ -22,6 +32,12 @@ namespace emudroid {
     };
 
 
+    /**
+     * 模拟器抽象基类。
+     * <p>提供帧模拟、渲染、存档、历史状态、金手指等通用接口。
+     * 采用三缓冲图形交换机制（working/working_copy/stable），
+     * 双缓冲音频交换机制，确保模拟线程和渲染线程的安全并发。</p>
+     */
     class Emulator {
 
     public:
@@ -81,6 +97,7 @@ namespace emudroid {
         JavaVM *jvm;
     protected:
 
+        /** 历史状态环形缓冲区大小（帧数） */
         static const int HIS_SIZE = 40;
 
         virtual bool emulate(int keys, int turbos, int numFramesToSkip) = 0;

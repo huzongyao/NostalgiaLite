@@ -10,6 +10,14 @@ import nostalgia.framework.utils.EmuUtils;
 import nostalgia.framework.utils.annotations.Column;
 import nostalgia.framework.utils.annotations.Table;
 
+/**
+ * 游戏描述领域对象。
+ * <p>
+ * 表示一个 ROM 游戏的基本信息，包括名称、路径、校验和、
+ * 所属 ZIP 文件、插入时间、最近游玩时间和游玩次数。
+ * 实现 Serializable 以便通过 Intent 传递，实现 Comparable 以支持排序。
+ * </p>
+ */
 @Table
 public class GameDescription implements Serializable, Comparable<GameDescription> {
 
@@ -66,10 +74,12 @@ public class GameDescription implements Serializable, Comparable<GameDescription
         return name + " " + checksum + " zipId:" + zipfile_id;
     }
 
+    /** 判断游戏是否在压缩包中 */
     public boolean isInArchive() {
         return zipfile_id != -1;
     }
 
+    /** 获取去除扩展名和路径后的干净游戏名 */
     public String getCleanName() {
         if (cleanNameCache == null) {
             String name = EmuUtils.removeExt(this.name);
@@ -83,6 +93,7 @@ public class GameDescription implements Serializable, Comparable<GameDescription
         return cleanNameCache;
     }
 
+    /** 获取用于排序的小写名称 */
     public String getSortName() {
         if (sortNameCache == null) {
             sortNameCache = getCleanName().toLowerCase();
@@ -90,11 +101,13 @@ public class GameDescription implements Serializable, Comparable<GameDescription
         return sortNameCache;
     }
     
+    /** 获取文件大小（字节） */
     public long getFileSize() {
         File file = new File(path);
         return file.exists() ? file.length() : 0;
     }
     
+    /** 获取格式化的文件大小字符串 */
     public String getFileSizeFormatted() {
         long size = getFileSize();
         if (size < 1024) {

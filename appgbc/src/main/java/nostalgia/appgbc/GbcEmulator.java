@@ -18,15 +18,27 @@ import nostalgia.framework.base.JniBridge;
 import nostalgia.framework.base.JniEmulator;
 import nostalgia.framework.ui.gamegallery.GameDescription;
 
+/**
+ * GBC 模拟器实现类。
+ * <p>继承 {@link JniEmulator}，提供 GameBoy Color 平台的图形/音频配置、
+ * GameGenie/GameShark 金手指支持。通过 {@link Core} 与 C++ libgambatte 核心交互。</p>
+ *
+ * @author NostalgiaLite
+ */
 public class GbcEmulator extends JniEmulator {
 
+    /** 数据包后缀标识 */
     public final static String PACK_SUFFIX = "ngbcs";
+    /** 模拟器单例实例 */
     private static GbcEmulator instance;
+    /** 模拟器信息 */
     private static EmulatorInfo info = new Info();
 
+    /** 私有构造 */
     private GbcEmulator() {
     }
 
+    /** 获取模拟器单例实例 */
     public static GbcEmulator getInstance() {
         if (instance == null) {
             instance = new GbcEmulator();
@@ -34,6 +46,7 @@ public class GbcEmulator extends JniEmulator {
         return instance;
     }
 
+    /** 获取模拟器信息 */
     @Override
     public EmulatorInfo getInfo() {
         if (info == null) {
@@ -42,11 +55,20 @@ public class GbcEmulator extends JniEmulator {
         return info;
     }
 
+    /** 获取 JNI 桥接实例 */
     @Override
     public JniBridge getBridge() {
         return Core.getInstance();
     }
 
+    /**
+     * 启用金手指。
+     * <p>支持 GameGenie（9位或6位格式）和 GameShark（01开头）两种格式，
+     * 自动格式化代码并调用本地方法。</p>
+     *
+     * @param gg 金手指代码字符串
+     * @throws EmulatorException 无效金手指时抛出
+     */
     @Override
     public void enableCheat(String gg) {
         int type = -1;
@@ -72,21 +94,29 @@ public class GbcEmulator extends JniEmulator {
         }
     }
 
+    /** 自动检测图形配置（返回默认配置） */
     @Override
     public GfxProfile autoDetectGfx(GameDescription game) {
         return getInfo().getDefaultGfxProfile();
     }
 
+    /** 自动检测音频配置（返回默认配置） */
     @Override
     public SfxProfile autoDetectSfx(GameDescription game) {
         return getInfo().getDefaultSfxProfile();
     }
 
+    /**
+     * GBC 模拟器信息内部类。
+     * <p>定义 GBC 平台的图形配置（160x144, 60fps）、
+     * 音频配置（22050Hz 立体声 PCM16）和按键映射。</p>
+     */
     private static class Info extends BasicEmulatorInfo {
 
         static List<GfxProfile> profiles = new ArrayList<>();
         static List<SfxProfile> sfxProfiles = new ArrayList<>();
 
+        /** 初始化默认图形和音频配置 */
         static {
             GfxProfile prof = new GbcGfxProfile();
             prof.fps = 60;
@@ -104,16 +134,19 @@ public class GbcEmulator extends JniEmulator {
             sfxProfiles.add(sfx);
         }
 
+        /** GBC 不支持光枪 */
         @Override
         public boolean hasZapper() {
             return false;
         }
 
+        /** GBC 不支持多人游戏 */
         @Override
         public boolean isMultiPlayerSupported() {
             return false;
         }
 
+        /** 获取模拟器名称 */
         @Override
         public String getName() {
             return "Nostalgia.GBC";
@@ -144,11 +177,13 @@ public class GbcEmulator extends JniEmulator {
             return sfxProfiles;
         }
 
+        /** GBC 不支持原始金手指 */
         @Override
         public boolean supportsRawCheats() {
             return false;
         }
 
+        /** 获取 GBC 手柄按键映射表 */
         @Override
         public SparseIntArray getKeyMapping() {
             SparseIntArray mapping = new SparseIntArray();
@@ -170,6 +205,7 @@ public class GbcEmulator extends JniEmulator {
             return 2;
         }
 
+        /** GBC 图形配置 */
         private static class GbcGfxProfile extends GfxProfile {
             @Override
             public int toInt() {
@@ -177,6 +213,7 @@ public class GbcEmulator extends JniEmulator {
             }
         }
 
+        /** GBC 音频配置 */
         private static class GbcSfxProfile extends SfxProfile {
             @Override
             public int toInt() {

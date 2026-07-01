@@ -16,9 +16,17 @@ import nostalgia.framework.R;
 import nostalgia.framework.ui.gamegallery.GalleryAdapter.RowItem;
 import nostalgia.framework.utils.NLog;
 
+/**
+ * 游戏画廊 ViewPager 适配器。
+ * <p>
+ * 管理多个排序方式的 ListView 页面（按名称、最近游玩、游玩次数），
+ * 支持游戏点击、长按多选、状态保存恢复等功能。
+ * </p>
+ */
 public class GalleryPagerAdapter extends PagerAdapter {
 
     public static final String EXTRA_POSITIONS = "EXTRA_POSITIONS";
+    /** 各页面的排序类型 */
     private final static int[] SORT_TYPES = new int[]{
             GalleryAdapter.SORT_BY_NAME_ALPHA,
             GalleryAdapter.SORT_BY_LAST_PLAYED,
@@ -42,6 +50,7 @@ public class GalleryPagerAdapter extends PagerAdapter {
         }
     }
     
+    /** 设置长按点击监听器 */
     public void setOnItemLongClickListener(OnItemLongClickListener listener) {
         this.longClickListener = listener;
     }
@@ -119,6 +128,7 @@ public class GalleryPagerAdapter extends PagerAdapter {
         container.removeView((View) object);
     }
 
+    /** 设置游戏列表（替换所有） */
     public void setGames(ArrayList<GameDescription> games) {
         for (GalleryAdapter adapter : listAdapters) {
             adapter.setGames(new ArrayList<>(games));
@@ -127,6 +137,7 @@ public class GalleryPagerAdapter extends PagerAdapter {
     }
 
 
+    /** 添加新游戏 */
     public int addGames(ArrayList<GameDescription> newGames) {
         int result = 0;
         for (GalleryAdapter adapter : listAdapters) {
@@ -135,6 +146,7 @@ public class GalleryPagerAdapter extends PagerAdapter {
         return result;
     }
     
+    /** 获取所有游戏列表 */
     public ArrayList<GameDescription> getAllGames() {
         if (listAdapters.length > 0) {
             return listAdapters[0].getGames();
@@ -142,6 +154,7 @@ public class GalleryPagerAdapter extends PagerAdapter {
         return new ArrayList<>();
     }
 
+    /** 设置过滤关键字 */
     public void setFilter(String filter) {
         for (GalleryAdapter adapter : listAdapters) {
             adapter.setFilter(filter);
@@ -159,10 +172,12 @@ public class GalleryPagerAdapter extends PagerAdapter {
         super.notifyDataSetChanged();
     }
 
+    /** 保存实例状态 */
     public void onSaveInstanceState(Bundle outState) {
         outState.putIntArray(EXTRA_POSITIONS, yOffsets);
     }
 
+    /** 恢复实例状态 */
     public void onRestoreInstanceState(Bundle inState) {
         if (inState != null) {
             yOffsets = inState.getIntArray(EXTRA_POSITIONS);
@@ -171,10 +186,12 @@ public class GalleryPagerAdapter extends PagerAdapter {
         }
     }
 
+    /** 游戏点击监听器接口 */
     public interface OnItemClickListener {
         void onItemClick(GameDescription game);
     }
     
+    /** 游戏长按/多选状态变化监听器接口 */
     public interface OnItemLongClickListener {
         void onSelectionChanged();
     }

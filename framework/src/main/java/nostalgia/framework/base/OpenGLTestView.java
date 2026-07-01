@@ -20,6 +20,9 @@ import javax.microedition.khronos.opengles.GL10;
 
 import nostalgia.framework.utils.NLog;
 
+/**
+ * OpenGL 测试视图，通过渲染测试纹理并读取像素值来检测设备的 OpenGL 能力。
+ */
 @SuppressLint("ViewConstructor")
 public class OpenGLTestView extends GLSurfaceView {
 

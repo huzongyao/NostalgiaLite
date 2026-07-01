@@ -19,6 +19,13 @@ import nostalgia.framework.ui.multitouchbutton.MultitouchLayer;
 import nostalgia.framework.ui.multitouchbutton.MultitouchLayer.EDIT_MODE;
 import nostalgia.framework.utils.DatabaseHelper;
 
+/**
+ * 触摸控制器设置 Activity。
+ * <p>
+ * 在编辑模式下调整虚拟按钮的位置和大小，
+ * 支持重置和保存触摸控制器布局配置。
+ * </p>
+ */
 public class TouchControllerSettingsActivity extends AppCompatActivity implements
         OnGameMenuListener {
 

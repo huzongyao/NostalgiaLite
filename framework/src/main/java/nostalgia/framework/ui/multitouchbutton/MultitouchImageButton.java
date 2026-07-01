@@ -6,6 +6,13 @@ import android.view.MotionEvent;
 
 import androidx.appcompat.widget.AppCompatImageButton;
 
+/**
+ * 支持多点触控的图片按钮控件。
+ * <p>
+ * 继承自 AppCompatImageButton，实现 MultitouchBtnInterface 接口，
+ * 支持触摸进入/退出事件和重绘状态管理。
+ * </p>
+ */
 public class MultitouchImageButton extends AppCompatImageButton
         implements MultitouchBtnInterface {
 

@@ -25,16 +25,29 @@ import nostalgia.framework.utils.DialogUtils;
 import nostalgia.framework.utils.FileUtils;
 import nostalgia.framework.utils.NLog;
 
+/**
+ * 游戏画廊 Activity 基类。
+ * <p>
+ * 负责 ROM 文件的搜索、导入和管理，支持从文件系统扫描、
+ * 从分享 Intent 导入、从文件选择器导入等多种方式。
+ * 子类需实现 ROM 扩展名、模拟器 Activity 等具体配置。
+ * </p>
+ */
 abstract public class BaseGameGalleryActivity extends AppCompatActivity
         implements OnRomsFinderListener {
 
     private static final String TAG = "BaseGameGalleryActivity";
     private static final int REQUEST_SELECT_FILE = 1002;
 
+    /** 支持的 ROM 文件扩展名集合 */
     protected Set<String> exts;
+    /** ZIP 包内支持的 ROM 扩展名集合 */
     protected Set<String> inZipExts;
+    /** 是否需要重新加载游戏列表 */
     protected boolean reloadGames = true;
+    /** 是否正在重新加载 */
     protected boolean reloading = false;
+    /** 是否正在导入 ROM */
     protected boolean importingRom = false;
     private RomsFinder romsFinder = null;
     private GameRepository gameRepository = null;
@@ -51,10 +64,12 @@ abstract public class BaseGameGalleryActivity extends AppCompatActivity
         pendingShareIntent = getIntent();
     }
     
+    /** 获取游戏数据仓库 */
     public GameRepository getGameRepository() {
         return gameRepository;
     }
     
+    /** 扩展名初始化完成后的回调，处理待处理的分享 Intent */
     protected void onExtensionsInitialized() {
         // 等子类设置完exts和inZipExts后再处理分享Intent
         if (pendingShareIntent != null) {
@@ -104,6 +119,7 @@ abstract public class BaseGameGalleryActivity extends AppCompatActivity
         }
     }
 
+    /** 重新加载游戏列表，可选是否搜索新 ROM */
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     protected void reloadGames(boolean searchNew, File selectedFolder) {
         if (romsFinder == null) {
@@ -114,6 +130,7 @@ abstract public class BaseGameGalleryActivity extends AppCompatActivity
         }
     }
     
+    /** 导入单个 ROM 文件 */
     protected void importRom(File file) {
         if (romsFinder == null) {
             importingRom = true;
@@ -123,6 +140,7 @@ abstract public class BaseGameGalleryActivity extends AppCompatActivity
         }
     }
     
+    /** 从 Uri 导入 ROM */
     protected void importRom(Uri uri) {
         if (romsFinder == null) {
             importingRom = true;
@@ -132,6 +150,7 @@ abstract public class BaseGameGalleryActivity extends AppCompatActivity
         }
     }
     
+    /** 批量导入多个 Uri */
     protected void importRoms(ArrayList<Uri> uris) {
         if (romsFinder == null) {
             importingRom = true;
@@ -141,6 +160,7 @@ abstract public class BaseGameGalleryActivity extends AppCompatActivity
         }
     }
     
+    /** 打开系统文件选择器，支持多选 */
     protected void openFilePicker() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -211,12 +231,14 @@ abstract public class BaseGameGalleryActivity extends AppCompatActivity
         importingRom = false;
     }
 
+    /** 停止 ROM 搜索 */
     protected void stopRomsFinding() {
         if (romsFinder != null) {
             romsFinder.stopSearch();
         }
     }
 
+    /** 显示 SD 卡未挂载错误对话框 */
     public void showSDCardFailed() {
         runOnUiThread(() -> {
             AlertDialog dialog = new AlertDialog.Builder(BaseGameGalleryActivity.this)
@@ -229,16 +251,22 @@ abstract public class BaseGameGalleryActivity extends AppCompatActivity
         });
     }
 
+    /** 获取模拟器 Activity 类 */
     public abstract Class<? extends EmulatorActivity> getEmulatorActivityClass();
 
+    /** 设置已有游戏列表 */
     abstract public void setLastGames(ArrayList<GameDescription> games);
 
+    /** 设置新发现的游戏列表 */
     abstract public void setNewGames(ArrayList<GameDescription> games);
 
+    /** 获取 ROM 文件扩展名集合 */
     abstract protected Set<String> getRomExtensions();
 
+    /** 获取模拟器实例 */
     public abstract Emulator getEmulatorInstance();
 
+    /** 获取压缩包扩展名集合（默认 zip） */
     protected Set<String> getArchiveExtensions() {
         HashSet<String> set = new HashSet<>();
         set.add("zip");

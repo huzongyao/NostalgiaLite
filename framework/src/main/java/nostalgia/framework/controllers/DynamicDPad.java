@@ -19,6 +19,13 @@ import nostalgia.framework.R;
 import nostalgia.framework.ui.gamegallery.GameDescription;
 import nostalgia.framework.ui.preferences.PreferenceUtil;
 
+/**
+ * 动态方向键控制器，在触摸位置动态显示方向键。
+ * <p>
+ * 用户触摸屏幕空白区域时，在该位置显示可拖动的方向键，
+ * 支持 8 方向识别（上下左右 + 四个对角线）和触觉反馈。
+ * </p>
+ */
 public class DynamicDPad implements EmulatorController {
 
     private int leftMapped;

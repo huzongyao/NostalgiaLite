@@ -23,8 +23,16 @@ import nostalgia.framework.R;
 import nostalgia.framework.base.EmulatorHolder;
 
 
+/**
+ * 金手指/作弊码管理 Activity。
+ * <p>
+ * 展示当前游戏的作弊码列表，支持添加、编辑、删除和启用/禁用作弊码。
+ * 通过 Intent 传入游戏哈希值来关联作弊码数据。
+ * </p>
+ */
 public class CheatsActivity extends AppCompatActivity {
 
+    /** Intent 额外参数键：游戏哈希值 */
     public static final String EXTRA_IN_GAME_HASH = "EXTRA_IN_GAME_HASH";
     Button save;
     private ListView list;
@@ -78,6 +86,7 @@ public class CheatsActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    /** 打开作弊码详情编辑对话框，idx=-1 表示新增 */
     private void openCheatDetailDialog(final int idx) {
         final Dialog dialog = new Dialog(this, R.style.DialogTheme);
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -147,16 +156,19 @@ public class CheatsActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    /** 删除指定位置的作弊码 */
     public void removeCheat(int idx) {
         cheats.remove(idx);
         adapter.notifyDataSetChanged();
         Cheat.saveCheats(this, gameHash, cheats);
     }
 
+    /** 编辑指定位置的作弊码 */
     public void editCheat(int idx) {
         openCheatDetailDialog(idx);
     }
 
+    /** 保存当前所有作弊码 */
     public void saveCheats() {
         Cheat.saveCheats(this, gameHash, cheats);
     }

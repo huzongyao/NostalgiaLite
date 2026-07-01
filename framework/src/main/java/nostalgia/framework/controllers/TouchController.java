@@ -24,6 +24,13 @@ import nostalgia.framework.ui.multitouchbutton.OnMultitouchEventListener;
 import nostalgia.framework.ui.preferences.PreferenceUtil;
 import nostalgia.framework.utils.EmuUtils;
 
+/**
+ * 触摸控制器，实现屏幕虚拟手柄的触摸输入处理。
+ * <p>
+ * 管理多层触摸控件（方向键、A/B键、连发键、Start/Select、快进、菜单等），
+ * 支持自动隐藏、透明度调节、动态方向键切换等功能。
+ * </p>
+ */
 public class TouchController implements EmulatorController, OnMultitouchEventListener {
 
     private static final String TAG = "controllers.TouchController";
@@ -260,6 +267,7 @@ public class TouchController implements EmulatorController, OnMultitouchEventLis
         }
     }
 
+    /** 按键释放处理器，使用弱引用避免内存泄漏。 */
     private static class KeyHandler extends Handler {
 
         WeakReference<TouchController> weakController;

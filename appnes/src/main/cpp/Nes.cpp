@@ -1,3 +1,9 @@
+/**
+ * NES（FC）模拟器 C++ 实现。
+ * <p>继承 Emulator 基类，封装 fceux 核心引擎的初始化和调用。
+ * 实现 NES 平台特有的帧模拟、音频生成、金手指、光枪、
+ * 存档和历史状态管理功能。</p>
+ */
 #include <jni.h>
 #include <android/bitmap.h>
 #include "fceux/driver.h"
@@ -12,12 +18,20 @@ extern "C" {
 using namespace std;
 using namespace emudroid;
 
+/** NES 屏幕宽度（像素） */
 #define WIDTH 256
+/** PAL 制式屏幕高度（像素） */
 #define HEIGHT_PAL 240
+/** NTSC 制式屏幕高度（像素） */
 #define HEIGHT_NTSC 224
-
+/** 音频缓冲区大小 */
 #define SFX_BUF_SIZE 2048 * 8 * 2
 
+/**
+ * NES 模拟器实现类。
+ * <p>封装 fceux 引擎调用，管理图形/音频缓冲、
+ * 金手指、光枪、历史状态等功能。</p>
+ */
 class NesEmulator : public Emulator {
 
 private:
@@ -26,6 +40,7 @@ private:
     bool stereo;
 
 public:
+    /** 构造 NES 模拟器，初始化缓冲区和状态 */
     NesEmulator() {
         LOGI("NesEmulator Constructor");
         pads = 0;
@@ -37,11 +52,13 @@ public:
     }
 
 
+    /** 设置 fceux 基础目录 */
     bool setBaseDir(const char *path) {
         FCEUI_SetBaseDirectory(path);
         return true;
     }
 
+    /** 设置电池存档保存目录 */
     bool setBatterySaveDir(const char *path) {
         NOSTALGIA_SetBatterySaveDir(path);
         return true;
@@ -50,6 +67,11 @@ public:
     bool saveSavFiles;
     bool loadSavFiles;
 
+    /**
+     * 启动 NES 模拟器。
+     * <p>初始化 fceux 引擎，解析图形/音频/通用参数，
+     * 设置 PAL/NTSC 制式、音频采样率、光枪等。</p>
+     */
     bool start(int gfxInit, int sfxInit, int generalInit) {
         if (inited) {
             return true;
@@ -124,6 +146,11 @@ public:
     int zapperPressed;
     bool soundEnabled;
 
+    /**
+     * 执行一帧模拟。
+     * <p>先执行跳帧模拟（不渲染），再执行一帧渲染模拟，
+     * 将结果复制到图形缓冲并交换。定期保存历史状态。</p>
+     */
     bool emulate(int keys, int turbos, int numFramesToSkip) {
         bool canSaveHistory = true;
 
@@ -165,6 +192,7 @@ public:
         return true;
     }
 
+    /** 将音频采样数据追加到音频缓冲区（支持单声道/立体声） */
     void appendToSfxBuffer(int32 *data, int numStereoSamples) {
         if (!soundEnabled) {
             return;
@@ -203,6 +231,7 @@ public:
         sfxLock.Unlock();
     }
 
+    /** 添加金手指（检查是否已存在相同规则） */
     bool addCheat(const char *name, int ggAddr, int ggVal, int ggComp) {
         uint32 cAddr;
         uint8 cVal;
@@ -219,10 +248,12 @@ public:
         return (bool) FCEUI_AddCheat(name, ggAddr, ggVal, ggComp, 1);
     }
 
+    /** 启用原始地址金手指 */
     bool enableRawCheat(int ggAddr, int ggVal, int ggComp) {
         return addCheat("whatever", ggAddr, ggVal, ggComp);
     }
 
+    /** 解码并启用 GameGenie 格式金手指 */
     bool enableCheat(const char *cheat, int type) {
         int ggAddr;
         int ggVal;
@@ -236,6 +267,7 @@ public:
         return addCheat(cheat, ggAddr, ggVal, ggComp);
     }
 
+    /** 删除所有已启用的金手指 */
     bool disableAllCheats() {
         uint32 i = 0;
         uint32 cAddr;
@@ -251,17 +283,20 @@ public:
     }
 
 
+    /** 渲染历史状态帧到 Bitmap */
     bool renderHistory(JNIEnv *env, jobject bitmap, int pos, int w, int h) {
         return this->render(env, bitmap, w, h, travel[posToIdx(pos)]);
     }
 
 
+    /** 从内存流加载历史状态 */
     bool doLoadHistoryState(int idx) {
         bool res = FCEUSS_LoadFP(&(ms[idx]), SSLOADPARAM_NOBACKUP);
         return res;
     }
 
 
+    /** 保存历史状态到内存流和旅行缓冲 */
     bool doSaveHistoryState(int idx) {
         ms[idx].truncate(0);
         bool res = FCEUSS_SaveMS(&(ms[idx]), 0);
@@ -270,20 +305,24 @@ public:
     }
 
 
+    /** 历史状态内存流数组 */
     EMUFILE_MEMORY ms[HIS_SIZE];
 
+    /** 保存游戏状态到文件 */
     bool saveState(const char *path, int slot) {
         FCEUI_SaveState(path);
         resetSfx();
         return true;
     }
 
+    /** 从文件加载游戏状态 */
     bool doLoadState(const char *path, int slot) {
         FCEUI_LoadState(path);
         resetSfx();
         return true;
     }
 
+    /** 重置模拟器（重新上电或重置到存档状态） */
     bool reset() {
         FCEUI_PowerNES();
 
@@ -297,6 +336,7 @@ public:
         return true;
     }
 
+    /** 停止模拟器，关闭游戏并释放引擎 */
     bool stop() {
         if (game != NULL) {
             FCEUI_CloseGame();
@@ -308,6 +348,7 @@ public:
         return true;
     }
 
+    /** 设置光枪坐标和触发状态 */
     bool fireZapper(int x, int y) {
         zapper[0] = x;
         zapper[1] = y;
@@ -324,6 +365,11 @@ public:
     }
 
 
+    /**
+     * 加载游戏 ROM。
+     * <p>关闭当前游戏，设置电池存档目录，
+     * 加载新游戏并配置输入设备（手柄/光枪）。</p>
+     */
     bool doLoadGame(const char *path, const char *batterySaveDir, const char *strippedName) {
         if (game != NULL) {
             FCEUI_CloseGame();
@@ -352,10 +398,12 @@ public:
         return game != NULL;
     }
 
+    /** 设置调色板颜色（由 fceux 回调） */
     void setPalette(int idx, int value) {
         emuPalette[idx] = value;
     }
 
+    /** 重置音频缓冲区状态 */
     void resetSfx() {
         sfxLock.Lock();
         sfxBufPos[0] = 0;
@@ -367,17 +415,21 @@ public:
         gfxLock.Unlock();
     }
 
+    /** 获取音频缓冲区大小 */
     int getSfxBufferSize() {
         return SFX_BUF_SIZE;
     }
 
+    /** 获取图形缓冲区大小（256x256） */
     int getGfxBufferSize() {
         return 256 * 256;
     }
 
 };
 
+/** 全局 NES 模拟器实例 */
 NesEmulator emulator;
+/** 全局桥接对象 */
 Bridge bridge(&emulator);
 
 }
@@ -436,6 +488,7 @@ const char *FCEUD_GetCompilerString() {
 }
 
 
+/** fceux 驱动回调：设置调色板颜色 */
 void FCEUD_SetPalette(uint8 index, uint8 r, uint8 g, uint8 b) {
     uint32 res = ((uint32) 0xFF000000) | (b << 16) | (g << 8) | (r << 0);
     emulator.setPalette(index, res);
@@ -445,10 +498,12 @@ void FCEUD_GetPalette(uint8 i, uint8 *r, uint8 *g, uint8 *b) {
 }
 
 
+/** fceux 驱动回调：打印错误信息 */
 void FCEUD_PrintError(const char *s) {
     LOGE("%s", s);
 }
 
+/** fceux 驱动回调：打印消息 */
 void FCEUD_Message(const char *s) {
     LOGI("%s", s);
 }

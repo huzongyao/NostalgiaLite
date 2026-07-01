@@ -17,9 +17,22 @@ import nostalgia.framework.ui.preferences.PreferenceUtil;
 import nostalgia.framework.utils.FileUtils;
 import nostalgia.framework.utils.NLog;
 
+/**
+ * 模拟器执行生命周期管理器，负责游戏加载、帧模拟、音频播放、
+ * 存档读档以及暂停/恢复控制。
+ * <p>
+ * 此类协调两个内部线程：
+ * <ul>
+ *   <li>{@link EmulatorThread} - 以目标帧率运行主模拟循环</li>
+ *   <li>{@link AudioPlayer} - 与模拟同步读取并渲染音频数据</li>
+ * </ul>
+ * 所有模拟器操作通过共享锁同步，确保线程安全。
+ * </p>
+ */
 public class EmulatorRunner {
 
     private static final String TAG = "EmulatorRunner";
+    /** 自动存档使用的保留槽位号，在暂停/停止时自动保存状态。 */
     private static final int AUTO_SAVE_SLOT = 0;
     protected final Object lock = new Object();
     protected Emulator emulator;
@@ -34,6 +47,12 @@ public class EmulatorRunner {
     private EmulatorThread updater;
     private OnNotRespondingListener notRespondingListener;
 
+    /**
+     * 创建模拟器运行器。
+     *
+     * @param emulator 要管理的模拟器实例
+     * @param context  Android 上下文
+     */
     public EmulatorRunner(Emulator emulator, Context context) {
         this.emulator = emulator;
         emulator.setBaseDir(EmulatorUtils.getBaseDir(context));
@@ -41,6 +60,10 @@ public class EmulatorRunner {
         fixBatterySaveBug();
     }
 
+    /**
+     * 将电池存档文件从外部缓存目录迁移到基础目录。
+     * 修复历史版本中存档保存在错误位置的缺陷。
+     */
     private void fixBatterySaveBug() {
         if (PreferenceUtil.isBatterySaveBugFixed(context)) {
             return;
@@ -74,6 +97,7 @@ public class EmulatorRunner {
         PreferenceUtil.setBatterySaveBugFixed(context);
     }
 
+    /** 释放所有资源，包括音频播放器和模拟线程。 */
     public void destroy() {
         if (audioPlayer != null) {
             audioPlayer.destroy();
@@ -88,6 +112,7 @@ public class EmulatorRunner {
         notRespondingListener = listener;
     }
 
+    /** 暂停模拟，自动保存当前状态，并挂起模拟线程。 */
     public void pauseEmulation() {
         synchronized (pauseLock) {
             if (!isPaused.get()) {
@@ -100,6 +125,7 @@ public class EmulatorRunner {
         }
     }
 
+    /** 从暂停状态恢复模拟。 */
     public void resumeEmulation() {
         synchronized (pauseLock) {
             if (isPaused.get()) {
@@ -111,6 +137,7 @@ public class EmulatorRunner {
         }
     }
 
+    /** 停止当前游戏，保存状态并释放模拟器。 */
     public void stopGame() {
         if (audioPlayer != null) {
             audioPlayer.destroy();
@@ -127,12 +154,19 @@ public class EmulatorRunner {
         }
     }
 
+    /** 重置模拟器到开机初始状态。 */
     public void resetEmulator() {
         synchronized (lock) {
             emulator.reset();
         }
     }
 
+    /**
+     * 开始新游戏。从偏好设置中初始化图像/声音配置，
+     * 加载 ROM 和电池存档，然后启动模拟线程和音频线程。
+     *
+     * @param game 包含 ROM 路径的游戏描述
+     */
     public void startGame(GameDescription game) {
         isPaused.set(false);
 
@@ -253,10 +287,18 @@ public class EmulatorRunner {
         this.benchmark = benchmark;
     }
 
+    /** 模拟器无响应（ANR检测）时的监听器回调接口。 */
     public interface OnNotRespondingListener {
         void onNotResponding();
     }
 
+    /**
+     * 内部模拟线程，运行主模拟循环。
+     * <p>
+     * 根据模拟器的目标帧率计算帧间隔时间，当模拟落后时处理跳帧，
+     * 并在固定间隔触发音频数据读取。
+     * </p>
+     */
     private class EmulatorThread extends Thread {
 
         private int totalSkipped;
@@ -270,6 +312,7 @@ public class EmulatorRunner {
         private int delayPerFrame;
 
         public void setFps(int fps) {
+            // 使用10倍精度计算每帧的精确延迟（微秒级）
             exactDelayPerFrameE1 = (int) ((1000 / (float) fps) * 10);
             delayPerFrame = (int) (exactDelayPerFrameE1 / 10f + 0.5);
         }
@@ -293,6 +336,7 @@ public class EmulatorRunner {
 
                 long time1 = System.currentTimeMillis();
 
+                // 暂停等待循环
                 synchronized (pauseLock) {
                     while (isPaused) {
                         try {
@@ -314,6 +358,7 @@ public class EmulatorRunner {
                 long diff = ((expectedTimeE1 / 10) - realTime);
                 long delay = +diff;
 
+                // 帧率同步：如果超前则等待，落后则最小等待
                 if (delay > 0) {
                     try {
                         Thread.sleep(delay);
@@ -334,6 +379,7 @@ public class EmulatorRunner {
                     afterSkip--;
                 }
 
+                // 跳帧逻辑：当落后超过3帧时计算需要跳过的帧数（最多8帧）
                 if (skippedTime >= delayPerFrame * 3 && afterSkip == 0) {
                     numFramesToSkip = (int) (skippedTime / delayPerFrame) - 1;
                     int originalSkipped = numFramesToSkip;
@@ -351,6 +397,7 @@ public class EmulatorRunner {
                         emulator.emulateFrame(numFramesToSkip);
                         cnt += 1 + numFramesToSkip;
 
+                        // 每3帧读取一次音频数据
                         if (audioEnabled && cnt >= 3) {
                             emulator.readSfxData();
 
@@ -394,6 +441,13 @@ public class EmulatorRunner {
 
     }
 
+    /**
+     * 内部音频线程，负责音频渲染。
+     * <p>
+     * 等待模拟线程发出音频数据就绪信号后，
+     * 调用 {@link Emulator#renderSfx()} 输出声音。
+     * </p>
+     */
     private class AudioPlayer extends Thread {
 
         protected AtomicBoolean isRunning = new AtomicBoolean();
@@ -404,6 +458,7 @@ public class EmulatorRunner {
             setName("emudroid:audioReader");
 
             while (isRunning.get()) {
+                // 等待音频数据就绪信号
                 synchronized (sfxReadyLock) {
                     while (!sfxReady) {
                         try {

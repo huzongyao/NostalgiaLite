@@ -8,6 +8,13 @@ import android.widget.SeekBar;
 
 import nostalgia.framework.ui.widget.SeekBarPreference;
 
+/**
+ * 振动强度偏好设置。
+ * <p>
+ * 继承自 SeekBarPreference，滑动停止时触发振动反馈，
+ * 让用户直观感受当前设置的振动强度。
+ * </p>
+ */
 public class SeekBarVibrationPreference extends SeekBarPreference {
 
     private Vibrator vibrator;

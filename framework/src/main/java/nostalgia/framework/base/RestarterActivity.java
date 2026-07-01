@@ -11,6 +11,12 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
+/**
+ * 进程重启 Activity，用于定期重启模拟器进程以防止内存泄漏。
+ * <p>
+ * 先杀死旧进程，等待进程完全终止后重新启动模拟器 Activity。
+ * </p>
+ */
 public class RestarterActivity extends Activity {
 
     public static final String EXTRA_PID = "pid";

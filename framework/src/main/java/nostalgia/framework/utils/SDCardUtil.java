@@ -14,28 +14,35 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Scanner;
 
+/**
+ * SD 卡存储工具类。
+ * <p>提供外部存储可用性检测、SD 卡路径查找、符号链接检测等功能。
+ * 支持扫描 /proc/mounts 和 vold.fstab 发现所有可用的 SD 卡挂载点。</p>
+ * <p>基于 StackOverflow 用户 richard 的实现修改。</p>
+ *
+ * @author NostalgiaLite
+ */
 public class SDCardUtil {
 
+    /** 内部 SD 卡标识 */
     public static final String SD_CARD = "sdCard";
+    /** 外部 SD 卡标识 */
     public static final String EXTERNAL_SD_CARD = "externalSdCard";
     private static final String TAG = "utils.SDCardUtil";
 
-    /**
-     * @return True if the external storage is available. False otherwise.
-     */
+    /** 检查外部存储是否可用（已挂载或只读挂载） */
     public static boolean isAvailable() {
         String state = Environment.getExternalStorageState();
         return Environment.MEDIA_MOUNTED.equals(state)
                 || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state);
     }
 
+    /** 获取默认外部存储目录路径（末尾带 "/"） */
     public static String getSdCardPath() {
         return Environment.getExternalStorageDirectory().getPath() + "/";
     }
 
-    /**
-     * @return True if the external storage is writable. False otherwise.
-     */
+    /** 检查外部存储是否可写 */
     public static boolean isWritable() {
         String state = Environment.getExternalStorageState();
         return Environment.MEDIA_MOUNTED.equals(state);
@@ -43,7 +50,10 @@ public class SDCardUtil {
     }
 
     /**
-     * @return A map of all storage locations available
+     * 获取所有可用的存储位置。
+     * <p>通过扫描 /proc/mounts 和 vold.fstab 发现所有 VFAT/exFAT/FUSE 类型的挂载点。</p>
+     *
+     * @return 所有可读存储目录的集合
      */
     public static HashSet<File> getAllStorageLocations() {
         HashSet<String> sdcards = new HashSet<>(3);
@@ -82,10 +92,9 @@ public class SDCardUtil {
     }
 
     /**
-     * Copy from
-     * http://www.javacodegeeks.com/2012/10/android-finding-sd-card-path.html
+     * 从 vold.fstab 解析 SD 卡路径并加入集合。
      *
-     * @return
+     * @param set 存储路径集合
      */
     private static void getSDcardsPath(HashSet<String> set) {
         File file = new File("/system/etc/vold.fstab");
@@ -131,12 +140,11 @@ public class SDCardUtil {
     }
 
     /**
-     * http://svn.apache.org/viewvc/commons/proper/io/trunk/src/main/java/org/
-     * apache/commons/io/FileUtils.java?view=markup
+     * 检测文件是否为符号链接。
      *
-     * @param file
-     * @return
-     * @throws IOException
+     * @param file 要检测的文件
+     * @return 如果是符号链接返回 true
+     * @throws IOException 检测失败时抛出
      */
     public static boolean isSymlink(File file) throws IOException {
         if (file == null)

@@ -24,6 +24,13 @@ import nostalgia.framework.R;
 import nostalgia.framework.utils.DialogUtils;
 import nostalgia.framework.utils.EmuUtils;
 
+/**
+ * 游戏内菜单，提供游戏中暂停后的操作选项。
+ * <p>
+ * 支持动态添加菜单项，根据屏幕方向自适应布局（横屏双列、竖屏单列），
+ * 通过 {@link OnGameMenuListener} 回调通知菜单事件。
+ * </p>
+ */
 public class GameMenu {
 
     ArrayList<GameMenuItem> items = new ArrayList<>();
@@ -177,6 +184,7 @@ public class GameMenu {
         return null;
     }
 
+    /** 游戏菜单事件监听器接口。 */
     public interface OnGameMenuListener {
 
         void onGameMenuCreate(GameMenu menu);
@@ -190,6 +198,7 @@ public class GameMenu {
         void onGameMenuItemSelected(GameMenu menu, GameMenuItem item);
     }
 
+    /** 游戏菜单项数据。 */
     public class GameMenuItem {
         String title = "";
         int id;

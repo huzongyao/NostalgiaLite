@@ -16,19 +16,38 @@ import java.util.Set;
 import nostalgia.framework.controllers.KeyboardController;
 import nostalgia.framework.utils.NLog;
 
+/**
+ * 键盘/手柄映射配置，定义物理按键到虚拟手柄按键的映射关系。
+ * <p>
+ * 支持多种预设配置（默认、PS3手柄、Wii遥控器）以及用户自定义配置，
+ * 配置通过 SharedPreferences 持久化存储。
+ * </p>
+ */
 public class KeyboardProfile implements Serializable {
+    /** 预设配置名称 */
     public static final String[] DEFAULT_PROFILES_NAMES = {"default", "ps3", "wiimote"};
 
     private static final long serialVersionUID = 5817859819275903370L;
     private static final String KEYBOARD_PROFILES_SETTINGS = "keyboard_profiles_pref";
     private static final String KEYBOARD_PROFILE_POSTFIX = "_keyboard_profile";
     private static final String TAG = "KeyboardProfile";
+
+    /** 按键名称数组（由子类或外部初始化） */
     public static String[] BUTTON_NAMES = null;
+    /** 按键描述数组 */
     public static String[] BUTTON_DESCRIPTIONS = null;
+    /** 按键对应的 Android KeyEvent 键码数组 */
     public static int[] BUTTON_KEY_EVENT_CODES = null;
+
+    /** 配置名称 */
     public String name;
+    /** 物理键码到虚拟手柄按键的映射表 */
     public SparseIntArray keyMap = new SparseIntArray();
 
+    /**
+     * 创建默认键盘映射配置。
+     * 方向键=方向，Enter=Start，空格=Select，Q=A，W=B，A=连发A，S=连发B。
+     */
     public static KeyboardProfile createDefaultProfile() {
         KeyboardProfile profile = new KeyboardProfile();
         profile.name = "default";
@@ -45,6 +64,10 @@ public class KeyboardProfile implements Serializable {
         return profile;
     }
 
+    /**
+     * 创建 PS3 手柄映射配置。
+     * 方向键=方向，Start/Select=Start/Select，X=A，Y=B，R2=菜单，L2=返回，L1=快进。
+     */
     @SuppressLint("InlinedApi")
     public static KeyboardProfile createPS3Profile() {
         KeyboardProfile profile = new KeyboardProfile();
@@ -65,9 +88,14 @@ public class KeyboardProfile implements Serializable {
         return profile;
     }
 
+    /**
+     * 创建 Wii 遥控器映射配置。
+     * 支持双人映射：玩家1使用数字键1/2和方向键，玩家2使用字母键IJKL和OJHM。
+     */
     public static KeyboardProfile createWiimoteProfile() {
         KeyboardProfile profile = new KeyboardProfile();
         profile.name = "wiimote";
+        // 玩家1映射
         profile.keyMap.put(KeyEvent.KEYCODE_DPAD_LEFT, EmulatorController.KEY_LEFT);
         profile.keyMap.put(KeyEvent.KEYCODE_DPAD_RIGHT, EmulatorController.KEY_RIGHT);
         profile.keyMap.put(KeyEvent.KEYCODE_DPAD_UP, EmulatorController.KEY_UP);
@@ -78,6 +106,7 @@ public class KeyboardProfile implements Serializable {
         profile.keyMap.put(KeyEvent.KEYCODE_2, EmulatorController.KEY_A);
         profile.keyMap.put(KeyEvent.KEYCODE_DPAD_CENTER, KeyboardController.KEY_MENU);
         profile.keyMap.put(KeyEvent.KEYCODE_H, KeyboardController.KEY_BACK);
+        // 玩家2映射（使用偏移量区分）
         profile.keyMap.put(KeyEvent.KEYCODE_O,
                 EmulatorController.KEY_LEFT + KeyboardController.PLAYER2_OFFSET);
         profile.keyMap.put(KeyEvent.KEYCODE_J,
@@ -97,12 +126,27 @@ public class KeyboardProfile implements Serializable {
         return profile;
     }
 
+    /**
+     * 获取当前选中的键盘配置。
+     *
+     * @param gameHash 游戏的唯一标识（未使用，保留用于未来按游戏设置不同配置）
+     * @param context  Android 上下文
+     * @return 当前选中的键盘配置
+     */
     public static KeyboardProfile getSelectedProfile(String gameHash, Context context) {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
         String name = pref.getString("pref_game_keyboard_profile", "default");
         return load(context, name);
     }
 
+    /**
+     * 从 SharedPreferences 加载指定名称的键盘配置。
+     * 若无自定义数据则回退到对应的预设配置。
+     *
+     * @param context Android 上下文
+     * @param name    配置名称
+     * @return 加载的键盘配置
+     */
     public static KeyboardProfile load(Context context, String name) {
         if (name != null) {
             SharedPreferences pref = context.getSharedPreferences(name + KEYBOARD_PROFILE_POSTFIX,
@@ -134,19 +178,33 @@ public class KeyboardProfile implements Serializable {
         }
     }
 
+    /**
+     * 获取所有可用的配置名称列表（预设 + 用户自定义）。
+     *
+     * @param context Android 上下文
+     * @return 配置名称列表
+     */
     public static ArrayList<String> getProfilesNames(Context context) {
         SharedPreferences pref =
                 context.getSharedPreferences(KEYBOARD_PROFILES_SETTINGS, Context.MODE_PRIVATE);
         Set<String> prefNames = pref.getAll().keySet();
         ArrayList<String> names = new ArrayList<>();
+        // 先添加预设名称
         for (String defName : DEFAULT_PROFILES_NAMES) {
             if (!prefNames.contains(defName))
                 names.add(defName);
         }
+        // 再添加用户自定义名称
         names.addAll(prefNames);
         return names;
     }
 
+    /**
+     * 判断指定名称是否为预设配置。
+     *
+     * @param name 配置名称
+     * @return true 表示是预设配置
+     */
     public static boolean isDefaultProfile(String name) {
         boolean defProf = false;
         for (String defName : KeyboardProfile.DEFAULT_PROFILES_NAMES) {
@@ -157,6 +215,12 @@ public class KeyboardProfile implements Serializable {
         return defProf;
     }
 
+    /**
+     * 恢复指定预设配置到默认状态。
+     *
+     * @param name    预设配置名称
+     * @param context Android 上下文
+     */
     public static void restoreDefaultProfile(String name, Context context) {
         KeyboardProfile prof = null;
         switch (name) {
@@ -177,6 +241,12 @@ public class KeyboardProfile implements Serializable {
         }
     }
 
+    /**
+     * 删除此配置。
+     *
+     * @param context Android 上下文
+     * @return true 表示删除成功
+     */
     public boolean delete(Context context) {
         NLog.i(TAG, "delete profile " + name);
         SharedPreferences pref =
@@ -191,6 +261,12 @@ public class KeyboardProfile implements Serializable {
         return true;
     }
 
+    /**
+     * 保存此配置到 SharedPreferences。
+     *
+     * @param context Android 上下文
+     * @return true 表示保存成功
+     */
     public boolean save(Context context) {
         SharedPreferences pref =
                 context.getSharedPreferences(name + KEYBOARD_PROFILE_POSTFIX, Context.MODE_PRIVATE);
@@ -198,6 +274,7 @@ public class KeyboardProfile implements Serializable {
         Editor editor = pref.edit();
         editor.clear();
 
+        // 遍历所有可映射按键，保存当前映射关系
         for (int i = 0; i < BUTTON_NAMES.length; i++) {
             int value = BUTTON_KEY_EVENT_CODES[i];
             int idx = keyMap.indexOfValue(value);
@@ -210,6 +287,7 @@ public class KeyboardProfile implements Serializable {
         }
 
         editor.apply();
+        // 非默认配置记录到配置注册表中
         if (!name.equals("default")) {
             pref = context.getSharedPreferences(KEYBOARD_PROFILES_SETTINGS, Context.MODE_PRIVATE);
             editor = pref.edit();

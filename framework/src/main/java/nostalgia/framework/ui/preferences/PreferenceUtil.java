@@ -21,6 +21,14 @@ import nostalgia.framework.base.EmulatorHolder;
 import nostalgia.framework.base.ViewPort;
 import nostalgia.framework.ui.gamegallery.GameDescription;
 
+/**
+ * 偏好设置工具类。
+ * <p>
+ * 封装 SharedPreferences 的读写操作，提供各类模拟器设置的访问方法，
+ * 包括视频模式、声音、振动、快进、OpenGL、动态方向键、屏幕布局、
+ * 键盘配置、时间回溯等。还支持设置的导入/导出功能。
+ * </p>
+ */
 public class PreferenceUtil {
 
     public static final int EXPORT = 1;

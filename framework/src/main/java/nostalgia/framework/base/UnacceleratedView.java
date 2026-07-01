@@ -8,6 +8,10 @@ import android.view.View;
 
 import nostalgia.framework.Emulator;
 
+/**
+ * 软件渲染视图，使用 SurfaceView + Canvas 绘制模拟器帧。
+ * 作为 OpenGL 不可用时的回退方案。
+ */
 class UnacceleratedView extends SurfaceView implements EmulatorView {
 
     private static final int DELAY_PER_FRAME = 40;

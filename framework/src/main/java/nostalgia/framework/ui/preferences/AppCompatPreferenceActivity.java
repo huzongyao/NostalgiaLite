@@ -14,9 +14,12 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 
 /**
- * Created by huzongyao on 17-10-17.
+ * 兼容 AppCompat 的 PreferenceActivity 基类。
+ * <p>
+ * 通过 AppCompatDelegate 将旧版 PreferenceActivity 与
+ * AppCompat 主题和 Toolbar 支持集成。
+ * </p>
  */
-
 public abstract class AppCompatPreferenceActivity extends PreferenceActivity {
 
     private AppCompatDelegate mDelegate;
@@ -101,6 +104,7 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity {
         getDelegate().invalidateOptionsMenu();
     }
 
+    /** 获取或创建 AppCompatDelegate 实例 */
     private AppCompatDelegate getDelegate() {
         if (mDelegate == null) {
             mDelegate = AppCompatDelegate.create(this, null);

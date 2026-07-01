@@ -60,6 +60,20 @@ import nostalgia.framework.utils.EmuUtils;
 import nostalgia.framework.utils.NLog;
 
 
+/**
+ * 模拟器 Activity 基类，所有平台模拟器的游戏界面均继承此类。
+ * <p>
+ * 负责统一管理模拟器的完整生命周期，包括：
+ * <ul>
+ *   <li>初始化模拟器实例、渲染视图、输入控制器</li>
+ *   <li>游戏菜单（重置、存档、读档、金手指、截图、设置）</li>
+ *   <li>快进、时间旅行、自动存档</li>
+ *   <li>性能基准测试与质量自动调整</li>
+ *   <li>进程重启机制（防止内存泄漏）</li>
+ * </ul>
+ * 子类需提供特定平台的模拟器实例和 OpenGL 片段着色器。
+ * </p>
+ */
 public abstract class EmulatorActivity extends Activity
         implements OnGameMenuListener, EmulatorRunner.OnNotRespondingListener {
 
@@ -132,18 +146,23 @@ public abstract class EmulatorActivity extends Activity
     private ViewGroup group;
     private String baseDir;
 
+    /** 获取平台特定的模拟器实例。 */
     public abstract Emulator getEmulatorInstance();
 
+    /** 获取 OpenGL 片段着色器代码。 */
     public abstract String getFragmentShader();
 
+    /** 获取纹理边界，用于特殊平台（如 NES 的调色板纹理）。 */
     public int[] getTextureBounds(Emulator emulator) {
         return null;
     }
 
+    /** 获取 OpenGL 纹理尺寸。 */
     public int getGLTextureSize() {
         return 256;
     }
 
+    /** 是否使用 OpenGL 调色板纹理。 */
     public boolean hasGLPalette() {
         return true;
     }

@@ -11,6 +11,13 @@ import nostalgia.framework.R;
 import nostalgia.framework.ui.gamegallery.GameDescription;
 
 
+/**
+ * 游戏偏好设置 Fragment。
+ * <p>
+ * 加载游戏级别的偏好设置，包括视频模式、光枪等配置。
+ * 使用游戏校验和作为 SharedPreferences 文件名。
+ * </p>
+ */
 public class GamePreferenceFragment extends PreferenceFragment {
 
     @Override

@@ -7,6 +7,13 @@ import android.view.MotionEvent;
 
 import nostalgia.framework.R;
 
+/**
+ * 双按钮组合控件。
+ * <p>
+ * 触摸时同时触发两个关联按钮的按下/释放事件，
+ * 用于实现组合键（如 AB 同按）。
+ * </p>
+ */
 public class MultitouchTwoButton extends MultitouchImageButton {
 
     protected int firstButtonRID = -1;

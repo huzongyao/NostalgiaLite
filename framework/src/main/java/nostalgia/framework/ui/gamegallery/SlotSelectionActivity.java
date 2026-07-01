@@ -27,6 +27,13 @@ import nostalgia.framework.base.SlotUtils;
 import nostalgia.framework.ui.widget.PopupMenu;
 import nostalgia.framework.utils.NLog;
 
+/**
+ * 存档槽位选择 Activity。
+ * <p>
+ * 显示 8 个存档槽位，支持加载和保存两种模式。
+ * 每个槽位显示截图、日期和时间信息，支持长按弹出操作菜单。
+ * </p>
+ */
 public class SlotSelectionActivity extends AppCompatActivity {
 
     public static final String EXTRA_GAME = "EXTRA_GAME";
@@ -46,6 +53,7 @@ public class SlotSelectionActivity extends AppCompatActivity {
     int saveFocusIdx = 0;
     private ActionBar actionBar;
 
+    /** 初始化单个槽位的显示内容 */
     private void initSlot(final SlotInfo slotInfo, final int idx, final String labelS,
                           String messageS, final String dateS, final String timeS) {
 
@@ -83,6 +91,7 @@ public class SlotSelectionActivity extends AppCompatActivity {
         }
     }
 
+    /** 槽位被选中时的处理 */
     private void onSelected(GameDescription game, int slot, boolean isUsed) {
         if (type == DIALOAG_TYPE_LOAD && (!isUsed)) {
             return;

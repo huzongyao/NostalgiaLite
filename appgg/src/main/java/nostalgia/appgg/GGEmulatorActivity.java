@@ -3,8 +3,18 @@ package nostalgia.appgg;
 import nostalgia.framework.Emulator;
 import nostalgia.framework.base.EmulatorActivity;
 
+/**
+ * Game Gear 游戏运行界面 Activity。
+ * <p>继承自 {@link EmulatorActivity}，负责 GG 游戏的实时渲染。
+ * 使用 OpenGL ES 片段着色器将 RGB 三通道分离纹理合成显示。</p>
+ */
 public class GGEmulatorActivity extends EmulatorActivity {
 
+    /**
+     * GLSL 片段着色器。
+     * <p>将纹理中的 Alpha 通道分离为 R、G、B 三个通道：
+     * 第一行读取红色通道，第二行读取绿色通道，第三行读取蓝色通道。</p>
+     */
     private static String shader = "precision mediump float;"
             + "varying vec2 v_texCoord;                     "
             + "uniform sampler2D s_texture;                 "
@@ -30,11 +40,19 @@ public class GGEmulatorActivity extends EmulatorActivity {
         return shader;
     }
 
+    /**
+     * 获取 OpenGL 纹理尺寸。
+     * @return 纹理尺寸 512
+     */
     @Override
     public int getGLTextureSize() {
         return 512;
     }
 
+    /**
+     * 是否使用调色板渲染。
+     * @return 始终返回 false，GG 使用 RGB 分离渲染而非调色板
+     */
     public boolean hasGLPalette() {
         return false;
     }

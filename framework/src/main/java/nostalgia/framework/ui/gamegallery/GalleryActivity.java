@@ -37,6 +37,14 @@ import nostalgia.framework.utils.DialogUtils;
 import nostalgia.framework.utils.EmuUtils;
 import nostalgia.framework.utils.NLog;
 
+/**
+ * 游戏画廊 Activity。
+ * <p>
+ * 使用 ViewPager + TabLayout 展示游戏列表，支持按名称、最近游玩、
+ * 游玩次数排序。支持多选模式、删除游戏、导入 ROM、搜索 ROM 等功能。
+ * 继承自 BaseGameGalleryActivity 并实现游戏点击和长按事件。
+ * </p>
+ */
 public abstract class GalleryActivity extends BaseGameGalleryActivity
         implements OnItemClickListener {
 
@@ -51,7 +59,9 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
     private boolean rotateAnim = false;
     private TabLayout mTabLayout;
     
+    /** 后台线程池，用于数据库操作和文件处理 */
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    /** 主线程 Handler，用于将结果回调到 UI 线程 */
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     @Override
@@ -101,6 +111,7 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
         return super.onCreateOptionsMenu(menu);
     }
     
+    /** 更新菜单栏可见性（多选模式 vs 普通模式） */
     private void updateMenuVisibility(Menu menu) {
         boolean isMultiSelect = adapter.isMultiSelectMode();
         if (menu != null) {
@@ -157,6 +168,7 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
         return super.onOptionsItemSelected(item);
     }
     
+    /** 更新标题栏显示（多选模式显示选中数量） */
     private void updateActionMode() {
         boolean isMultiSelect = adapter.isMultiSelectMode();
         int selectedCount = adapter.getSelectedCount();
@@ -176,12 +188,14 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
         invalidateOptionsMenu();
     }
     
+    /** 退出多选模式 */
     private void exitMultiSelectMode() {
         adapter.setMultiSelectMode(false);
         adapter.clearSelection();
         updateActionMode();
     }
     
+    /** 删除选中的游戏（包括数据库记录和文件） */
     private void deleteSelectedGames() {
         ArrayList<GameDescription> selectedGames = adapter.getSelectedGames();
         if (selectedGames.isEmpty()) {
@@ -306,6 +320,7 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
         }
     }
     
+    /** 处理游戏选中事件（从压缩包解压后） */
     private void handleGameSelected(GameDescription game, File gameFile) {
         if (gameFile.exists()) {
             game.lastGameTime = System.currentTimeMillis();
@@ -339,6 +354,7 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
         }
     }
 
+    /** 启动模拟器 Activity */
     public boolean onGameSelected(GameDescription game, int slot) {
         Intent intent = new Intent(this, getEmulatorActivityClass());
         intent.putExtra(EmulatorActivity.EXTRA_GAME, game);
@@ -360,6 +376,7 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
         updateGameVisibility(adapter.getAllGames());
     }
     
+    /** 更新游戏列表可见性（无游戏时显示提示文本） */
     private void updateGameVisibility(ArrayList<GameDescription> games) {
         if (games.isEmpty()) {
             pager.setVisibility(View.GONE);
@@ -370,6 +387,7 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
         }
     }
 
+    /** 显示搜索进度对话框 */
     private void showSearchProgressDialog(boolean zipMode) {
         if (searchDialog == null) {
             searchDialog = new ProgressDialog(this);

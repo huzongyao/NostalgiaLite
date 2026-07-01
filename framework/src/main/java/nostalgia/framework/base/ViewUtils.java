@@ -8,6 +8,13 @@ import nostalgia.framework.Emulator;
 import nostalgia.framework.GfxProfile;
 import nostalgia.framework.ui.preferences.PreferenceUtil;
 
+/**
+ * 视口计算工具类，根据屏幕尺寸和模拟器图像比例计算最佳显示区域。
+ * <p>
+ * 支持全屏模式、用户自定义视口以及自动按比例缩放。优先从偏好设置加载，
+ * 否则根据屏幕和图像比例自动计算。
+ * </p>
+ */
 public class ViewUtils {
     private ViewUtils() {
     }

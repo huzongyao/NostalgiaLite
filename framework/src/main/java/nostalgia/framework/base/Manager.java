@@ -13,6 +13,12 @@ import nostalgia.framework.ui.gamegallery.GameDescription;
 import nostalgia.framework.utils.FileUtils;
 import nostalgia.framework.utils.NLog;
 
+/**
+ * 模拟器管理器，继承 {@link EmulatorRunner} 并扩展快进、金手指和存档复制功能。
+ * <p>
+ * 由 {@link EmulatorActivity} 创建，作为游戏界面的核心管理组件。
+ * </p>
+ */
 public class Manager extends EmulatorRunner {
 
     public Manager(Emulator emulator, Context context) {
@@ -27,6 +33,7 @@ public class Manager extends EmulatorRunner {
         emulator.setFastForwardFrameCount(frames);
     }
 
+    /** 将自动存档复制到指定槽位。 */
     public void copyAutoSave(int slot) {
         if (!emulator.isGameLoaded()) {
             throw new EmulatorException("game not loaded");
@@ -48,6 +55,7 @@ public class Manager extends EmulatorRunner {
         }
     }
 
+    /** 启用指定游戏的所有已激活金手指，返回启用的金手指数量。 */
     public int enableCheats(Context ctx, GameDescription game) {
         int numCheats = 0;
 

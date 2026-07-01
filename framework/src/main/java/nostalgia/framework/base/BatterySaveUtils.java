@@ -12,10 +12,21 @@ import nostalgia.framework.utils.EmuUtils;
 import nostalgia.framework.utils.FileUtils;
 
 
+/**
+ * 电池存档工具类，处理游戏电池存档文件（.sav）的复制和路径管理。
+ * <p>
+ * 当 ROM 所在目录不可写时，自动将存档复制到应用基础目录，
+ * 并通过 MD5 元数据文件避免重复复制。
+ * </p>
+ */
 public class BatterySaveUtils {
     private BatterySaveUtils() {
     }
 
+    /**
+     * 如果 ROM 所在目录不可写，则将 .sav 文件复制到应用基础目录。
+     * 通过 MD5 校验避免重复复制。
+     */
     public static void createSavFileCopyIfNeeded(Context context, String gameFilePath) {
         File gameFile = new File(gameFilePath);
         File batterySavFile =
@@ -57,6 +68,7 @@ public class BatterySaveUtils {
     }
 
 
+    /** 判断源文件是否已变更，需要重新复制。 */
     private static boolean needsRewrite(Context context, File sourceBatteryFile, String sourceMD5) {
         String previousSourceMD5;
         File metaFile = getMetaFile(context, sourceBatteryFile);
@@ -92,6 +104,10 @@ public class BatterySaveUtils {
         return new File(EmulatorUtils.getBaseDir(context), batterySavFile.getName() + ".meta");
     }
 
+    /**
+     * 获取电池存档的保存目录。
+     * 如果 ROM 所在目录不可写或位于缓存目录，则返回应用基础目录。
+     */
     public static String getBatterySaveDir(Context context, String gameFilePath) {
         File f = new File(gameFilePath);
         String directory = f.getParent();

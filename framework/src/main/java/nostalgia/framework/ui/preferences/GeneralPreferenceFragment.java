@@ -12,6 +12,13 @@ import android.preference.PreferenceFragment;
 import nostalgia.framework.R;
 
 
+/**
+ * 通用偏好设置 Fragment。
+ * <p>
+ * 加载全局偏好设置，初始化各设置项的状态和监听器，
+ * 包括振动、视频质量、键盘配置、快进、屏幕布局等。
+ * </p>
+ */
 public class GeneralPreferenceFragment extends PreferenceFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {

@@ -28,6 +28,14 @@ import nostalgia.framework.ui.gamegallery.GameDescription;
 import nostalgia.framework.utils.NLog;
 import nostalgia.framework.utils.EmuUtils;
 
+/**
+ * JNI 模拟器抽象基类，实现 {@link Emulator} 接口并通过 {@link JniBridge} 调用本地代码。
+ * <p>
+ * 封装了模拟器的核心功能：游戏加载、帧模拟、音视频渲染、存档读档、
+ * 按键输入、光枪、快进等。各平台模拟器（NES、GBC、GG）继承此类，
+ * 提供平台特定的 {@link JniBridge} 实例和图像/声音自动检测逻辑。
+ * </p>
+ */
 public abstract class JniEmulator implements Emulator {
     private static final String TAG = "JniEmulator";
     private static final int SIZE = 32768 * 2;
@@ -67,6 +75,7 @@ public abstract class JniEmulator implements Emulator {
         this.jni = getBridge();
     }
 
+    /** 获取平台特定的 JNI 桥接实例。 */
     public abstract JniBridge getBridge();
 
     @Override
@@ -241,6 +250,7 @@ public abstract class JniEmulator implements Emulator {
         }
     }
 
+    /** 设置按键的按下/释放状态，使用位运算组合多玩家按键。 */
     @Override
     public void setKeyPressed(int port, int key, boolean isPressed) {
         int n = port * 8;
@@ -255,6 +265,7 @@ public abstract class JniEmulator implements Emulator {
         }
     }
 
+    /** 设置按键的连发状态。 */
     public void setTurboEnabled(int port, int key, boolean isEnabled) {
         int n = port * 8;
         int t = ~turbos;
@@ -396,6 +407,7 @@ public abstract class JniEmulator implements Emulator {
         }
     }
 
+    /** 使用双缓冲区交换读取音频数据，避免音频撕裂。 */
     @Override
     public void readSfxData() {
         int length = jni.readSfxBuffer(sfxBuffer);
@@ -437,6 +449,7 @@ public abstract class JniEmulator implements Emulator {
         }
     }
 
+    /** 将音频缓冲区数据写入 AudioTrack 输出。 */
     @Override
     public void renderSfx() {
         synchronized (readyLock) {
@@ -469,6 +482,7 @@ public abstract class JniEmulator implements Emulator {
         bitmap = Bitmap.createBitmap(w, h, Config.ARGB_8888);
     }
 
+    /** 初始化 AudioTrack，配置采样率、声道和编码格式。 */
     private void initSound(SfxProfile sfx) {
         int format = sfx.isStereo ? AudioFormat.CHANNEL_OUT_STEREO : AudioFormat.CHANNEL_OUT_MONO;
         int encoding = sfx.encoding == SfxProfile.SoundEncoding.PCM8 ?
@@ -487,6 +501,7 @@ public abstract class JniEmulator implements Emulator {
         NLog.d(TAG, "sound init OK");
     }
 
+    /** 获取 ROM 文件的 MD5 校验值，结果会被缓存。 */
     private String getMD5(String path) {
         if (path == null) {
             path = getLoadedGame().path;

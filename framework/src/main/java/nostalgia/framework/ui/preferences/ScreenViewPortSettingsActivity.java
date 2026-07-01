@@ -19,6 +19,13 @@ import nostalgia.framework.ui.multitouchbutton.MultitouchLayer;
 import nostalgia.framework.ui.multitouchbutton.MultitouchLayer.EDIT_MODE;
 import nostalgia.framework.utils.DatabaseHelper;
 
+/**
+ * 屏幕视口设置 Activity。
+ * <p>
+ * 在编辑模式下调整游戏画面的显示位置和大小，
+ * 支持重置和保存屏幕布局配置。
+ * </p>
+ */
 public class ScreenViewPortSettingsActivity extends AppCompatActivity
         implements OnGameMenuListener {
 

@@ -23,6 +23,14 @@ import nostalgia.framework.KeyboardProfile;
 import nostalgia.framework.R;
 import nostalgia.framework.base.EmulatorHolder;
 
+/**
+ * 通用偏好设置 Activity。
+ * <p>
+ * 全局设置页面，包括视频质量、键盘配置、振动、快进、
+ * 屏幕布局、输入法、关于等设置项。
+ * 支持键盘配置文件的创建、编辑和切换。
+ * </p>
+ */
 public class GeneralPreferenceActivity extends AppCompatPreferenceActivity {
 
     static String[] keyboardProfileNames = null;
@@ -163,6 +171,7 @@ public class GeneralPreferenceActivity extends AppCompatPreferenceActivity {
         super.onPause();
     }
 
+    /** 初始化键盘配置文件列表，包含“新建配置文件”选项 */
     private void initKeyboardProfiles() {
         ArrayList<String> names = KeyboardProfile.getProfilesNames(this);
         keyboardProfileNames = new String[names.size() + 1];

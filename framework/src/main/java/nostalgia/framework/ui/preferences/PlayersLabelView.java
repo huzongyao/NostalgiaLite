@@ -9,6 +9,13 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
 
+/**
+ * 玩家标签视图。
+ * <p>
+ * 在键盘设置界面显示“PLAYER 1”、“PLAYER 2”等玩家标签，
+ * 支持滚动时动态定位显示。
+ * </p>
+ */
 public class PlayersLabelView extends View {
 
     private static final String TAG = "PlayersLabelView";

@@ -46,15 +46,31 @@ import nostalgia.framework.base.EmulatorUtils;
 import nostalgia.framework.base.SlotUtils;
 import nostalgia.framework.ui.gamegallery.GameDescription;
 
+/**
+ * 模拟器通用工具类。
+ * <p>提供文件哈希计算、ZIP 解压、OpenGL ES 2.0 支持检测、
+ * 设备类型判断、网络状态查询、屏幕截图生成等通用工具方法。</p>
+ *
+ * @author NostalgiaLite
+ */
 public class EmuUtils {
 
     private static final String TAG = "utils.EmuUtils";
+    /** MD5 计算时的最大读取字节数 */
     private static final int MD5_BYTES_COUNT = 10240;
+    /** 复用的屏幕尺寸测量点 */
     private static Point size = new Point();
 
+    /** 私有构造，禁止实例化 */
     private EmuUtils() {
     }
 
+    /**
+     * 去除文件扩展名。
+     *
+     * @param str 文件名
+     * @return 不含扩展名的文件名
+     */
     public static String stripExtension(String str) {
         if (str == null)
             return null;
@@ -64,6 +80,12 @@ public class EmuUtils {
         return str.substring(0, pos);
     }
 
+    /**
+     * 计算文件的 MD5 校验和。
+     *
+     * @param file 要计算的文件
+     * @return MD5 十六进制字符串，失败返回空字符串
+     */
     public static String getMD5Checksum(File file) {
         InputStream fis = null;
         try {
@@ -81,10 +103,24 @@ public class EmuUtils {
         return "";
     }
 
+    /**
+     * 计算输入流的 MD5 校验和。
+     *
+     * @param zis 输入流
+     * @return MD5 十六进制字符串
+     * @throws IOException 读取失败时抛出
+     */
     public static String getMD5Checksum(InputStream zis) throws IOException {
         return countMD5(zis);
     }
 
+    /**
+     * 计算 Uri 指向内容的 MD5 校验和。
+     *
+     * @param context 上下文
+     * @param uri     内容 Uri
+     * @return MD5 十六进制字符串，失败返回空字符串
+     */
     public static String getMD5Checksum(Context context, Uri uri) {
         InputStream is = null;
         try {
@@ -102,6 +138,14 @@ public class EmuUtils {
         return "";
     }
     
+    /**
+     * 将 Uri 指向的内容复制到目标文件。
+     *
+     * @param context     上下文
+     * @param uri         源内容 Uri
+     * @param destination 目标文件
+     * @return 复制成功返回目标文件，失败返回 null
+     */
     public static File copyUriToFile(Context context, Uri uri, File destination) {
         InputStream is = null;
         FileOutputStream os = null;
@@ -131,6 +175,14 @@ public class EmuUtils {
         }
     }
 
+    /**
+     * 计算输入流的 MD5 校验和（内部实现）。
+     * <p>仅读取前 {@value #MD5_BYTES_COUNT} 字节进行计算，
+     * 若文件小于该阈值则返回 "small file"。</p>
+     *
+     * @param is 输入流
+     * @return MD5 十六进制字符串
+     */
     private static String countMD5(InputStream is) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
@@ -167,6 +219,13 @@ public class EmuUtils {
         return "";
     }
 
+    /**
+     * 获取 ZIP 文件中指定条目的 CRC32 校验值。
+     *
+     * @param dir   ZIP 文件路径
+     * @param entry 条目名称
+     * @return CRC32 值，失败返回 -1
+     */
     public static long getCrc(String dir, String entry) {
         try {
             ZipFile zf = new ZipFile(dir);
@@ -177,6 +236,12 @@ public class EmuUtils {
         }
     }
 
+    /**
+     * 检查设备是否支持 OpenGL ES 2.0。
+     *
+     * @param context 上下文
+     * @return 支持返回 true
+     */
     public static boolean checkGL20Support(Context context) {
         EGL10 egl = (EGL10) EGLContext.getEGL();
         EGLDisplay display = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
@@ -194,6 +259,14 @@ public class EmuUtils {
         return num_config[0] > 0;
     }
 
+    /**
+     * 从 ZIP 文件中解压指定条目到目标文件。
+     *
+     * @param zipFile    源 ZIP 文件
+     * @param entryName  条目名称
+     * @param outputFile 输出文件
+     * @throws IOException 解压失败时抛出
+     */
     public static void extractFile(File zipFile, String entryName, File outputFile)
             throws IOException {
         NLog.i(TAG, "extract " + entryName + " from " + zipFile.getAbsolutePath() + " to "
@@ -214,6 +287,7 @@ public class EmuUtils {
         }
     }
 
+    /** 去除文件扩展名（与 {@link #stripExtension} 功能相同） */
     public static String removeExt(String fileName) {
         int idx = fileName.lastIndexOf('.');
         if (idx > 0) {
@@ -223,6 +297,7 @@ public class EmuUtils {
         }
     }
 
+    /** 获取文件扩展名（不含点号） */
     public static String getExt(String fileName) {
         int idx = fileName.lastIndexOf('.');
         if (idx > 0) {
@@ -232,6 +307,7 @@ public class EmuUtils {
         }
     }
 
+    /** 根据设备特性判断设备类型（手机/平板/电视） */
     public static ServerType getDeviceType(Context context) {
         if (context.getPackageManager().hasSystemFeature("android.hardware.telephony")) {
             return ServerType.mobile;
@@ -242,16 +318,19 @@ public class EmuUtils {
         }
     }
 
+    /** 获取屏幕显示宽度（像素） */
     public static int getDisplayWidth(Display display) {
         display.getSize(size);
         return size.x;
     }
 
+    /** 获取屏幕显示高度（像素） */
     public static int getDisplayHeight(Display display) {
         display.getSize(size);
         return size.y;
     }
 
+    /** 检查应用是否为可调试模式 */
     public static boolean isDebuggable(Context ctx) {
         boolean debuggable = false;
         PackageManager pm = ctx.getPackageManager();
@@ -263,6 +342,7 @@ public class EmuUtils {
         return debuggable;
     }
 
+    /** 检查网络是否可用 */
     public static boolean isNetworkAvailable(Context context) {
         ConnectivityManager connectivityManager =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -270,6 +350,7 @@ public class EmuUtils {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
+    /** 检查 WiFi 是否已连接 */
     public static boolean isWifiAvailable(Context context) {
         WifiManager manager = (WifiManager)
                 context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
@@ -277,6 +358,7 @@ public class EmuUtils {
         return (manager.getWifiState() == WifiManager.WIFI_STATE_ENABLED) & (wifiInfo.getIpAddress() != 0);
     }
 
+    /** 获取局域网广播地址 */
     public static InetAddress getBroadcastAddress(Context context) {
         String ip = getNetPrefix(context) + ".255";
         try {
@@ -286,6 +368,7 @@ public class EmuUtils {
         }
     }
 
+    /** 获取本机 IP 信息（内部实现） */
     private static IpInfo getIP() {
         try {
             IpInfo result = new IpInfo();
@@ -321,16 +404,25 @@ public class EmuUtils {
         return new IpInfo();
     }
 
+    /** 获取本机所在网段前缀（如 "192.168.1"） */
     public static String getNetPrefix(Context context) {
         IpInfo info = getIP();
         int prefix = info.address & info.netmask;
         return ((prefix >> 24) & 0xff) + "." + ((prefix >> 16) & 0xff) + "." + ((prefix >> 8) & 0xff);
     }
 
+    /** 获取本机 IP 地址字符串 */
     public static String getIpAddr(Context context) {
         return getIP().sAddress;
     }
 
+    /**
+     * 为游戏创建截图缩略图 Bitmap（2 倍放大，无抗锯齿）。
+     *
+     * @param context 上下文
+     * @param game    游戏描述
+     * @return 放大后的截图 Bitmap
+     */
     public static Bitmap createScreenshotBitmap(Context context, GameDescription game) {
         String path = SlotUtils.getScreenshotPath(EmulatorUtils.getBaseDir(context), game.checksum, 0);
         Bitmap bitmap = BitmapFactory.decodeFile(path);
@@ -351,6 +443,7 @@ public class EmuUtils {
         return largeBitmap;
     }
 
+    /** 检查指定 Action 的 Intent 是否有应用可处理 */
     public static boolean isIntentAvailable(Context context, String action) {
         final PackageManager packageManager = context.getPackageManager();
         final Intent intent = new Intent(action);
@@ -359,10 +452,12 @@ public class EmuUtils {
         return list.size() > 0;
     }
 
+    /** 设备类型枚举：手机、平板、电视 */
     public enum ServerType {
         mobile, tablet, tv
     }
 
+    /** IP 地址信息封装类 */
     public static class IpInfo {
         public String sAddress;
         public int address;

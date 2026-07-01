@@ -26,11 +26,23 @@ import java.util.Set;
 
 import nostalgia.framework.R;
 
+/**
+ * 游戏列表适配器。
+ * <p>
+ * 实现 SectionIndexer 接口，支持快速滚动定位。
+ * 支持按名称、插入日期、游玩次数、最近游玩四种排序方式，
+ * 以及名称过滤和多选模式。
+ * </p>
+ */
 public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
 
+    /** 按名称字母排序 */
     public static final int SORT_BY_NAME_ALPHA = 0;
+    /** 按插入日期排序 */
     public static final int SORT_BY_INSERT_DATE = 1;
+    /** 按游玩次数排序 */
     public static final int SORT_BY_MOST_PLAYED = 2;
+    /** 按最近游玩时间排序 */
     public static final int SORT_BY_LAST_PLAYED = 3;
 
     private HashMap<Character, Integer> alphaIndexer = new HashMap<>();
@@ -140,6 +152,7 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
         return convertView;
     }
     
+    /** 获取文件扩展名 */
     private String getFileExtension(String filename) {
         int lastDot = filename.lastIndexOf('.');
         if (lastDot > 0 && lastDot < filename.length() - 1) {
@@ -148,16 +161,19 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
         return "";
     }
 
+    /** 设置过滤关键字 */
     public void setFilter(String filter) {
         this.filter = filter.toLowerCase();
         filterGames();
     }
 
+    /** 设置游戏列表（替换） */
     public void setGames(ArrayList<GameDescription> games) {
         this.games = new ArrayList<>(games);
         filterGames();
     }
 
+    /** 添加新游戏（去重），返回总数 */
     public int addGames(ArrayList<GameDescription> newGames) {
         for (GameDescription game : newGames) {
             if (!games.contains(game)) {
@@ -168,10 +184,12 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
         return games.size();
     }
     
+    /** 获取游戏列表副本 */
     public ArrayList<GameDescription> getGames() {
         return new ArrayList<>(games);
     }
 
+    /** 过滤和排序游戏列表 */
     private void filterGames() {
         filterGames.clear();
         switch (sortType) {
@@ -221,6 +239,7 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
         super.notifyDataSetChanged();
     }
 
+    /** 设置排序类型 */
     public void setSortType(int sortType) {
         this.sortType = sortType;
         filterGames();
@@ -270,6 +289,7 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
         filterGames();
     }
 
+    /** 列表行数据项 */
     public class RowItem {
         GameDescription game;
         char firstLetter;

@@ -1,3 +1,7 @@
+/**
+ * GBC 模拟器基类实现。
+ * <p>实现帧渲染、双缓冲交换、历史状态环形缓冲、音频缓冲读取等通用逻辑。</p>
+ */
 
 #include "Emulator.h"
 #include <android/bitmap.h>
@@ -7,7 +11,9 @@
 
 using namespace emudroid;
 
+/** 全局 Java 虚拟机指针 */
 JavaVM *jvm;
+/** 构造模拟器 */
 Emulator::Emulator() {
     viewPortHeight = 0;
     viewPortWidth = 0;
@@ -22,6 +28,7 @@ Emulator::Emulator() {
     emuPalette = new PALETTE_TYPE[256];
 }
 
+/** 设置视口尺寸 */
 bool Emulator::setViewPortSize(int w, int h) {
     viewPortWidth = w;
     viewPortHeight = h;
@@ -34,25 +41,31 @@ bool Emulator::setViewPortSize(int w, int h) {
     return true;
 }
 
+/** 启用金手指（基类默认不实现） */
 bool Emulator::enableCheat(const char *cheat, int type) {
     return false;
 }
 
 
+/** 启用原始金手指（基类默认不实现） */
 bool Emulator::enableRawCheat(int addr, int val, int comp) {
     return false;
 }
 
+/** 光枪发射（基类默认不实现） */
 bool Emulator::fireZapper(int x, int y) {
     return false;
 }
 
+/** 读取调色板数据 */
 bool Emulator::readPalette(JNIEnv *env, jintArray result) {
     env->SetIntArrayRegion(result, 0, 256, (const int*) emuPalette);
     return true;
 }
 
+/** 全局连发计数器 */
 int turboCounter = 0;
+/** 执行一帧模拟 */
 bool Emulator::emulateFrame(int keys, int turbos, int numFramesToSkip) {
     if (turboCounter == 0) {
         keys &= turbos;
@@ -69,6 +82,7 @@ bool Emulator::emulateFrame(int keys, int turbos, int numFramesToSkip) {
     return res;
 }
 
+/** 加载存档状态 */
 bool Emulator::loadState(const char*path, int slot) {
     if (slot != 0) {
         historyIndex = -1;
@@ -78,6 +92,7 @@ bool Emulator::loadState(const char*path, int slot) {
     return doLoadState(path, slot);
 }
 
+/** 加载游戏 */
 bool Emulator::loadGame(const char*path, const char*batteryPath, const char*strippedName) {
     if (strcmp(lastPath, path) != 0) {
         historyIndex = -1;
@@ -91,6 +106,7 @@ bool Emulator::loadGame(const char*path, const char*batteryPath, const char*stri
 }
 
 // based on http://willperone.net/Code/codescaling.php
+/** 渲染当前帧到 Bitmap（基于 Bresenham 缩放） */
 bool Emulator::render(JNIEnv *env, jobject bitmap, int w, int h, BUFFER_TYPE *force) {
     int stable = swapBuffersBeforeRead();
     void *pixels;
@@ -151,6 +167,7 @@ bool Emulator::render(JNIEnv *env, jobject bitmap, int w, int h, BUFFER_TYPE *fo
     return true;
 }
 
+/** 启用/禁用历史状态记录 */
 bool Emulator::setHistoryEnabled(bool enabled) {
     if (enabled && !historyEnabled) {
         historyIndex = -1;
@@ -161,6 +178,7 @@ bool Emulator::setHistoryEnabled(bool enabled) {
     return true;
 }
 
+/** 保存到历史缓冲 */
 bool Emulator::saveToHistory() {
     historyIndex++;
 
@@ -175,6 +193,7 @@ bool Emulator::saveToHistory() {
     return doSaveHistoryState(historyIndex);
 }
 
+/** 获取历史状态帧数 */
 int Emulator::getHistoryItemCount() {
     if (!historyEnabled) {
         return 0;
@@ -183,6 +202,7 @@ int Emulator::getHistoryItemCount() {
     return historySize;
 }
 
+/** 加载历史状态 */
 bool Emulator::loadHistoryState(int delta) {
     if (delta > getHistoryItemCount()) {
         return false;
@@ -204,6 +224,7 @@ bool Emulator::loadHistoryState(int delta) {
     return res;
 }
 
+/** 偏移转索引 */
 int Emulator::posToIdx(int delta) {
     int curPos = historyIndex;
     curPos -= delta;
@@ -215,6 +236,7 @@ int Emulator::posToIdx(int delta) {
     return curPos;
 }
 
+/** OpenGL 纹理渲染 */
 bool Emulator::renderGL() {
     int stable = swapBuffersBeforeRead();
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, origWidth, origHeight, GL_ALPHA,
@@ -236,6 +258,7 @@ void CThreadLock::Unlock() {
     pthread_mutex_unlock(&mutexlock);
 }
 
+/** 读取音频缓冲 */
 int Emulator::readSfxBuffer(JNIEnv *env, jobject obj, jshortArray data) {
     CThreadLock lock = sfxLock;
     lock.Lock();
@@ -248,9 +271,11 @@ int Emulator::readSfxBuffer(JNIEnv *env, jobject obj, jshortArray data) {
     return len;
 }
 
+/** 析构 */
 Emulator::~Emulator() {
 }
 
+/** 渲染前交换缓冲 */
 int Emulator::swapBuffersBeforeRead() {
     CThreadLock lock = gfxLock;
     lock.Lock();
@@ -267,6 +292,7 @@ int Emulator::swapBuffersBeforeRead() {
     return res;
 }
 
+/** 渲染后交换缓冲 */
 void Emulator::swapBuffersAfterWrite() {
     CThreadLock lock = gfxLock;
     lock.Lock();
@@ -277,6 +303,7 @@ void Emulator::swapBuffersAfterWrite() {
     lock.Unlock();
 }
 
+/** 初始化缓冲区 */
 void Emulator::initBuffers() {
     for (int i = 0; i < 3; i++) {
         gfxBufs[i] = new BUFFER_TYPE[getGfxBufferSize()];

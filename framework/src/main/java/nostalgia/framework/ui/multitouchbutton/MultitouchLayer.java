@@ -45,6 +45,14 @@ import nostalgia.framework.ui.preferences.PreferenceUtil;
 import nostalgia.framework.utils.EmuUtils;
 import nostalgia.framework.utils.NLog;
 
+/**
+ * 多点触控层。
+ * <p>
+ * 核心触控控制层，负责管理所有虚拟按钮的触摸事件分发、
+ * 按钮位图渲染、编辑模式（布局调整）和配置文件持久化。
+ * 支持最多 6 个手指同时触控，通过像素级触摸映射实现精确的按钮命中检测。
+ * </p>
+ */
 public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
 
     private static final String TAG = "MultitouchLayer";
@@ -1233,6 +1241,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
     }
 
 
+    /** 编辑模式枚举 */
     public enum EDIT_MODE {
         NONE, TOUCH, SCREEN
     }
@@ -1241,6 +1250,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
         void onClick();
     }
 
+    /** 可编辑元素（按钮或屏幕区域） */
     private class EditElement {
 
         RectF boundingbox = new RectF();

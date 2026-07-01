@@ -16,6 +16,13 @@ import java.util.List;
 
 import nostalgia.framework.R;
 
+/**
+ * 作弊码列表适配器。
+ * <p>
+ * 用于在 ListView 中展示作弊码条目，包含作弊码字符、描述、
+ * 启用复选框以及编辑/删除按钮。
+ * </p>
+ */
 public class CheatsListAdapter extends ArrayAdapter<Cheat> {
 
     LayoutInflater inflater;

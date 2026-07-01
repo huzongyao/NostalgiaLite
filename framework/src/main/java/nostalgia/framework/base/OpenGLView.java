@@ -22,6 +22,12 @@ import nostalgia.framework.Emulator;
 import nostalgia.framework.GfxProfile;
 import nostalgia.framework.utils.NLog;
 
+/**
+ * OpenGL 硬件加速渲染视图，使用 GLES20 渲染模拟器帧。
+ * <p>
+ * 支持主纹理和可选的调色板纹理，通过自定义片段着色器实现像素级精确渲染。
+ * </p>
+ */
 @SuppressLint("ViewConstructor")
 class OpenGLView extends GLSurfaceView implements EmulatorView {
     private static final String TAG = "base.OpenGLView";

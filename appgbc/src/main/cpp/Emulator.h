@@ -1,3 +1,8 @@
+/**
+ * GBC 模拟器基类头文件。
+ * <p>定义 Emulator 抽象基类和 CThreadLock 线程锁工具类，
+ * 与 appnes 模块结构相同，提供帧渲染、音频缓冲、历史状态等通用接口。</p>
+ */
 
 #ifndef EMULATOR_H_
 #define EMULATOR_H_
@@ -9,6 +14,7 @@
 
 namespace emudroid {
 
+    /** 线程互斥锁封装 */
     class CThreadLock {
     public:
         CThreadLock();
@@ -24,6 +30,7 @@ namespace emudroid {
     };
 
 
+    /** 模拟器抽象基类，提供通用模拟功能接口 */
     class Emulator {
 
     public:
@@ -88,6 +95,7 @@ namespace emudroid {
         JavaVM *jvm;
     protected:
 
+        /** 历史状态环形缓冲区大小 */
         static const int HIS_SIZE = 40;
 
         virtual bool emulate(int keys, int turbos, int numFramesToSkip) = 0;

@@ -43,6 +43,14 @@ import nostalgia.framework.base.EmulatorHolder;
 import nostalgia.framework.controllers.KeyboardController;
 import nostalgia.framework.utils.NLog;
 
+/**
+ * 键盘设置 Activity。
+ * <p>
+ * 管理键盘映射配置文件的编辑，支持创建新配置文件、
+ * 修改按键映射、删除配置文件等功能。
+ * 支持物理键盘和游戏手柄的按键映射。
+ * </p>
+ */
 public class KeyboardSettingsActivity extends AppCompatActivity
         implements OnItemClickListener {
 
@@ -106,6 +114,7 @@ public class KeyboardSettingsActivity extends AppCompatActivity
         NON_PRINTABLE_KEY_LABELS.put(KeyEvent.KEYCODE_BUTTON_L2, "L2");
     }
 
+    /** 获取按键码的显示标签 */
     public static String getKeyLabel(int keyCode) {
         if (keyCode == 0) {
             return "";
@@ -311,6 +320,7 @@ public class KeyboardSettingsActivity extends AppCompatActivity
         }
     }
 
+    /** 处理按键事件，将按键映射到指定按钮 */
     private boolean proccessKeyEvent(String txt, DialogInterface dialog, int keyCode, int position) {
         NLog.i(TAG, "txt:" + txt);
         if (!txt.equals("") && keyCode != KeyEvent.KEYCODE_BACK) {
@@ -341,6 +351,7 @@ public class KeyboardSettingsActivity extends AppCompatActivity
         }
     }
 
+    /** 按键映射列表适配器 */
     private class Adapter extends BaseAdapter {
 
         LayoutInflater inflater;

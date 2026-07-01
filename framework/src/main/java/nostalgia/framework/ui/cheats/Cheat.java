@@ -10,10 +10,22 @@ import java.util.Map.Entry;
 
 import nostalgia.framework.utils.NLog;
 
+/**
+ * 金手指/作弊码数据模型。
+ * <p>
+ * 每条作弊码包含字符序列（chars）、描述（desc）和启用状态（enable）。
+ * 作弊码数据通过 SharedPreferences 持久化，以游戏哈希值为前缀存储。
+ * 支持作弊码的原始格式解析（地址:值）和序列化。
+ * </p>
+ */
 public class Cheat {
+    /** SharedPreferences 键后缀 */
     public static final String CHEAT_PREF_SUFFIX = ".cheats";
+    /** 作弊码字符序列（格式：地址[?比较值]:值，十六进制） */
     String chars = "";
+    /** 作弊码描述 */
     String desc = "";
+    /** 是否启用 */
     boolean enable = false;
 
     public Cheat(String chars, String desc, boolean enable) {
@@ -23,6 +35,7 @@ public class Cheat {
     }
 
 
+    /** 获取指定游戏的所有作弊码 */
     public static ArrayList<Cheat> getAllCheats(Context context, String gameHash) {
         ArrayList<Cheat> result = new ArrayList<>();
         SharedPreferences pref =
@@ -42,6 +55,7 @@ public class Cheat {
         return result;
     }
 
+    /** 将原始作弊码字符串解析为 [地址, 值, 比较值] 数组 */
     public static int[] rawToValues(String raw) {
         String comp = null;
         String addr = raw.split(":")[0];
@@ -65,6 +79,7 @@ public class Cheat {
         return new int[]{iaddr, ival, icomp};
     }
 
+    /** 将地址、值、比较值序列化为原始字符串格式 */
     public static String valuesToRaw(int addr, int val, int comp) {
         String hexAddr = Integer.toHexString(addr);
         String hexVal = Integer.toHexString(val);
@@ -80,6 +95,7 @@ public class Cheat {
     }
 
 
+    /** 获取指定游戏所有已启用的作弊码字符序列 */
     public static ArrayList<String> getAllEnableCheats(Context context, String gameHash) {
         ArrayList<Cheat> cheats = getAllCheats(context, gameHash);
         ArrayList<String> result = new ArrayList<>();
@@ -91,6 +107,7 @@ public class Cheat {
     }
 
 
+    /** 保存作弊码列表到 SharedPreferences */
     public static void saveCheats(Context context, String gameHash, ArrayList<Cheat> items) {
         SharedPreferences pref =
                 context.getSharedPreferences(gameHash + CHEAT_PREF_SUFFIX, Context.MODE_PRIVATE);

@@ -12,9 +12,11 @@ import java.util.TimerTask;
 import nostalgia.framework.R;
 
 /**
- * Created by huzongyao on 2018/6/4.
+ * 启动画面 Activity。
+ * <p>
+ * 显示启动 Logo 800ms 后自动跳转到游戏画廊页面。
+ * </p>
  */
-
 public class SplashActivity extends Activity {
 
     @Override
@@ -30,6 +32,7 @@ public class SplashActivity extends Activity {
         }, 800L);
     }
 
+    /** 延迟 800ms 后启动游戏画廊 */
     private void startActivity() {
         Intent intent = new Intent();
         intent.setAction(getString(R.string.action_gallery_page));

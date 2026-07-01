@@ -6,6 +6,12 @@ import android.preference.ListPreference;
 import android.util.AttributeSet;
 
 
+/**
+ * 可控列表偏好设置。
+ * <p>
+ * 继承自 ListPreference，提供对话框显示的控制能力。
+ * </p>
+ */
 public class ControllableListPreference extends ListPreference {
 
     public ControllableListPreference(Context context, AttributeSet attrs) {

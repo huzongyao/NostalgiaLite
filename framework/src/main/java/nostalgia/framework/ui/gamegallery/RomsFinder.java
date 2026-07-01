@@ -23,6 +23,14 @@ import nostalgia.framework.utils.EmuUtils;
 import nostalgia.framework.utils.NLog;
 import nostalgia.framework.utils.SDCardUtil;
 
+/**
+ * ROM 文件搜索器。
+ * <p>
+ * 在后台线程中搜索文件系统、ZIP 压缩包或 Uri 中的 ROM 文件，
+ * 支持单文件导入、多文件导入、文件系统扫描等模式。
+ * 通过回调接口通知搜索进度和结果。
+ * </p>
+ */
 public class RomsFinder extends Thread {
     private static final String TAG = "RomsFinder";
     private FilenameExtFilter filenameExtFilter;
@@ -83,6 +91,7 @@ public class RomsFinder extends Thread {
         return gameRepository.getAllGamesSortedByName();
     }
 
+    /** 递归搜索目录中的 ROM 和压缩包文件，最大深度 12 层 */
     private void getRomAndPackedFiles(File root, List<File> result, HashSet<String> usedPaths) {
         String dirPath = null;
         Stack<DirInfo> dirStack = new Stack<>();
@@ -161,6 +170,7 @@ public class RomsFinder extends Thread {
         }
     }
     
+    /** 导入单个文件 */
     private void importSingleFile(File file) {
         if (!running.get()) return;
         
@@ -205,6 +215,7 @@ public class RomsFinder extends Thread {
         }
     }
     
+    /** 从 Uri 导入单个文件（先复制到本地） */
     private void importSingleUri(Uri uri) {
         if (!running.get()) return;
         
@@ -235,6 +246,7 @@ public class RomsFinder extends Thread {
         }
     }
     
+    /** 批量导入多个 Uri */
     private void importMultipleUris() {
         if (!running.get()) return;
         
@@ -278,6 +290,7 @@ public class RomsFinder extends Thread {
         }
     }
     
+    /** 导入已复制到本地的文件 */
     private void importCopiedFile(File copiedFile, String filename) {
         String path = copiedFile.getAbsolutePath();
         
@@ -306,6 +319,7 @@ public class RomsFinder extends Thread {
         }
     }
     
+    /** 从 Uri 提取文件名 */
     private String getFilenameFromUri(Uri uri) {
         String result = null;
         try {
@@ -326,6 +340,7 @@ public class RomsFinder extends Thread {
         return result;
     }
     
+    /** 根据校验和查找已存在的游戏 */
     private GameDescription findGameByChecksum(String checksum) {
         for (GameDescription game : oldGames.values()) {
             if (game.checksum.equals(checksum)) {
@@ -335,6 +350,7 @@ public class RomsFinder extends Thread {
         return null;
     }
 
+    /** 检查 ZIP 压缩包内的 ROM 文件 */
     private void checkZip(File zipFile) {
         File externalCache = activity.getExternalCacheDir();
 
@@ -424,6 +440,7 @@ public class RomsFinder extends Thread {
         }
     }
 
+    /** 启动文件系统扫描模式 */
     private void startFileSystemMode(ArrayList<GameDescription> oldRoms) {
         HashSet<File> roots = new HashSet<>();
 
@@ -499,6 +516,7 @@ public class RomsFinder extends Thread {
         NLog.i(TAG, "time:" + ((System.currentTimeMillis() - startTime) / 1000));
     }
 
+    /** 停止搜索 */
     public void stopSearch() {
         if (running.get()) {
             listener.onRomsFinderCancel(true);
@@ -508,6 +526,7 @@ public class RomsFinder extends Thread {
         NLog.i(TAG, "cancel search");
     }
 
+    /** 移除不存在的 ROM 记录并去重 */
     private ArrayList<GameDescription> removeNonExistRoms(ArrayList<GameDescription> roms) {
         HashSet<String> hashs = new HashSet<>();
         ArrayList<GameDescription> newRoms = new ArrayList<>(roms.size());
@@ -550,6 +569,7 @@ public class RomsFinder extends Thread {
         return newRoms;
     }
 
+    /** ROM 搜索回调监听器接口 */
     public interface OnRomsFinderListener {
 
         void onRomsFinderStart(boolean searchNew);
@@ -569,6 +589,7 @@ public class RomsFinder extends Thread {
         void onRomsFinderCancel(boolean searchNew);
     }
 
+    /** 目录信息（用于递归搜索） */
     private class DirInfo {
         public File file;
         public int level;

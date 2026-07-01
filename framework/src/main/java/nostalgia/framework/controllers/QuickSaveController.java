@@ -12,6 +12,12 @@ import nostalgia.framework.base.EmulatorActivity;
 import nostalgia.framework.ui.gamegallery.GameDescription;
 import nostalgia.framework.ui.preferences.PreferenceUtil;
 
+/**
+ * 快速存档控制器，通过双击手势实现快速存档/读档。
+ * <p>
+ * 屏幕左半部分双击=读档，右半部分双击=存档。
+ * </p>
+ */
 public class QuickSaveController implements EmulatorController {
 
     TouchController touchController;

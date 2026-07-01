@@ -1,5 +1,11 @@
 package nostalgia.framework.base;
 
+/**
+ * 性能基准测试工具，用于测量模拟器和 OpenGL 渲染的帧率性能。
+ * <p>
+ * 在指定数量的帧后触发回调，根据测量结果自动调整模拟质量。
+ * </p>
+ */
 public class Benchmark {
     private boolean isRunning = true;
     private BenchmarkCallback callback;
@@ -52,6 +58,7 @@ public class Benchmark {
         return name;
     }
 
+    /** 基准测试完成时的回调接口。 */
     public interface BenchmarkCallback {
         void onBenchmarkReset(Benchmark benchmark);
 

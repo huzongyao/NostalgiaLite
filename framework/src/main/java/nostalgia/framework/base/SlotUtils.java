@@ -14,6 +14,14 @@ import java.util.List;
 import nostalgia.framework.SlotInfo;
 import nostalgia.framework.utils.NLog;
 
+/**
+ * 存档槽位工具类，管理游戏状态存档和截图文件。
+ * <p>
+ * 存档文件命名规则：{baseDir}/{md5}.{slot}.state，
+ * 截图文件命名规则：{baseDir}/{md5}.{slot}.png。
+ * 支持 8 个用户存档槽位和 1 个自动存档槽位。
+ * </p>
+ */
 public class SlotUtils {
     public static final int NUM_SLOTS = 8;
     private static final String SLOT_SUFFIX = ".state";

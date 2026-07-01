@@ -3,6 +3,9 @@ package nostalgia.framework.base;
 import android.app.Activity;
 import android.os.Bundle;
 
+/**
+ * OpenGL 兼容性测试 Activity，用于检测设备的 OpenGL 纹理能力。
+ */
 public class OpenGLTestActivity extends Activity
         implements OpenGLTestView.Callback {
 

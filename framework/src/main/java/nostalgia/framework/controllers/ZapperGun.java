@@ -11,6 +11,12 @@ import nostalgia.framework.base.ViewPort;
 import nostalgia.framework.ui.gamegallery.GameDescription;
 import nostalgia.framework.ui.preferences.PreferenceUtil;
 
+/**
+ * 光枪控制器，将触摸事件转换为光枪坐标。
+ * <p>
+ * 在视口区域内触摸即发射光枪，触摸点坐标会映射到模拟器屏幕坐标。
+ * </p>
+ */
 public class ZapperGun implements EmulatorController {
 
     private float startX;

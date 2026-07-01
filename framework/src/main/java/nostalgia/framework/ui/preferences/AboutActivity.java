@@ -14,9 +14,11 @@ import androidx.appcompat.widget.Toolbar;
 import nostalgia.framework.R;
 
 /**
- * Created by huzongyao on 17-11-10.
+ * 关于页面 Activity。
+ * <p>
+ * 显示应用版本号和关于信息，支持链接点击。
+ * </p>
  */
-
 public class AboutActivity extends AppCompatActivity {
 
     private TextView mTextVersion;
@@ -35,6 +37,7 @@ public class AboutActivity extends AppCompatActivity {
         getPackageVersionInfo();
     }
 
+    /** 获取并显示应用版本号 */
     private void getPackageVersionInfo() {
         try {
             PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);

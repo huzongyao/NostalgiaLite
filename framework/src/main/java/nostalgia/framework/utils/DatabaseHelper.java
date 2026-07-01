@@ -23,16 +23,32 @@ import nostalgia.framework.utils.annotations.Column;
 import nostalgia.framework.utils.annotations.ObjectFromOtherTable;
 import nostalgia.framework.utils.annotations.Table;
 
+/**
+ * 基于注解的 SQLite 数据库助手类。
+ * <p>通过反射和自定义注解（{@link Table}、{@link Column}、{@link ObjectFromOtherTable}）
+ * 实现 Java 实体类与 SQLite 表之间的自动映射，支持 CRUD 操作、深度关联查询和级联插入/更新。</p>
+ * <p>注意：此类为旧版数据库实现，新项目已迁移至 Room 数据库（{@link nostalgia.framework.data.AppDatabase}）。</p>
+ *
+ * @author NostalgiaLite
+ */
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "DatabaseHelper";
+    /** 数据库版本号 */
     private static int DB_VERSION_CODE = 21;
+    /** 注册的数据模型类（游戏描述、ZIP ROM 文件） */
     private Class<?>[] classes = new Class<?>[]{
             GameDescription.class,
             ZipRomFile.class
     };
+    /** 类元数据缓存，存储每个类的表名、字段、注解等信息 */
     private HashMap<Class<?>, ClassItem> classItems = new HashMap<>();
 
+    /**
+     * 构造数据库助手。
+     *
+     * @param context 上下文
+     */
     public DatabaseHelper(Context context) {
         super(context, "db", null, DB_VERSION_CODE);
         for (Class<?> cls : classes) {
@@ -40,6 +56,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    /** 创建所有注册的表 */
     @Override
     public void onCreate(SQLiteDatabase db) {
         try {
@@ -54,6 +71,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    /** 数据库升级时重建所有表（从版本 13 升级到 21 时跳过） */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion == 13 && newVersion == 21) {
@@ -63,6 +81,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    /** 根据实体类注解生成 CREATE TABLE SQL 语句 */
     private String getCreateSql(Class<?> cls) {
         ClassItem classItem = classItems.get(cls);
         String tableName = classItem.tableName;
@@ -143,6 +162,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return sql.toString();
     }
 
+    /** 获取集合类型字段的泛型参数类 */
     private Class<?> getCollectionGenericClass(Field field) {
         Type type = field.getGenericType();
 
@@ -156,6 +176,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    /** 删除所有注册的表（DROP TABLE） */
     private void removeTablesDB(SQLiteDatabase db) {
         for (Class<?> cls : classes) {
             Table table = cls.getAnnotation(Table.class);
@@ -172,6 +193,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    /** 清空所有表的数据（DELETE FROM） */
     private void clearTablesDB(SQLiteDatabase db) {
         for (Class<?> cls : classes) {
             Table table = cls.getAnnotation(Table.class);
@@ -187,6 +209,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    /** 清空所有表数据 */
     public void clearDB() {
         SQLiteDatabase db = getWritableDatabase();
 
@@ -198,6 +221,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    /** 更新对象到数据库（指定要更新的字段） */
     public void updateObjToDb(Object obj, String[] fields) {
         SQLiteDatabase db = getWritableDatabase();
 
@@ -212,6 +236,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    /** 插入单个对象到数据库 */
     public void insertObjToDb(Object obj) {
         SQLiteDatabase db = getWritableDatabase();
 
@@ -226,6 +251,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    /** 批量插入对象到数据库 */
     public void insertObjsToDb(List<Object> objs) {
         SQLiteDatabase db = getWritableDatabase();
 
@@ -244,6 +270,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    /** 统计符合条件的记录数 */
     public int countObjsInDb(Class<?> cls, String where) {
         where = where == null ? "" : where;
         SQLiteDatabase db = getWritableDatabase();
@@ -262,6 +289,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return count;
     }
 
+    /** 查询指定类型的所有记录 */
     public <T> ArrayList<T> selectObjsFromDb(Class<T> cls) {
         ArrayList<T> resultList = null;
         SQLiteDatabase db = getReadableDatabase();
@@ -276,6 +304,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return resultList;
     }
 
+    /** 查询指定类型记录（支持分组、排序和深度查询） */
     public <T> ArrayList<T> selectObjsFromDb(Class<T> cls, boolean deep, String groupBy, String orderBy) {
         ArrayList<T> resultList = null;
         SQLiteDatabase db = getReadableDatabase();
@@ -290,6 +319,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return resultList;
     }
 
+    /** 根据条件查询单条记录（深度查询） */
     public <T> T selectObjFromDb(Class<T> cls, String where) {
         ArrayList<T> resultList = null;
         SQLiteDatabase db = getReadableDatabase();
@@ -309,6 +339,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    /** 根据条件查询单条记录（可指定深度） */
     public <T> T selectObjFromDb(Class<T> cls, String where, boolean deep) {
         ArrayList<T> resultList = null;
         SQLiteDatabase db = getReadableDatabase();
@@ -323,6 +354,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return resultList.get(0);
     }
 
+    /** 内部更新对象到数据库（支持事务和级联更新） */
     private void updateObjToDb(Object obj, SQLiteDatabase db, String[] fields) {
         Class<?> cls = obj.getClass();
         HashSet<String> fieldsSet = new HashSet<>();
@@ -434,6 +466,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    /** 内部统计记录数 */
     private int countObjsInDb(Class<?> cls, SQLiteDatabase db, String where) {
         ClassItem classItem = classItems.get(cls);
         int count = -1;
@@ -456,6 +489,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    /** 内部插入对象到数据库（支持级联插入关联对象） */
     private void insertObjToDb(Object obj, SQLiteDatabase db, Pair<String, Long> idMapping) {
         Class<?> cls = obj.getClass();
         ClassItem classItem = classItems.get(cls);
@@ -555,6 +589,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    /** 按条件删除指定类型的记录 */
     public void deleteObjsFromDb(Class<?> cls, String where) {
         ClassItem classItem = classItems.get(cls);
         if (classItem != null) {
@@ -573,6 +608,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    /** 删除指定对象（根据主键匹配） */
     public void deleteObjFromDb(Object obj) {
         Class<?> cls = obj.getClass();
         ClassItem classItem = classItems.get(cls);
@@ -614,6 +650,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    /** 内部查询实现（支持条件、分组、排序、深度关联查询） */
     private <T> ArrayList<T> selectObjsFromDb(Class<T> cls, SQLiteDatabase db, String where,
                                               String groupby, String orderBy, boolean deep) {
         ClassItem classItem = classItems.get(cls);
@@ -721,6 +758,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    /**
+     * 类元数据封装类。
+     * <p>缓存实体类的字段、注解、表名等反射信息，
+     * 避免每次操作时重复解析注解。</p>
+     */
     private class ClassItem {
         Field[] fields = null;
         Column[] columns = null;
