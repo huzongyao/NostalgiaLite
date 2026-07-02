@@ -11,21 +11,26 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmerge-all-constants -fvisibility=hidde
 
 add_definitions(-Wno-narrowing)
 
-# Creates and names a library, sets it as either STATIC
-# or SHARED, and provides the relative paths to its source code.
-# You can define multiple libraries, and CMake builds it for you.
-# Gradle automatically packages shared libraries with your APK.
-file(GLOB_RECURSE NATIVE_SRCS *.c *.cpp)
+# 收集所有本地源文件，排除已移至 framework 共享的重复文件
+file(GLOB_RECURSE ALL_NATIVE_SRCS *.c *.cpp)
+set(NATIVE_SRCS ${ALL_NATIVE_SRCS})
+list(FILTER NATIVE_SRCS EXCLUDE REGEX ".*/Emulator\\.cpp$")
+list(FILTER NATIVE_SRCS EXCLUDE REGEX ".*/Bridge\\.cpp$")
+
+# framework 共享 C++ 源文件（模拟器基类 + JNI 桥接）
+set(FRAMEWORK_CPP_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../../../framework/src/main/cpp)
+set(SHARED_SRCS
+    ${FRAMEWORK_CPP_PATH}/Emulator.cpp
+    ${FRAMEWORK_CPP_PATH}/Bridge.cpp
+)
 
 include_directories(./ fceux/
                     fceux/boards/
-                    fceux/input/)
+                    fceux/input/
+                    ${FRAMEWORK_CPP_PATH})
 
-add_library(nes SHARED ${NATIVE_SRCS})
+add_library(nes SHARED ${NATIVE_SRCS} ${SHARED_SRCS})
 
 set_target_properties(nes PROPERTIES LINK_FLAGS "-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384")
 
-# Specifies libraries CMake should link to your target library. You
-# can link multiple libraries, such as libraries you define in the
-# build script, prebuilt third-party libraries, or system libraries.
 target_link_libraries(nes z log jnigraphics GLESv1_CM)

@@ -84,7 +84,7 @@ class OpenGLView extends GLSurfaceView implements EmulatorView {
                 + "   v_texCoord = a_texCoord;  							 "
                 + "}                            							 ";
 
-        private static String fragmentShaderCode;
+        private String fragmentShaderCode;
         public final int VERTEX_STRIDE = COORDS_PER_VERTEX * 4;
         public final int TEXTURE_STRIDE = COORDS_PER_TEXTURE * 4;
         private final short[] drawOrder = {0, 1, 2, 0, 2, 3};
@@ -198,6 +198,7 @@ class OpenGLView extends GLSurfaceView implements EmulatorView {
             }
 
             texCoordHandle = GLES20.glGetAttribLocation(program, "a_texCoord");
+            mvpMatrixHandle = GLES20.glGetUniformLocation(program, "uMVPMatrix");
             startTime = System.currentTimeMillis();
         }
 
@@ -234,7 +235,6 @@ class OpenGLView extends GLSurfaceView implements EmulatorView {
                     false, VERTEX_STRIDE, vertexBuffer);
             GLES20.glVertexAttribPointer(texCoordHandle, COORDS_PER_TEXTURE, GLES20.GL_FLOAT,
                     false, TEXTURE_STRIDE, textureBuffer);
-            mvpMatrixHandle = GLES20.glGetUniformLocation(program, "uMVPMatrix");
             GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, projMatrix, 0);
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mainTextureId);

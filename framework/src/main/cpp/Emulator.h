@@ -1,20 +1,24 @@
 /**
- * GBC 模拟器基类头文件。
- * <p>定义 Emulator 抽象基类和 CThreadLock 线程锁工具类，
- * 与 appnes 模块结构相同，提供帧渲染、音频缓冲、历史状态等通用接口。</p>
+ * 模拟器共享基类头文件。
+ * <p>定义 Emulator 抽象基类和 CThreadLock 线程锁工具类。
+ * Emulator 封装了帧渲染、音频缓冲、历史状态管理、双缓冲交换等通用逻辑，
+ * 具体平台（NES/GBC/GG）通过继承实现平台特有的模拟功能。</p>
+ * <p>各平台通过实现 getPixel() 虚函数提供不同的像素格式转换。</p>
  */
-
 #ifndef EMULATOR_H_
 #define EMULATOR_H_
 
 #include "jni.h"
-#include "settings.h"
+#include "settings_common.h"
 #include <pthread.h>
-#include <malloc.h>
+#include <string>
 
 namespace emudroid {
 
-    /** 线程互斥锁封装 */
+    /**
+     * 线程互斥锁封装。
+     * <p>基于 pthread_mutex 实现，用于保护图形和音频缓冲区的并发访问。</p>
+     */
     class CThreadLock {
     public:
         CThreadLock();
@@ -30,7 +34,13 @@ namespace emudroid {
     };
 
 
-    /** 模拟器抽象基类，提供通用模拟功能接口 */
+    /**
+     * 模拟器抽象基类。
+     * <p>提供帧模拟、渲染、存档、历史状态、金手指等通用接口。
+     * 采用三缓冲图形交换机制（working/working_copy/stable），
+     * 双缓冲音频交换机制，确保模拟线程和渲染线程的安全并发。</p>
+     * <p>子类必须实现 getPixel() 以提供平台特有的像素格式转换。</p>
+     */
     class Emulator {
 
     public:
@@ -46,11 +56,10 @@ namespace emudroid {
 
         bool loadState(const char *path, int slot);
 
-
         virtual bool saveState(const char *path, int slot) = 0;
 
-        virtual bool
-        doLoadGame(const char *path, const char *batterySaveDir, const char *strippedName) = 0;
+        virtual bool doLoadGame(const char *path, const char *batterySaveDir,
+                                const char *strippedName) = 0;
 
         virtual bool doLoadHistoryState(int idx) = 0;
 
@@ -58,16 +67,13 @@ namespace emudroid {
 
         virtual bool doLoadState(const char *path, int slot) = 0;
 
-
         virtual int getHistoryItemCount();
-
 
         virtual bool renderHistory(JNIEnv *env, jobject bitmap, int pos, int vw, int wh) = 0;
 
         bool saveToHistory();
 
         virtual bool loadHistoryState(int pos);
-
 
         virtual bool enableCheat(const char *cheat, int type);
 
@@ -81,7 +87,6 @@ namespace emudroid {
 
         virtual bool render(JNIEnv *env, jobject bitmap, int vw, int wh, BUFFER_TYPE *force);
 
-
         virtual bool renderGL();
 
         virtual bool readPalette(JNIEnv *env, jintArray result);
@@ -92,17 +97,25 @@ namespace emudroid {
 
         virtual ~Emulator();
 
-        JavaVM *jvm;
     protected:
 
-        /** 历史状态环形缓冲区大小 */
+        /** 历史状态环形缓冲区大小（帧数） */
         static const int HIS_SIZE = 40;
 
         virtual bool emulate(int keys, int turbos, int numFramesToSkip) = 0;
 
+        /**
+         * 将原始缓冲区数据转换为 ARGB 像素值。
+         * <p>各平台实现不同：NES 使用调色板查找，GBC/GG 直接组合 RGB 通道。</p>
+         * @param buf 图形缓冲区指针
+         * @param idx 缓冲区偏移索引
+         * @return 32 位 ARGB 像素值
+         */
+        virtual unsigned int getPixel(const BUFFER_TYPE *buf, int idx) const = 0;
+
         CThreadLock sfxLock;
         CThreadLock gfxLock;
-        char *lastPath;
+        std::string lastPath;
 
         int viewPortWidth;
         int viewPortHeight;
@@ -129,7 +142,6 @@ namespace emudroid {
 
         bool setHistoryEnabled(bool enable);
 
-
         int posToIdx(int delta);
 
         void swapBuffersAfterWrite();
@@ -142,5 +154,6 @@ namespace emudroid {
 
         int xd, yr, yd, xr;
     };
+
 }
 #endif

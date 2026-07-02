@@ -44,12 +44,10 @@ public:
 
     /** 构造函数，初始化所有缓冲区和引擎状态 */
     SmsEmulator() {
-        batterySavePath = NULL;
         started = false;
         numEnabledCheats = 0;
         origHeight = HEIGHT;
         origWidth = WIDTH;
-        lastPath = (char *) malloc(1);
         gfxBuf_LQ = new uint8[256 * 256];
         sfxBuf = new short[SFX_BUF_SIZE];
 
@@ -215,6 +213,11 @@ public:
         return true;
     }
 
+    /** 像素格式转换：GG 直接组合 RGB 通道分离存储的三平面数据 */
+    unsigned int getPixel(const BUFFER_TYPE *buf, int idx) const {
+        return 0xff000000 | (buf[idx + (160 * (144 + 26))] << 8) | (buf[idx + 160 * (144 + 26) * 2] << 16) | (buf[idx] << 0);
+    }
+
 
     int cheatAddrs[100];   /**< 金手指地址数组（最多 100 个） */
     char cheatVals[100];   /**< 金手指值数组 */
@@ -343,7 +346,7 @@ public:
         }
 
         if (sms.save) {
-            FILE *fd = fopen(batterySavePath, "wb");
+            FILE *fd = fopen(batterySavePath.c_str(), "wb");
 
             if (fd) {
                 fwrite(sram, 0x8000, 1, fd);
@@ -362,7 +365,7 @@ public:
             return;
         }
 
-        FILE *fd = fopen(batterySavePath, "rb");
+        FILE *fd = fopen(batterySavePath.c_str(), "rb");
 
         if (fd) {
             sms.save = 1;
@@ -373,7 +376,7 @@ public:
         }
     }
 
-    char *batterySavePath; /**< 电池存档文件路径 */
+    std::string batterySavePath; /**< 电池存档文件路径 */
 
     /**
      * 加载游戏 ROM。
@@ -384,12 +387,7 @@ public:
      * @return 加载成功返回 true
      */
     bool doLoadGame(const char *path, const char *batterySaveDir, const char *batteryFullPath) {
-        if (batterySavePath) {
-            free(batterySavePath);
-        }
-
-        batterySavePath = (char *) malloc(strlen(batteryFullPath) + 1);
-        strcpy(batterySavePath, batteryFullPath);
+        batterySavePath = batteryFullPath;
         bool res = load_rom(strdup(path));
 
         if (!started) {

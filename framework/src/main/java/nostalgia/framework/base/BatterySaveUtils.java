@@ -50,51 +50,27 @@ public class BatterySaveUtils {
 
     private static void saveMD5Meta(Context context, File batterySavFile, String md5) {
         File metaFile = getMetaFile(context, batterySavFile);
-        FileWriter fw = null;
-        try {
+        try (FileWriter fw = new FileWriter(metaFile)) {
             metaFile.delete();
             metaFile.createNewFile();
-            fw = new FileWriter(metaFile);
             fw.write(md5);
         } catch (Exception ignored) {
-        } finally {
-            try {
-                if (fw != null) {
-                    fw.close();
-                }
-            } catch (Exception ignored) {
-            }
         }
     }
 
 
     /** 判断源文件是否已变更，需要重新复制。 */
     private static boolean needsRewrite(Context context, File sourceBatteryFile, String sourceMD5) {
-        String previousSourceMD5;
         File metaFile = getMetaFile(context, sourceBatteryFile);
         File targetFile = new File(EmulatorUtils.getBaseDir(context), sourceBatteryFile.getName());
         if (!metaFile.exists() || !targetFile.exists()) {
             return true;
-        } else {
-            FileReader fileReader = null;
-            BufferedReader br = null;
-            try {
-                fileReader = new FileReader(metaFile);
-                br = new BufferedReader(fileReader);
-                previousSourceMD5 = br.readLine();
-            } catch (Exception ignored) {
-                return true;
-            } finally {
-                try {
-                    if (fileReader != null) {
-                        fileReader.close();
-                    }
-                    if (br != null) {
-                        br.close();
-                    }
-                } catch (Exception ignored) {
-                }
-            }
+        }
+        String previousSourceMD5;
+        try (BufferedReader br = new BufferedReader(new FileReader(metaFile))) {
+            previousSourceMD5 = br.readLine();
+        } catch (Exception ignored) {
+            return true;
         }
         Log.d("MD5", "source: " + sourceMD5 + " old: " + previousSourceMD5);
         return !sourceMD5.equals(previousSourceMD5);

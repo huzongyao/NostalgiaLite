@@ -1,7 +1,6 @@
 package nostalgia.framework.ui.gamegallery;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -51,7 +50,7 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
     public static final String EXTRA_TABS_IDX = "EXTRA_TABS_IDX";
     private static final String TAG = GalleryActivity.class.getSimpleName();
 
-    ProgressDialog searchDialog = null;
+    SearchProgressFragment searchDialog = null;
     private ViewPager pager = null;
     private TextView noGamesTextView = null;
     private GalleryPagerAdapter adapter;
@@ -284,44 +283,19 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
                 }
                 
                 // 返回主线程处理
-                mainHandler.post(() -> handleGameSelected(game, cacheFile));
+                mainHandler.post(() -> updateGameAndStart(game, cacheFile));
             });
         } else {
-            if (gameFile.exists()) {
-                game.lastGameTime = System.currentTimeMillis();
-                game.runCount++;
-                
-                // 在后台线程更新数据库
-                executor.execute(() -> {
-                    repository.updateGame(game);
-                    
-                    // 返回主线程启动游戏
-                    mainHandler.post(() -> onGameSelected(game, 0));
-                });
-            } else {
-                NLog.w(TAG, "rom file:" + gameFile.getAbsolutePath() + " does not exist");
-                AlertDialog dialog = new AlertDialog.Builder(this)
-                        .setMessage(getString(R.string.gallery_rom_not_found))
-                        .setTitle(R.string.error)
-                        .setPositiveButton(R.string.ok, (dialog1, which)
-                                -> {
-                            // 在后台线程删除不存在的ROM记录
-                            executor.execute(() -> {
-                                repository.deleteGame(game);
-                                ArrayList<GameDescription> games = repository.getAllGamesSortedByName();
-                                // 返回主线程刷新显示
-                                mainHandler.post(() -> setLastGames(games));
-                            });
-                        })
-                        .setCancelable(false)
-                        .create();
-                dialog.show();
-            }
+            updateGameAndStart(game, gameFile);
         }
     }
     
-    /** 处理游戏选中事件（从压缩包解压后） */
-    private void handleGameSelected(GameDescription game, File gameFile) {
+    /**
+     * 更新游戏信息并启动，或处理 ROM 不存在的情况。
+     * @param game 游戏描述
+     * @param gameFile 游戏 ROM 文件
+     */
+    private void updateGameAndStart(GameDescription game, File gameFile) {
         if (gameFile.exists()) {
             game.lastGameTime = System.currentTimeMillis();
             game.runCount++;
@@ -329,29 +303,36 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
             // 在后台线程更新数据库
             executor.execute(() -> {
                 getGameRepository().updateGame(game);
-                
                 // 返回主线程启动游戏
                 mainHandler.post(() -> onGameSelected(game, 0));
             });
         } else {
-            NLog.w(TAG, "rom file:" + gameFile.getAbsolutePath() + " does not exist");
-            AlertDialog dialog = new AlertDialog.Builder(this)
-                    .setMessage(getString(R.string.gallery_rom_not_found))
-                    .setTitle(R.string.error)
-                    .setPositiveButton(R.string.ok, (dialog1, which)
-                            -> {
-                        // 在后台线程删除不存在的ROM记录
-                        executor.execute(() -> {
-                            getGameRepository().deleteGame(game);
-                            ArrayList<GameDescription> games = getGameRepository().getAllGamesSortedByName();
-                            // 返回主线程刷新显示
-                            mainHandler.post(() -> setLastGames(games));
-                        });
-                    })
-                    .setCancelable(false)
-                    .create();
-            dialog.show();
+            handleRomNotFound(game, gameFile);
         }
+    }
+    
+    /**
+     * 处理 ROM 文件不存在的情况：显示提示对话框，确认后删除数据库记录。
+     * @param game 游戏描述
+     * @param gameFile 不存在的 ROM 文件
+     */
+    private void handleRomNotFound(GameDescription game, File gameFile) {
+        NLog.w(TAG, "rom file:" + gameFile.getAbsolutePath() + " does not exist");
+        new AlertDialog.Builder(this)
+                .setMessage(getString(R.string.gallery_rom_not_found))
+                .setTitle(R.string.error)
+                .setPositiveButton(R.string.ok, (dialog1, which) -> {
+                    // 在后台线程删除不存在的ROM记录
+                    executor.execute(() -> {
+                        GameRepository repository = getGameRepository();
+                        repository.deleteGame(game);
+                        ArrayList<GameDescription> games = repository.getAllGamesSortedByName();
+                        // 返回主线程刷新显示
+                        mainHandler.post(() -> setLastGames(games));
+                    });
+                })
+                .setCancelable(false)
+                .show();
     }
 
     /** 启动模拟器 Activity */
@@ -389,30 +370,25 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
 
     /** 显示搜索进度对话框 */
     private void showSearchProgressDialog(boolean zipMode) {
-        if (searchDialog == null) {
-            searchDialog = new ProgressDialog(this);
-            searchDialog.setMax(100);
-            searchDialog.setCancelable(false);
-            searchDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            searchDialog.setIndeterminate(true);
-            searchDialog.setProgressNumberFormat("");
-            searchDialog.setProgressPercentFormat(null);
-            searchDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel),
-                    (dialog, which) -> stopRomsFinding());
-        }
-        searchDialog.setMessage(getString(importingRom ?
+        String message = getString(importingRom ?
                 R.string.gallery_importing_rom
                 : zipMode ?
                 R.string.gallery_zip_search_label
-                : R.string.gallery_sdcard_search_label));
-        DialogUtils.show(searchDialog, false);
+                : R.string.gallery_sdcard_search_label);
 
+        if (searchDialog == null) {
+            searchDialog = SearchProgressFragment.newInstance(message, 100);
+            searchDialog.setOnCancelListener(this::stopRomsFinding);
+        } else {
+            searchDialog.setMessage(message);
+        }
+        searchDialog.show(getSupportFragmentManager(), SearchProgressFragment.TAG);
     }
 
     public void onSearchingEnd(final int count, final boolean showToast) {
         runOnUiThread(() -> {
             if (searchDialog != null) {
-                searchDialog.dismiss();
+                searchDialog.safeDismiss();
                 searchDialog = null;
             }
             if (showToast) {

@@ -4,13 +4,14 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
+import android.media.AudioAttributes;
 import android.media.AudioFormat;
-import android.media.AudioManager;
 import android.media.AudioTrack;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,7 +40,15 @@ import nostalgia.framework.utils.EmuUtils;
 public abstract class JniEmulator implements Emulator {
     private static final String TAG = "JniEmulator";
     private static final int SIZE = 32768 * 2;
-    private static Map<String, String> md5s = new HashMap<>();
+    /** MD5 缓存，使用线程安全的 LRU Map，最多缓存 64 个条目 */
+    private static final int MD5_CACHE_SIZE = 64;
+    private static final Map<String, String> md5s = Collections.synchronizedMap(
+            new LinkedHashMap<String, String>(MD5_CACHE_SIZE, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<String, String> eldest) {
+                    return size() > MD5_CACHE_SIZE;
+                }
+            });
     private final Object readyLock = new Object();
     private final Object loadLock = new Object();
     private final short[][] testX = new short[2][SIZE];
@@ -186,37 +195,32 @@ public abstract class JniEmulator implements Emulator {
             screen = Bitmap.createBitmap(gfx.originalScreenWidth, gfx.originalScreenHeight, Config.ARGB_8888);
         } catch (OutOfMemoryError ignored) {
         }
-        if (screen != null) {
-            if (!jni.renderVP(screen, gfx.originalScreenWidth, gfx.originalScreenHeight)) {
-                throw new EmulatorException(R.string.act_game_screenshot_failed);
-            }
-        }
-        if (!jni.saveState(fileName, slot)) {
-            throw new EmulatorException(R.string.act_emulator_save_state_failed);
-        }
-        if (screen != null) {
-            String pngFileName = SlotUtils.getScreenshotPath(baseDir, getMD5(null), slot);
-            FileOutputStream out = null;
-            try {
-                out = new FileOutputStream(pngFileName);
-                screen.compress(CompressFormat.PNG, 60, out);
-            } catch (Exception e) {
-                throw new EmulatorException(R.string.act_game_screenshot_failed);
-
-            } finally {
-                if (out != null) {
-                    try {
-                        out.flush();
-                        out.close();
-                    } catch (Exception ignored) {
-                    }
+        try {
+            if (screen != null) {
+                if (!jni.renderVP(screen, gfx.originalScreenWidth, gfx.originalScreenHeight)) {
+                    throw new EmulatorException(R.string.act_game_screenshot_failed);
                 }
             }
-            File file = new File(pngFileName);
-            NLog.i(TAG, "SCREEN: " + file.length());
-            screen.recycle();
-        } else {
-            throw new EmulatorException(R.string.act_game_screenshot_failed);
+            if (!jni.saveState(fileName, slot)) {
+                throw new EmulatorException(R.string.act_emulator_save_state_failed);
+            }
+            if (screen != null) {
+                String pngFileName = SlotUtils.getScreenshotPath(baseDir, getMD5(null), slot);
+                try (FileOutputStream out = new FileOutputStream(pngFileName)) {
+                    screen.compress(CompressFormat.PNG, 60, out);
+                    out.flush();
+                } catch (Exception e) {
+                    throw new EmulatorException(R.string.act_game_screenshot_failed);
+                }
+                File file = new File(pngFileName);
+                NLog.i(TAG, "SCREEN: " + file.length());
+            } else {
+                throw new EmulatorException(R.string.act_game_screenshot_failed);
+            }
+        } finally {
+            if (screen != null) {
+                screen.recycle();
+            }
         }
     }
 
@@ -482,14 +486,28 @@ public abstract class JniEmulator implements Emulator {
         bitmap = Bitmap.createBitmap(w, h, Config.ARGB_8888);
     }
 
-    /** 初始化 AudioTrack，配置采样率、声道和编码格式。 */
+    /** 初始化 AudioTrack，使用 Builder 模式配置采样率、声道和编码格式。 */
     private void initSound(SfxProfile sfx) {
         int format = sfx.isStereo ? AudioFormat.CHANNEL_OUT_STEREO : AudioFormat.CHANNEL_OUT_MONO;
         int encoding = sfx.encoding == SfxProfile.SoundEncoding.PCM8 ?
                 AudioFormat.ENCODING_PCM_8BIT : AudioFormat.ENCODING_PCM_16BIT;
         minSize = AudioTrack.getMinBufferSize(sfx.rate, format, encoding);
-        track = new AudioTrack(AudioManager.STREAM_MUSIC, sfx.rate, format,
-                encoding, minSize, AudioTrack.MODE_STREAM);
+
+        AudioAttributes attrs = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_GAME)
+                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                .build();
+        AudioFormat audioFormat = new AudioFormat.Builder()
+                .setSampleRate(sfx.rate)
+                .setChannelMask(format)
+                .setEncoding(encoding)
+                .build();
+        track = new AudioTrack.Builder()
+                .setAudioAttributes(attrs)
+                .setAudioFormat(audioFormat)
+                .setBufferSizeInBytes(minSize)
+                .setTransferMode(AudioTrack.MODE_STREAM)
+                .build();
         try {
             track.play();
             resetTrack();

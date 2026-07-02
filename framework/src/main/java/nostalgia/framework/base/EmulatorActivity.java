@@ -3,19 +3,13 @@ package nostalgia.framework.base;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ContentResolver;
-import android.content.ContentValues;
+import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
-import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -26,26 +20,13 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import nostalgia.framework.BaseApplication;
 import nostalgia.framework.Emulator;
-import nostalgia.framework.EmulatorController;
 import nostalgia.framework.EmulatorException;
 import nostalgia.framework.EmulatorRunner;
 import nostalgia.framework.R;
-import nostalgia.framework.base.Benchmark.BenchmarkCallback;
 import nostalgia.framework.base.GameMenu.GameMenuItem;
 import nostalgia.framework.base.GameMenu.OnGameMenuListener;
-import nostalgia.framework.controllers.DynamicDPad;
-import nostalgia.framework.controllers.KeyboardController;
-import nostalgia.framework.controllers.QuickSaveController;
-import nostalgia.framework.controllers.TouchController;
-import nostalgia.framework.controllers.ZapperGun;
 import nostalgia.framework.ui.cheats.CheatsActivity;
 import nostalgia.framework.ui.gamegallery.GameDescription;
 import nostalgia.framework.ui.gamegallery.SlotSelectionActivity;
@@ -74,20 +55,15 @@ import nostalgia.framework.utils.NLog;
  * 子类需提供特定平台的模拟器实例和 OpenGL 片段着色器。
  * </p>
  */
-public abstract class EmulatorActivity extends Activity
+public abstract class EmulatorActivity extends AppCompatActivity
         implements OnGameMenuListener, EmulatorRunner.OnNotRespondingListener {
 
     public static final String EXTRA_GAME = "game";
     public static final String EXTRA_SLOT = "slot";
     public static final String EXTRA_FROM_GALLERY = "fromGallery";
     private static final String TAG = "EmulatorActivity";
-    private static final String OPEN_GL_BENCHMARK = "openGL";
-    private static final String EMULATION_BENCHMARK = "emulation";
     private static final int REQUEST_SAVE = 1;
     private static final int REQUEST_LOAD = 2;
-    public static PackageManager pm;
-    public static String pn;
-    public static String sd;
     private static int oldConfig;
     private final int maxPRC = 10;
     boolean isRestarting;
@@ -96,8 +72,7 @@ public abstract class EmulatorActivity extends Activity
     TimeTravelDialog dialog;
     private GameMenu gameMenu = null;
     private GameDescription game = null;
-    private DynamicDPad dynamic;
-    private TouchController touchController = null;
+    private InputControllerManager inputManager;
     private boolean autoHide;
     private Boolean warningShowing = false;
     private boolean isFF = false;
@@ -106,43 +81,9 @@ public abstract class EmulatorActivity extends Activity
     private boolean exceptionOccurred;
     private Integer slotToRun;
     private Integer slotToSave;
-    private List<EmulatorController> controllers;
     private Manager manager;
     private EmulatorView emulatorView;
-
-    private BenchmarkCallback benchmarkCallback = new BenchmarkCallback() {
-        private int numTests = 0;
-        private int numOk = 0;
-
-        @Override
-        public void onBenchmarkReset(Benchmark benchmark) {
-        }
-
-        @Override
-        public void onBenchmarkEnded(Benchmark benchmark, int steps, long totalTime) {
-            float millisPerFrame = totalTime / (float) steps;
-            numTests++;
-            if (benchmark.getName().equals(OPEN_GL_BENCHMARK)) {
-                if (millisPerFrame < 17) {
-                    numOk++;
-                }
-            }
-            if (benchmark.getName().equals(EMULATION_BENCHMARK)) {
-                if (millisPerFrame < 17) {
-                    numOk++;
-                }
-            }
-            if (numTests == 2) {
-                PreferenceUtil.setBenchmarked(EmulatorActivity.this, true);
-                if (numOk == 2) {
-                    emulatorView.setQuality(2);
-                    PreferenceUtil.setEmulationQuality(EmulatorActivity.this, 2);
-                } else {
-                }
-            }
-        }
-    };
-    private List<View> controllerViews;
+    private PerformanceMonitor performanceMonitor;
     private ViewGroup group;
     private String baseDir;
 
@@ -213,27 +154,15 @@ public abstract class EmulatorActivity extends Activity
 
         if (hasOpenGL20) {
             openGLView = new OpenGLView(this, emulator, paddingLeft, paddingTop, shader);
-            if (needsBenchmark) {
-                openGLView.setBenchmark(new Benchmark(OPEN_GL_BENCHMARK, 200, benchmarkCallback));
-            }
         }
 
         emulatorView = openGLView != null ? openGLView :
                 new UnacceleratedView(this, emulator, paddingLeft, paddingTop);
-        controllers = new ArrayList<>();
-        touchController = new TouchController(this);
-        controllers.add(touchController);
-        touchController.connectToEmulator(0, emulator);
-        dynamic = new DynamicDPad(this, getWindowManager().getDefaultDisplay(), touchController);
-        controllers.add(dynamic);
-        dynamic.connectToEmulator(0, emulator);
-        QuickSaveController qsc = new QuickSaveController(this, touchController);
-        controllers.add(qsc);
-        KeyboardController kc = new KeyboardController(emulator, getApplicationContext(), game.checksum, this);
-        ZapperGun zapper = new ZapperGun(getApplicationContext(), this);
-        zapper.connectToEmulator(1, emulator);
-        controllers.add(zapper);
-        controllers.add(kc);
+        performanceMonitor = new PerformanceMonitor(this, emulatorView);
+        if (hasOpenGL20 && needsBenchmark) {
+            ((OpenGLView) emulatorView).setBenchmark(performanceMonitor.createOpenGLBenchmark());
+        }
+        inputManager = new InputControllerManager(this, emulator, game);
         group = new FrameLayout(this);
         Display display = getWindowManager().getDefaultDisplay();
         int w = EmuUtils.getDisplayWidth(display);
@@ -241,14 +170,7 @@ public abstract class EmulatorActivity extends Activity
         LayoutParams params = new LayoutParams(w, h);
         group.setLayoutParams(params);
         group.addView(emulatorView.asView());
-        controllerViews = new ArrayList<>();
-        for (EmulatorController controller : controllers) {
-            View controllerView = controller.getView();
-            if (controllerView != null) {
-                controllerViews.add(controllerView);
-                group.addView(controllerView);
-            }
-        }
+        inputManager.addControllerViewsToGroup(group);
 
         group.addView(new View(getApplicationContext()) {
             @Override
@@ -261,17 +183,12 @@ public abstract class EmulatorActivity extends Activity
         manager.setOnNotRespondingListener(this);
 
         if (needsBenchmark) {
-            manager.setBenchmark(new Benchmark(EMULATION_BENCHMARK, 1000, benchmarkCallback));
+            manager.setBenchmark(performanceMonitor.createEmulationBenchmark());
         }
     }
 
     public void hideTouchController() {
-        NLog.i(TAG, "hide controler");
-        if (autoHide) {
-            if (touchController != null) {
-                touchController.hide();
-            }
-        }
+        inputManager.hideTouchController(autoHide);
     }
 
     public void onNotResponding() {
@@ -308,15 +225,11 @@ public abstract class EmulatorActivity extends Activity
         }
         oldConfig = getChangingConfigurations();
         group.removeAllViews();
-        controllerViews.clear();
         try {
             manager.destroy();
         } catch (EmulatorException ignored) {
         }
-        for (EmulatorController controller : controllers) {
-            controller.onDestroy();
-        }
-        controllers.clear();
+        inputManager.onDestroy();
     }
 
     @Override
@@ -341,21 +254,14 @@ public abstract class EmulatorActivity extends Activity
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         boolean res = super.dispatchTouchEvent(ev);
-        if (touchController != null) {
-            touchController.show();
-        }
-        for (View controllerView : controllerViews) {
-            controllerView.dispatchTouchEvent(ev);
-        }
+        inputManager.dispatchTouchEvent(ev);
         return res;
     }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent ev) {
         boolean res = super.dispatchKeyEvent(ev);
-        for (View controllerView : controllerViews) {
-            controllerView.dispatchKeyEvent(ev);
-        }
+        inputManager.dispatchKeyEvent(ev);
         return res;
     }
 
@@ -380,17 +286,13 @@ public abstract class EmulatorActivity extends Activity
         if (exceptionOccurred) {
             return;
         }
-        pm = null;
         if (gameMenu != null && gameMenu.isOpen()) {
             gameMenu.dismiss();
         }
         if (dialog != null && dialog.isShowing()) {
             dialog.dismiss();
         }
-        for (EmulatorController controller : controllers) {
-            controller.onPause();
-            controller.onGamePaused(game);
-        }
+        inputManager.onPause(game);
         try {
             manager.stopGame();
 
@@ -427,33 +329,6 @@ public abstract class EmulatorActivity extends Activity
         DialogUtils.show(dialog, true);
     }
 
-    private void restartProcess(Class<?> activityToStartClass) {
-        isRestarting = true;
-        Intent intent = new Intent(this, RestarterActivity.class);
-        intent.putExtras(getIntent());
-        intent.putExtra(RestarterActivity.EXTRA_PID, android.os.Process.myPid());
-        String className = activityToStartClass.getName();
-        intent.putExtra(RestarterActivity.EXTRA_CLASS, className);
-        startActivity(intent);
-    }
-
-    private int decreaseResumesToRestart() {
-        int prc = PreferenceManager.getDefaultSharedPreferences(this).getInt("PRC", maxPRC);
-        if (prc > 0) {
-            prc--;
-        }
-        Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-        editor.putInt("PRC", prc);
-        editor.apply();
-        return prc;
-    }
-
-    private void resetProcessResetCounter() {
-        Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-        editor.putInt("PRC", maxPRC);
-        editor.apply();
-    }
-
     public void quickSave() {
         manager.saveState(10);
         runOnUiThread(() -> Toast.makeText(this,
@@ -475,10 +350,11 @@ public abstract class EmulatorActivity extends Activity
             isAfterProcessRestart = extras.getBoolean(RestarterActivity.EXTRA_AFTER_RESTART);
         }
         getIntent().removeExtra(RestarterActivity.EXTRA_AFTER_RESTART);
-        boolean shouldRestart = decreaseResumesToRestart() == 0;
+        boolean shouldRestart = ProcessRestarter.decreaseResumesToRestart(this, maxPRC) == 0;
         if (!isAfterProcessRestart && shouldRestart && canRestart) {
-            resetProcessResetCounter();
-            restartProcess(this.getClass());
+            ProcessRestarter.resetCounter(this, maxPRC);
+            isRestarting = true;
+            ProcessRestarter.restartProcess(this, this.getClass());
             return;
         }
         canRestart = true;
@@ -501,32 +377,17 @@ public abstract class EmulatorActivity extends Activity
                 break;
         }
         manager.setFastForwardFrameCount(PreferenceUtil.getFastForwardFrameCount(this));
-        if (PreferenceUtil.isDynamicDPADEnable(this)) {
-            if (!controllers.contains(dynamic)) {
-                controllers.add(dynamic);
-                controllerViews.add(dynamic.getView());
-            }
-            PreferenceUtil.setDynamicDPADUsed(this, true);
-        } else {
-            controllers.remove(dynamic);
-            controllerViews.remove(dynamic.getView());
-        }
+        inputManager.updateDynamicDPadState(this);
         if (PreferenceUtil.isFastForwardEnabled(this)) {
             PreferenceUtil.setFastForwardUsed(this, true);
         }
         if (PreferenceUtil.isScreenSettingsSaved(this)) {
             PreferenceUtil.setScreenLayoutUsed(this, true);
         }
-        pm = getPackageManager();
-        pn = getPackageName();
-        for (EmulatorController controller : controllers) {
-            controller.onResume();
-        }
+        inputManager.onResume();
         try {
             manager.startGame(game);
-            for (EmulatorController controller : controllers) {
-                controller.onGameStarted(game);
-            }
+            inputManager.onGameStarted(game);
             if (slotToRun != -1) {
                 manager.loadState(slotToRun);
             } else {
@@ -580,9 +441,7 @@ public abstract class EmulatorActivity extends Activity
         if (exceptionOccurred) {
             return;
         }
-        for (EmulatorController controller : controllers) {
-            controller.onGameStarted(game);
-        }
+        inputManager.onWindowFocusChanged(hasFocus, game);
     }
 
     public void openGameMenu() {
@@ -616,10 +475,8 @@ public abstract class EmulatorActivity extends Activity
             if (!runTimeMachine) {
                 if (!menu.isOpen()) {
                     manager.resumeEmulation();
-                    for (EmulatorController controller : controllers) {
-                        controller.onGameStarted(game);
-                        controller.onResume();
-                    }
+                    inputManager.onGameStarted(game);
+                    inputManager.onResume();
                 }
             }
         } catch (EmulatorException e) {
@@ -633,10 +490,7 @@ public abstract class EmulatorActivity extends Activity
         try {
             if (manager != null) {
                 manager.pauseEmulation();
-                for (EmulatorController controller : controllers) {
-                    controller.onGamePaused(game);
-                    controller.onPause();
-                }
+                inputManager.onPause(game);
             }
         } catch (EmulatorException e) {
             handleException(e);
@@ -668,48 +522,79 @@ public abstract class EmulatorActivity extends Activity
     @Override
     public void onGameMenuItemSelected(GameMenu menu, GameMenuItem item) {
         try {
-            if (item.id == R.string.game_menu_back_to_past) {
+            int id = item.id;
+            if (id == R.string.game_menu_back_to_past) {
                 onGameBackToPast();
-            } else if (item.id == R.string.game_menu_reset) {
-                manager.resetEmulator();
-                enableCheats();
-            } else if (item.id == R.string.game_menu_save) {
-                Intent i = new Intent(this, SlotSelectionActivity.class);
-                i.putExtra(SlotSelectionActivity.EXTRA_GAME, game);
-                i.putExtra(SlotSelectionActivity.EXTRA_BASE_DIRECTORY, baseDir);
-                i.putExtra(SlotSelectionActivity.EXTRA_DIALOG_TYPE_INT,
-                        SlotSelectionActivity.DIALOAG_TYPE_SAVE);
-                freeStartActivityForResult(this, i, REQUEST_SAVE);
-            } else if (item.id == R.string.game_menu_load) {
-                Intent i = new Intent(this, SlotSelectionActivity.class);
-                i.putExtra(SlotSelectionActivity.EXTRA_GAME, game);
-                i.putExtra(SlotSelectionActivity.EXTRA_BASE_DIRECTORY, baseDir);
-                i.putExtra(SlotSelectionActivity.EXTRA_DIALOG_TYPE_INT,
-                        SlotSelectionActivity.DIALOAG_TYPE_LOAD);
-                freeStartActivityForResult(this, i, REQUEST_LOAD);
-            } else if (item.id == R.string.game_menu_cheats) {
-                Intent i = new Intent(this, CheatsActivity.class);
-                i.putExtra(CheatsActivity.EXTRA_IN_GAME_HASH, game.checksum);
-                freeStartActivity(this, i);
-            } else if (item.id == R.string.game_menu_settings) {
-                Intent i = new Intent(this, GamePreferenceActivity.class);
-                i.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
-                i.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
-                        GamePreferenceFragment.class.getName());
-                i.putExtra(GamePreferenceActivity.EXTRA_GAME, game);
-                startActivity(i);
-            } else if (item.id == R.string.gallery_menu_pref) {
-                Intent i = new Intent(this, GeneralPreferenceActivity.class);
-                i.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
-                i.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
-                        GeneralPreferenceFragment.class.getName());
-                startActivity(i);
-            } else if (item.id == R.string.game_menu_screenshot) {
-                saveGameScreenshot();
+            } else if (id == R.string.game_menu_reset) {
+                onMenuReset();
+            } else if (id == R.string.game_menu_save) {
+                onMenuSave();
+            } else if (id == R.string.game_menu_load) {
+                onMenuLoad();
+            } else if (id == R.string.game_menu_cheats) {
+                onMenuCheats();
+            } else if (id == R.string.game_menu_settings) {
+                onMenuGameSettings();
+            } else if (id == R.string.gallery_menu_pref) {
+                onMenuGeneralSettings();
+            } else if (id == R.string.game_menu_screenshot) {
+                ScreenshotHelper.saveScreenshot(this, game);
             }
         } catch (EmulatorException e) {
             handleException(e);
         }
+    }
+
+    /** 游戏菜单 - 重置模拟器 */
+    private void onMenuReset() {
+        manager.resetEmulator();
+        enableCheats();
+    }
+
+    /** 游戏菜单 - 存档 */
+    private void onMenuSave() {
+        Intent i = new Intent(this, SlotSelectionActivity.class);
+        i.putExtra(SlotSelectionActivity.EXTRA_GAME, game);
+        i.putExtra(SlotSelectionActivity.EXTRA_BASE_DIRECTORY, baseDir);
+        i.putExtra(SlotSelectionActivity.EXTRA_DIALOG_TYPE_INT,
+                SlotSelectionActivity.DIALOAG_TYPE_SAVE);
+        freeStartActivityForResult(this, i, REQUEST_SAVE);
+    }
+
+    /** 游戏菜单 - 读档 */
+    private void onMenuLoad() {
+        Intent i = new Intent(this, SlotSelectionActivity.class);
+        i.putExtra(SlotSelectionActivity.EXTRA_GAME, game);
+        i.putExtra(SlotSelectionActivity.EXTRA_BASE_DIRECTORY, baseDir);
+        i.putExtra(SlotSelectionActivity.EXTRA_DIALOG_TYPE_INT,
+                SlotSelectionActivity.DIALOAG_TYPE_LOAD);
+        freeStartActivityForResult(this, i, REQUEST_LOAD);
+    }
+
+    /** 游戏菜单 - 金手指 */
+    private void onMenuCheats() {
+        Intent i = new Intent(this, CheatsActivity.class);
+        i.putExtra(CheatsActivity.EXTRA_IN_GAME_HASH, game.checksum);
+        freeStartActivity(this, i);
+    }
+
+    /** 游戏菜单 - 游戏设置 */
+    private void onMenuGameSettings() {
+        Intent i = new Intent(this, GamePreferenceActivity.class);
+        i.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
+        i.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
+                GamePreferenceFragment.class.getName());
+        i.putExtra(GamePreferenceActivity.EXTRA_GAME, game);
+        startActivity(i);
+    }
+
+    /** 游戏菜单 - 通用设置 */
+    private void onMenuGeneralSettings() {
+        Intent i = new Intent(this, GeneralPreferenceActivity.class);
+        i.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
+        i.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
+                GeneralPreferenceFragment.class.getName());
+        startActivity(i);
     }
 
     private void onGameBackToPast() {
@@ -725,48 +610,6 @@ public abstract class EmulatorActivity extends Activity
             });
             DialogUtils.show(dialog, true);
             runTimeMachine = true;
-        }
-    }
-
-    private void saveGameScreenshot() {
-        String name = game.getCleanName() + "-screenshot";
-        String emulatorName = EmulatorHolder.getInfo().getName().replace(' ', '_');
-        
-        Bitmap bitmap = EmuUtils.createScreenshotBitmap(EmulatorActivity.this, game);
-        if (bitmap == null) {
-            Toast.makeText(EmulatorActivity.this,
-                    getString(R.string.act_game_screenshot_failed), Toast.LENGTH_LONG).show();
-            return;
-        }
-        
-        ContentResolver resolver = getContentResolver();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, name + ".png");
-        contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
-        contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, 
-                "Pictures/" + emulatorName);
-        
-        Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
-        
-        if (imageUri == null) {
-            Toast.makeText(EmulatorActivity.this,
-                    getString(R.string.act_game_screenshot_failed), Toast.LENGTH_LONG).show();
-            return;
-        }
-        
-        try (OutputStream fos = resolver.openOutputStream(imageUri)) {
-            if (fos != null) {
-                bitmap.compress(Bitmap.CompressFormat.PNG, 90, fos);
-                Toast.makeText(EmulatorActivity.this,
-                        getString(R.string.act_game_screenshot_saved), Toast.LENGTH_LONG).show();
-            }
-        } catch (IOException e) {
-            NLog.e(TAG, "Failed to save screenshot", e);
-            resolver.delete(imageUri, null, null);
-            Toast.makeText(EmulatorActivity.this,
-                    getString(R.string.act_game_screenshot_failed), Toast.LENGTH_LONG).show();
-        } finally {
-            bitmap.recycle();
         }
     }
 

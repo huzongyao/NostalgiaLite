@@ -237,12 +237,19 @@ public class RomsFinder extends Thread {
             
             if (copiedFile == null) {
                 NLog.e(TAG, "Failed to copy file");
-                return;
+            } else {
+                importCopiedFile(copiedFile, filename);
             }
-            
-            importCopiedFile(copiedFile, filename);
         } catch (Exception e) {
             NLog.e(TAG, "Error importing Uri", e);
+        }
+        
+        if (running.get()) {
+            NLog.i(TAG, "Imported " + games.size() + " games from uri");
+            activity.runOnUiThread(() -> {
+                listener.onRomsFinderNewGames(games);
+                listener.onRomsFinderEnd(true);
+            });
         }
     }
     
@@ -361,10 +368,29 @@ public class RomsFinder extends Thread {
             ZipRomFile zipRomFile = gameRepository.getZipFileByHash(hash);
             ZipFile zip = null;
 
-            if (zipRomFile == null) {
+            // 缓存命中时，从数据库加载游戏列表
+            if (zipRomFile != null) {
+                zipRomFile.games = gameRepository.getGamesByZipFileId(zipRomFile._id);
+                if (zipRomFile.games.isEmpty()) {
+                    // 旧数据损坏（游戏未入库或 zipfile_id 错误），删除后重新导入
+                    NLog.i(TAG, "zip in cache has no games, re-importing");
+                    gameRepository.deleteZipFile(zipRomFile);
+                    zipRomFile = null;
+                }
+            }
+
+            if (zipRomFile != null) {
+                // 缓存命中且数据完整，直接使用
+                games.addAll(zipRomFile.games);
+                listener.onRomsFinderFoundZipEntry(zipFile.getName(), zipRomFile.games.size());
+                NLog.i(TAG, "found zip in cache " + zipRomFile.games.size());
+            } else {
+                // 首次导入或旧数据损坏，重新处理 ZIP 文件
                 zipRomFile = new ZipRomFile();
                 zipRomFile.path = zipFile.getAbsolutePath();
                 zipRomFile.hash = hash;
+                // 先插入数据库获取真实 ID，后续游戏才能正确关联
+                gameRepository.insertZipFile(zipRomFile);
 
                 try {
                     ZipEntry ze;
@@ -394,6 +420,7 @@ public class RomsFinder extends Thread {
                                 GameDescription game = new GameDescription(ze.getName(), "", checksum);
                                 game.inserTime = System.currentTimeMillis();
                                 game.zipfile_id = zipRomFile._id;
+                                gameRepository.insertGame(game);
                                 zipRomFile.games.add(game);
                                 games.add(game);
                             }
@@ -416,9 +443,6 @@ public class RomsFinder extends Thread {
                             listener.onRomsFinderFoundZipEntry(zipFile.getName() + "\n" + name, 0);
                         }
                     }
-                    if (running.get()) {
-                        gameRepository.insertZipFile(zipRomFile);
-                    }
                 } catch (Exception e) {
                     NLog.e(TAG, "", e);
                 } finally {
@@ -429,10 +453,6 @@ public class RomsFinder extends Thread {
                         NLog.e(TAG, "", e);
                     }
                 }
-            } else {
-                games.addAll(zipRomFile.games);
-                listener.onRomsFinderFoundZipEntry(zipFile.getName(), zipRomFile.games.size());
-                NLog.i(TAG, "found zip in cache " + zipRomFile.games.size());
             }
         } else {
             NLog.e(TAG, "external cache dir is null");

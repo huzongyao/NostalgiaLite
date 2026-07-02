@@ -156,8 +156,9 @@ public class GameRepository {
         return entity != null ? convertToZipRomFile(entity) : null;
     }
     
-    /** 删除 ZIP ROM 文件 */
+    /** 删除 ZIP ROM 文件及其关联的游戏 */
     public void deleteZipFile(ZipRomFile zipFile) {
+        gameDescriptionDao.deleteByZipFileId(zipFile._id);
         ZipRomFileEntity entity = convertToEntity(zipFile);
         zipRomFileDao.delete(entity);
     }
@@ -178,7 +179,7 @@ public class GameRepository {
     }
     
     /** 根据 ZIP 文件 ID 获取其包含的所有游戏 */
-    private ArrayList<GameDescription> getGamesByZipFileId(long zipfileId) {
+    public ArrayList<GameDescription> getGamesByZipFileId(long zipfileId) {
         List<GameDescriptionEntity> entities = gameDescriptionDao.getByZipFileId(zipfileId);
         return convertToGameDescriptions(entities);
     }

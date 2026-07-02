@@ -46,7 +46,7 @@ public:
         pads = 0;
         inited = false;
         gfxBuf = NULL;
-        strcpy(lastPath, "");
+        lastPath = "";
         initBuffers();
         resetSfx();
     }
@@ -327,7 +327,7 @@ public:
         FCEUI_PowerNES();
 
         if (loadSavFiles) {
-            doLoadGame(lastPath, 0, 0);
+            doLoadGame(lastPath.c_str(), 0, 0);
 
         } else {
             GameInterface(GI_RESETSAVE);
@@ -401,6 +401,11 @@ public:
     /** 设置调色板颜色（由 fceux 回调） */
     void setPalette(int idx, int value) {
         emuPalette[idx] = value;
+    }
+
+    /** 像素格式转换：NES 使用调色板查找 */
+    unsigned int getPixel(const BUFFER_TYPE *buf, int idx) const {
+        return emuPalette[buf[idx]];
     }
 
     /** 重置音频缓冲区状态 */

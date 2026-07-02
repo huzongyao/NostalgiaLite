@@ -83,4 +83,8 @@ public interface GameDescriptionDao {
     /** 根据 ZIP 文件 ID 获取该压缩包内的所有游戏 */
     @Query("SELECT * FROM GameDescription WHERE zipfile_id = :zipfileId")
     List<GameDescriptionEntity> getByZipFileId(long zipfileId);
+
+    /** 根据 ZIP 文件 ID 删除关联的所有游戏 */
+    @Query("DELETE FROM GameDescription WHERE zipfile_id = :zipfileId")
+    void deleteByZipFileId(long zipfileId);
 }

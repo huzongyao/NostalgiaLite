@@ -54,7 +54,6 @@ public:
 
     /** 构造 GBC 模拟器，初始化 gambatte 引擎和缓冲区 */
     GameBoyEmulator() {
-        lastPath = (char *) malloc(1);
         ok = false;
         initBuffers();
         origWidth = WIDTH;
@@ -276,6 +275,11 @@ public:
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 160, (144 + PADDING) * 3, GL_ALPHA,
                         GL_UNSIGNED_BYTE, gfxBufs[stable]);
         return true;
+    }
+
+    /** 像素格式转换：GBC 直接组合 RGB 通道分离存储的三平面数据 */
+    unsigned int getPixel(const BUFFER_TYPE *buf, int idx) const {
+        return 0xff000000 | (buf[idx + 23040 + 3200] << 8) | (buf[idx + 46080 + 6400] << 16) | (buf[idx] << 0);
     }
 
 private:

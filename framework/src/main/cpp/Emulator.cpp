@@ -1,19 +1,16 @@
 /**
- * 模拟器基类实现。
+ * 模拟器共享基类实现。
  * <p>实现帧渲染（基于 Bresenham 缩放算法）、双缓冲交换、
  * 历史状态环形缓冲、音频缓冲读取等通用逻辑。</p>
+ * <p>像素格式转换通过虚函数 getPixel() 延迟到子类实现。</p>
  */
 #include "Emulator.h"
 #include <android/bitmap.h>
 #include <stdio.h>
 #include <GLES/gl.h>
 #include <cstring>
-#include <malloc.h>
 
 using namespace emudroid;
-
-/** 全局 Java 虚拟机指针 */
-JavaVM *jvm;
 
 /** 构造模拟器，初始化缓冲区指针和调色板 */
 Emulator::Emulator() {
@@ -25,7 +22,7 @@ Emulator::Emulator() {
     historyIndex = -1;
     historySize = 0;
     historyEnabled = false;
-    lastPath = (char *) malloc(1);
+    lastPath = "";
     stableGfx = 0;
     emuPalette = new PALETTE_TYPE[256];
 }
@@ -100,14 +97,12 @@ bool Emulator::loadState(const char *path, int slot) {
 
 /** 加载游戏（切换游戏时清空历史缓冲） */
 bool Emulator::loadGame(const char *path, const char *batteryPath, const char *strippedName) {
-    if (strcmp(lastPath, path) != 0) {
+    if (lastPath != path) {
         historyIndex = -1;
         historySize = 0;
     }
 
-    free(lastPath);
-    lastPath = (char *) malloc(strlen(path) + 1);
-    strcpy(lastPath, path);
+    lastPath = path;
     return doLoadGame(path, batteryPath, strippedName);
 }
 
@@ -116,6 +111,7 @@ bool Emulator::loadGame(const char *path, const char *batteryPath, const char *s
  * 渲染当前帧到 Android Bitmap。
  * <p>基于 Bresenham 缩放算法将原始像素缓冲映射到目标 Bitmap，
  * 支持任意尺寸缩放。通过 AndroidBitmap_lockPixels 直接操作像素内存。</p>
+ * <p>像素格式转换通过虚函数 getPixel() 实现平台差异化。</p>
  */
 bool Emulator::render(JNIEnv *env, jobject bitmap, int w, int h, BUFFER_TYPE *force) {
     int stable = swapBuffersBeforeRead();
@@ -154,7 +150,7 @@ bool Emulator::render(JNIEnv *env, jobject bitmap, int w, int h, BUFFER_TYPE *fo
         int *data = (int *) pixels;
 
         for (int x = newWidth, xe = 0; x > 0; x--) {
-            data[outOffset++] = GET_PIXEL(buf, inOffset);
+            data[outOffset++] = getPixel(buf, inOffset);
             inOffset += mxd;
             xe += mxr;
 
