@@ -103,7 +103,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
     private float buttonMinSizePx = 0;
     private ArrayList<EditElement> editElements = new ArrayList<>();
     private byte[][] maps;
-    private Rect[] boundingBoxs;
+    private Rect[] boundingBoxes;
     private Bitmap[] buttonsBitmaps = new Bitmap[0];
     private Bitmap[] pressedButtonsBitmaps = new Bitmap[0];
     private ArrayList<Integer> dpadRIDs = new ArrayList<>();
@@ -137,7 +137,6 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
     }
 
     private void remapOldMTLprefToNew(SharedPreferences pref, Map<String, ?> prefMap) {
-        HashMap<Integer, Integer> oldIdsToNewMap = null;
         Editor editor = pref.edit();
         HashSet<String> keysToRemove = new HashSet<>();
         boolean wrongFormat = false;
@@ -146,10 +145,9 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
             String value = (String) entry.getValue();
             keysToRemove.add(entry.getKey());
             Integer oldBtnId = Integer.parseInt(entry.getKey());
-            Integer newBtnId = oldIdsToNewMap.get(oldBtnId);
-            int newKey = btnIdMap.indexOf(newBtnId);
-            if (newBtnId == 0 || newKey == -1) {
-                NLog.e(TAG, "oldBtnId:" + oldBtnId + " newBtnId:" + newBtnId + " newKey:" + newKey);
+            int newKey = btnIdMap.indexOf(oldBtnId);
+            if (newKey == -1) {
+                NLog.e(TAG, "unknown old MTL button id:" + oldBtnId);
                 wrongFormat = true;
             } else {
                 editor.putString(newKey + "", value);
@@ -278,7 +276,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
             }
         }
 
-        boundingBoxs = new Rect[btnsCount];
+        boundingBoxes = new Rect[btnsCount];
         buttonsBitmaps = new Bitmap[btnsCount];
         pressedButtonsBitmaps = new Bitmap[btnsCount];
         int idx = 0;
@@ -292,7 +290,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                 int btnH = btn.getMeasuredHeight();
                 int btnX = getRelativeLeft(btn, this);
                 int btnY = getRelativeTop(btn, this);
-                boundingBoxs[idx] = new Rect(btnX, btnY, btnX + btnW, btnY + btnH);
+                boundingBoxes[idx] = new Rect(btnX, btnY, btnX + btnW, btnY + btnH);
                 r.offsetTo(btnX, btnY);
 
                 if (btnW > 0 && btnH > 0) {
@@ -379,7 +377,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
 
             for (View btn : btns) {
                 if (btn.getVisibility() != View.GONE) {
-                    Rect bb = boundingBoxs[idx];
+                    Rect bb = boundingBoxes[idx];
 
                     if (btn.getId() == R.id.button_fast_forward) {
                         NLog.i(TAG, "fast f btn " + idx + " bb " + bb);
@@ -430,7 +428,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
 
         for (View btn : btns) {
             if (btn.getVisibility() != View.GONE) {
-                Rect bb = boundingBoxs[idx];
+                Rect bb = boundingBoxes[idx];
                 int len = bb.width() * bb.height();
                 byte[] map = maps[idx];
                 if (map == null || (map.length != len)) {
@@ -485,7 +483,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
 
         int newBtnIdx = EMPTY_COLOR;
         for (int i = maps.length - 1; i >= 0; i--) {
-            Rect boundingBox = boundingBoxs[i];
+            Rect boundingBox = boundingBoxes[i];
 
             if (boundingBox != null && boundingBox.contains(x, y)
                     && btns.get(i).isEnabled()) {
@@ -582,13 +580,13 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
         super.onDraw(canvas);
 
         if (!isInEditMode() && editMode == EDIT_MODE.NONE) {
-            for (int idx = 0; idx < boundingBoxs.length; idx++) {
+            for (int idx = 0; idx < boundingBoxes.length; idx++) {
                 MultitouchBtnInterface btn = (MultitouchBtnInterface) btns.get(idx);
                 btn.removeRequestRepaint();
                 if (btn.getVisibility() == View.VISIBLE) {
                     Bitmap b = btn.isPressed() ? pressedButtonsBitmaps[idx] : buttonsBitmaps[idx];
                     if (b != null) {
-                        Rect bb = boundingBoxs[idx];
+                        Rect bb = boundingBoxes[idx];
                         canvas.drawBitmap(b, bb.left, bb.top, paint);
                         if (editMode != EDIT_MODE.NONE) {
                             canvas.drawRect(bb, pp);
@@ -655,7 +653,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
             }
         }
 
-        for (int idx = 0; idx < boundingBoxs.length; idx++) {
+        for (int idx = 0; idx < boundingBoxes.length; idx++) {
             MultitouchBtnInterface btn = (MultitouchBtnInterface) btns.get(idx);
             if (btn.getId() == R.id.button_menu) {
                 paint.setAlpha(255);
@@ -665,7 +663,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
             btn.removeRequestRepaint();
             Bitmap b = btn.isPressed() ? pressedButtonsBitmaps[idx] : buttonsBitmaps[idx];
             if (b != null) {
-                Rect bb = boundingBoxs[idx];
+                Rect bb = boundingBoxes[idx];
                 Rect bRect = new Rect(0, 0, b.getWidth(), b.getHeight());
                 canvas.drawBitmap(b, bRect, bb, paint);
             }
@@ -724,7 +722,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                 e.resizeRects.clear();
                 for (int i = 0; i < e.ids.size(); i++) {
                     int id = e.ids.get(i);
-                    e.resizeRects.add(new RectF(boundingBoxs[id]));
+                    e.resizeRects.add(new RectF(boundingBoxes[id]));
                 }
             }
             Rect invalR = new Rect();
@@ -832,7 +830,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
         for (int i = 0; i < element.ids.size(); i++) {
             int id = element.ids.get(i);
             RectF offset = new RectF(element.offsetshistory.get(i));
-            RectF bb = new RectF(element.boundingboxsHistory.get(i));
+            RectF bb = new RectF(element.boundingBoxesHistory.get(i));
             RectF elemBB = element.boundingboxHistory;
             bb.offset(-elemBB.left, -elemBB.top);
             bb.left *= scaleFactor;
@@ -843,7 +841,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
             offset.top *= scaleFactor;
             element.offsets.get(i).set(offset);
             bb.offset(element.boundingbox.left, element.boundingbox.top);
-            bb.round(boundingBoxs[id]);
+            bb.round(boundingBoxes[id]);
         }
     }
 
@@ -862,25 +860,25 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
     }
 
     private boolean isRectValid(RectF r, EditElement element) {
-        boolean isvalid = true;
+        boolean isValid = true;
         RectF globalBox = new RectF(0, 0, touchMapWidth, touchMapHeight);
         if (globalBox.contains(r)) {
             if (editMode == EDIT_MODE.TOUCH) {
                 for (EditElement el : editElements) {
                     if (el != element && RectF.intersects(r, el.boundingbox)) {
-                        isvalid = false;
+                        isValid = false;
                         break;
                     }
                 }
             }
         } else {
-            isvalid = false;
+            isValid = false;
         }
         if (element.boundingbox.width() < element.minimalSize ||
                 element.boundingbox.height() < element.minimalSize) {
-            isvalid = false;
+            isValid = false;
         }
-        return isvalid;
+        return isValid;
     }
 
     @Override
@@ -905,47 +903,47 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
         MultitouchBtnInterface btn = (MultitouchBtnInterface) btns.get(btnIdx);
         btn.onTouchEnter(event);
         btn.requestRepaint();
-        invalidate(boundingBoxs[btnIdx]);
+        invalidate(boundingBoxes[btnIdx]);
 
         if (btn instanceof MultitouchTwoButtonArea) {
             MultitouchTwoButtonArea mtba = (MultitouchTwoButtonArea) btn;
             int idx1 = ridToIdxMap.get(mtba.getFirstBtnRID());
             int idx2 = ridToIdxMap.get(mtba.getSecondBtnRID());
-            invalidate(boundingBoxs[idx1]);
-            invalidate(boundingBoxs[idx2]);
+            invalidate(boundingBoxes[idx1]);
+            invalidate(boundingBoxes[idx2]);
 
         } else if (btn instanceof MultitouchTwoButton) {
             MultitouchTwoButton mtba = (MultitouchTwoButton) btn;
             int idx1 = ridToIdxMap.get(mtba.getFirstBtnRID());
             int idx2 = ridToIdxMap.get(mtba.getSecondBtnRID());
-            invalidate(boundingBoxs[idx1]);
-            invalidate(boundingBoxs[idx2]);
+            invalidate(boundingBoxes[idx1]);
+            invalidate(boundingBoxes[idx2]);
         }
     }
 
     private void onTouchExit(int btnIdx, MotionEvent event) {
         MultitouchBtnInterface btn = (MultitouchBtnInterface) btns.get(btnIdx);
         btn.onTouchExit(event);
-        invalidate(boundingBoxs[btnIdx]);
+        invalidate(boundingBoxes[btnIdx]);
         btn.requestRepaint();
 
         if (btn instanceof MultitouchTwoButtonArea) {
             MultitouchTwoButtonArea mtba = (MultitouchTwoButtonArea) btn;
             int idx1 = ridToIdxMap.get(mtba.getFirstBtnRID());
             int idx2 = ridToIdxMap.get(mtba.getSecondBtnRID());
-            invalidate(boundingBoxs[idx1]);
-            invalidate(boundingBoxs[idx2]);
+            invalidate(boundingBoxes[idx1]);
+            invalidate(boundingBoxes[idx2]);
 
         } else if (btn instanceof MultitouchTwoButton) {
             MultitouchTwoButton mtba = (MultitouchTwoButton) btn;
             int idx1 = ridToIdxMap.get(mtba.getFirstBtnRID());
             int idx2 = ridToIdxMap.get(mtba.getSecondBtnRID());
-            invalidate(boundingBoxs[idx1]);
-            invalidate(boundingBoxs[idx2]);
+            invalidate(boundingBoxes[idx1]);
+            invalidate(boundingBoxes[idx2]);
         }
     }
 
-    public void setLastgameScreenshot(Bitmap bitmap, String gfxProfileName) {
+    public void setLastGameScreenshot(Bitmap bitmap, String gfxProfileName) {
         NLog.i(TAG, "set last profile:" + gfxProfileName);
         lastGameScreenshot = bitmap;
         lastGfxProfileName = gfxProfileName;
@@ -1038,8 +1036,8 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
         for (EditElement element : editElements) {
             element.boundingbox.set(element.boundingboxHistory);
             for (int i = 0; i < element.ids.size(); i++) {
-                Rect bb = boundingBoxs[element.ids.get(i)];
-                bb.set(element.boundingboxsHistory.get(i));
+                Rect bb = boundingBoxes[element.ids.get(i)];
+                bb.set(element.boundingBoxesHistory.get(i));
                 element.offsets.get(i).set(element.offsetshistory.get(i));
             }
         }
@@ -1060,8 +1058,8 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
         for (EditElement element : editElements) {
             element.boundingbox.set(element.boundingboxHistory);
             for (int i = 0; i < element.ids.size(); i++) {
-                Rect bb = boundingBoxs[element.ids.get(i)];
-                bb.set(element.boundingboxsHistory.get(i));
+                Rect bb = boundingBoxes[element.ids.get(i)];
+                bb.set(element.boundingBoxesHistory.get(i));
                 element.offsets.get(i).set(element.offsetshistory.get(i));
             }
         }
@@ -1108,7 +1106,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
 
         for (int i = 0; i < btns.size(); i++) {
             View btn = btns.get(i);
-            Rect offset = boundingBoxs[i];
+            Rect offset = boundingBoxes[i];
             String s = offset.left + "-" + offset.top + "-" + offset.right + "-" + offset.bottom;
             int id = btnIdMap.indexOf(btn.getId());
             editor.putString(id + "", s);
@@ -1153,7 +1151,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                     String s = pref.getString("" + id, "");
                     if (!s.equals("")) {
                         String[] sa = s.split("-");
-                        Rect bb = boundingBoxs[ridToIdxMap.get(btn.getId())];
+                        Rect bb = boundingBoxes[ridToIdxMap.get(btn.getId())];
                         int left = Integer.parseInt(sa[0]);
                         int top = Integer.parseInt(sa[1]);
                         int right = Integer.parseInt(sa[2]);
@@ -1169,7 +1167,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                     elem.computeBoundingBox();
                     elem.computeOffsets();
                 }
-                //NLog.i(TAG, hashCode() + " isNew:" + isNew + " " + btns.size() + " " + Arrays.toString(boundingBoxs));
+                //NLog.i(TAG, hashCode() + " isNew:" + isNew + " " + btns.size() + " " + Arrays.toString(boundingBoxes));
                 checkFastForwardButton();
                 return isNew;
             }
@@ -1177,12 +1175,12 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
     }
 
     private void checkFastForwardButton() {
-        if (boundingBoxs != null) {
+        if (boundingBoxes != null) {
             int idx = ridToIdxMap.get(R.id.button_fast_forward);
-            Rect ff_bb = boundingBoxs[idx];
+            Rect ff_bb = boundingBoxes[idx];
             //NLog.i(TAG, "fast forward btn " + idx + " rect " + ff_bb);
 
-            for (Rect bb2 : boundingBoxs) {
+            for (Rect bb2 : boundingBoxes) {
                 if (ff_bb != bb2 && Rect.intersects(ff_bb, bb2)) {
                     //NLog.i(TAG, "colision with " + bb2);
                     int w = getMeasuredWidth();
@@ -1200,7 +1198,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                             }
                         }
                         //NLog.i(TAG, i + " new rect " + ff_bb);
-                        for (Rect bb3 : boundingBoxs) {
+                        for (Rect bb3 : boundingBoxes) {
                             if (ff_bb != bb3 && Rect.intersects(ff_bb, bb3)) {
                                 //NLog.i(TAG, "colision with " + bb3);
                                 wrongPosition = true;
@@ -1217,7 +1215,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                         resetEditElement("");
                     } else {
                         NLog.i(TAG, "Podarilo se najit vhodnou pozici " + ff_bb + " "
-                                + boundingBoxs[btnIdMap.indexOf(R.id.button_fast_forward)]);
+                                + boundingBoxes[btnIdMap.indexOf(R.id.button_fast_forward)]);
                         for (EditElement elem : editElements) {
                             elem.computeBoundingBox();
                             elem.computeOffsets();
@@ -1261,7 +1259,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
 
         boolean movable = true;
         RectF boundingboxHistory = new RectF();
-        ArrayList<Rect> boundingboxsHistory = new ArrayList<>();
+        ArrayList<Rect> boundingBoxesHistory = new ArrayList<>();
         ArrayList<RectF> offsetshistory = new ArrayList<>();
 
 
@@ -1276,7 +1274,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
 
             if (idx != -1) {
                 ids.add(idx);
-                boundingbox.set(boundingBoxs[idx]);
+                boundingbox.set(boundingBoxes[idx]);
                 boundingboxHistory.set(boundingbox);
             }
 
@@ -1305,7 +1303,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
             int idx = ridToIdxMap.get(rid);
             ids.add(idx);
             RectF tmp = new RectF();
-            tmp.set(boundingBoxs[idx]);
+            tmp.set(boundingBoxes[idx]);
             boundingbox.union(tmp);
             boundingboxHistory.set(boundingbox);
             computeOffsets();
@@ -1319,7 +1317,7 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
                 offsets.add(offset);
             } else {
                 for (Integer id : ids) {
-                    Rect r = boundingBoxs[id];
+                    Rect r = boundingBoxes[id];
                     RectF offset = new RectF(r.left - boundingbox.left, r.top - boundingbox.top, 0, 0);
                     offsets.add(offset);
                 }
@@ -1328,10 +1326,10 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
 
         public void computeBoundingBox() {
             if (!isScreenElement) {
-                boundingbox.set(boundingBoxs[ids.get(0)]);
+                boundingbox.set(boundingBoxes[ids.get(0)]);
 
                 for (Integer id : ids) {
-                    Rect r = boundingBoxs[id];
+                    Rect r = boundingBoxes[id];
                     RectF tmp = new RectF();
                     tmp.set(r);
                     boundingbox.union(tmp);
@@ -1340,14 +1338,14 @@ public class MultitouchLayer extends RelativeLayout implements OnTouchListener {
         }
 
         public EditElement saveHistory() {
-            boundingboxsHistory.clear();
+            boundingBoxesHistory.clear();
             offsetshistory.clear();
 
             if (isScreenElement) {
             } else {
                 for (int i = 0; i < offsets.size(); i++) {
                     int id = ids.get(i);
-                    boundingboxsHistory.add(new Rect(boundingBoxs[id]));
+                    boundingBoxesHistory.add(new Rect(boundingBoxes[id]));
                     offsetshistory.add(new RectF(offsets.get(i)));
                 }
             }

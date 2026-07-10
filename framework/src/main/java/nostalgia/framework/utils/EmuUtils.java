@@ -87,18 +87,10 @@ public class EmuUtils {
      * @return MD5 十六进制字符串，失败返回空字符串
      */
     public static String getMD5Checksum(File file) {
-        InputStream fis = null;
-        try {
-            fis = new FileInputStream(file);
+        try (InputStream fis = new FileInputStream(file)) {
             return countMD5(fis);
         } catch (IOException e) {
             NLog.e(TAG, "", e);
-        } finally {
-            try {
-                if (fis != null)
-                    fis.close();
-            } catch (IOException ignored) {
-            }
         }
         return "";
     }
@@ -122,18 +114,10 @@ public class EmuUtils {
      * @return MD5 十六进制字符串，失败返回空字符串
      */
     public static String getMD5Checksum(Context context, Uri uri) {
-        InputStream is = null;
-        try {
-            is = context.getContentResolver().openInputStream(uri);
+        try (InputStream is = context.getContentResolver().openInputStream(uri)) {
             return countMD5(is);
         } catch (IOException e) {
             NLog.e(TAG, "", e);
-        } finally {
-            try {
-                if (is != null)
-                    is.close();
-            } catch (IOException ignored) {
-            }
         }
         return "";
     }
@@ -147,17 +131,15 @@ public class EmuUtils {
      * @return 复制成功返回目标文件，失败返回 null
      */
     public static File copyUriToFile(Context context, Uri uri, File destination) {
-        InputStream is = null;
-        FileOutputStream os = null;
-        try {
-            is = context.getContentResolver().openInputStream(uri);
+        try (InputStream is = context.getContentResolver().openInputStream(uri)) {
             if (is == null) return null;
             
-            os = new FileOutputStream(destination);
-            byte[] buffer = new byte[8192];
-            int bytesRead;
-            while ((bytesRead = is.read(buffer)) != -1) {
-                os.write(buffer, 0, bytesRead);
+            try (FileOutputStream os = new FileOutputStream(destination)) {
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+                while ((bytesRead = is.read(buffer)) != -1) {
+                    os.write(buffer, 0, bytesRead);
+                }
             }
             return destination;
         } catch (IOException e) {
@@ -166,12 +148,6 @@ public class EmuUtils {
                 destination.delete();
             }
             return null;
-        } finally {
-            try {
-                if (is != null) is.close();
-                if (os != null) os.close();
-            } catch (IOException ignored) {
-            }
         }
     }
 
@@ -184,10 +160,13 @@ public class EmuUtils {
      * @return MD5 十六进制字符串
      */
     private static String countMD5(InputStream is) {
+        if (is == null) {
+            return "";
+        }
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] buffer = new byte[MD5_BYTES_COUNT];
-            int readCount = 0;
+            int readCount;
             int totalCount = 0;
             int updateCount = 0;
             while ((readCount = is.read(buffer)) != -1) {
@@ -202,11 +181,11 @@ public class EmuUtils {
             }
             if (totalCount >= MD5_BYTES_COUNT) {
                 byte[] digest = md.digest();
-                String result = "";
+                StringBuilder result = new StringBuilder(digest.length * 2);
                 for (byte aDigest : digest) {
-                    result += Integer.toString((aDigest & 0xff) + 0x100, 16).substring(1);
+                    result.append(Integer.toString((aDigest & 0xff) + 0x100, 16).substring(1));
                 }
-                return result;
+                return result.toString();
             } else {
                 return "small file";
             }
@@ -227,8 +206,7 @@ public class EmuUtils {
      * @return CRC32 值，失败返回 -1
      */
     public static long getCrc(String dir, String entry) {
-        try {
-            ZipFile zf = new ZipFile(dir);
+        try (ZipFile zf = new ZipFile(dir)) {
             ZipEntry ze = zf.getEntry(entry);
             return ze.getCrc();
         } catch (Exception e) {
@@ -271,19 +249,20 @@ public class EmuUtils {
             throws IOException {
         NLog.i(TAG, "extract " + entryName + " from " + zipFile.getAbsolutePath() + " to "
                 + outputFile.getAbsolutePath());
-        ZipFile zipFile2 = new ZipFile(zipFile);
-        ZipEntry ze = zipFile2.getEntry(entryName);
-        if (ze != null) {
-            InputStream zis = zipFile2.getInputStream(ze);
-            FileOutputStream fos = new FileOutputStream(outputFile);
-            byte[] buffer = new byte[20480];
-            int count;
-            while ((count = zis.read(buffer)) != -1) {
-                fos.write(buffer, 0, count);
+        try (ZipFile zipFile2 = new ZipFile(zipFile)) {
+            ZipEntry ze = zipFile2.getEntry(entryName);
+            if (ze == null) {
+                throw new IOException("ZIP entry not found: " + entryName);
             }
-            zis.close();
-            zipFile2.close();
-            fos.close();
+
+            try (InputStream zis = zipFile2.getInputStream(ze);
+                 FileOutputStream fos = new FileOutputStream(outputFile)) {
+                byte[] buffer = new byte[20480];
+                int count;
+                while ((count = zis.read(buffer)) != -1) {
+                    fos.write(buffer, 0, count);
+                }
+            }
         }
     }
 
@@ -426,6 +405,10 @@ public class EmuUtils {
     public static Bitmap createScreenshotBitmap(Context context, GameDescription game) {
         String path = SlotUtils.getScreenshotPath(EmulatorUtils.getBaseDir(context), game.checksum, 0);
         Bitmap bitmap = BitmapFactory.decodeFile(path);
+        if (bitmap == null) {
+            return null;
+        }
+
         int w = bitmap.getWidth();
         int h = bitmap.getHeight();
         int newW = w * 2;

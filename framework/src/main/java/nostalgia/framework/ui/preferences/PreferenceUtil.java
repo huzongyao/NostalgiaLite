@@ -427,12 +427,12 @@ public class PreferenceUtil {
         edit.apply();
     }
 
-    public static boolean isOpenGLEnable(Context context) {
+    public static boolean isOpenGLEnabled(Context context) {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-        return isOpenGLEnable(context, pref);
+        return isOpenGLEnabled(context, pref);
     }
 
-    private static boolean isOpenGLEnable(Context context, SharedPreferences pref) {
+    private static boolean isOpenGLEnabled(Context context, SharedPreferences pref) {
         return pref.getBoolean("general_pref_opengl", true);
     }
 

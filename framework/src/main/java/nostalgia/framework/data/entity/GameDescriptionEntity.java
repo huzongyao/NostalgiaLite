@@ -10,13 +10,13 @@ import androidx.room.PrimaryKey;
  * <p>
  * 存储游戏的基本信息，包括名称、路径、校验和、所属 ZIP 文件、
  * 插入时间、最近游玩时间和游玩次数。
- * 在 checksum、inserTime、lastGameTime 字段上建立索引以加速查询。
+ * 在 checksum、insertTime、lastGameTime 字段上建立索引以加速查询。
  * </p>
  */
 @Entity(tableName = "GameDescription",
         indices = {
                 @Index(value = "checksum"),      // 校验和索引，用于快速查重
-                @Index(value = "inserTime"),      // 插入时间索引，用于按时间排序
+                @Index(value = "insertTime"),      // 插入时间索引，用于按时间排序
                 @Index(value = "lastGameTime")    // 最近游玩时间索引，用于排序
         })
 public class GameDescriptionEntity {
@@ -38,7 +38,7 @@ public class GameDescriptionEntity {
     public long zipfile_id = -1;
 
     /** 游戏插入时间（时间戳） */
-    public long inserTime = 0;
+    public long insertTime = 0;
 
     /** 最近一次游玩时间（时间戳） */
     public long lastGameTime = 0;

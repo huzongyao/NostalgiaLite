@@ -60,7 +60,7 @@ public class ScreenViewPortSettingsActivity extends AppCompatActivity
         }
 
         gfxProfile = PreferenceUtil.getLastGfxProfile(this);
-        mtLayer.setLastgameScreenshot(lastGameScreenshot,
+        mtLayer.setLastGameScreenshot(lastGameScreenshot,
                 gfxProfile == null ? null : gfxProfile.name);
     }
 

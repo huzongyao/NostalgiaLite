@@ -50,10 +50,14 @@ public class BatterySaveUtils {
 
     private static void saveMD5Meta(Context context, File batterySavFile, String md5) {
         File metaFile = getMetaFile(context, batterySavFile);
-        try (FileWriter fw = new FileWriter(metaFile)) {
-            metaFile.delete();
+        try {
+            if (metaFile.exists() && !metaFile.delete()) {
+                return;
+            }
             metaFile.createNewFile();
-            fw.write(md5);
+            try (FileWriter fw = new FileWriter(metaFile)) {
+                fw.write(md5);
+            }
         } catch (Exception ignored) {
         }
     }
@@ -87,9 +91,16 @@ public class BatterySaveUtils {
     public static String getBatterySaveDir(Context context, String gameFilePath) {
         File f = new File(gameFilePath);
         String directory = f.getParent();
+        if (directory == null) {
+            return EmulatorUtils.getBaseDir(context);
+        }
+
         String batteryPath = directory;
         boolean isWritable = new File(batteryPath).canWrite();
-        if (!isWritable || directory.equals(context.getExternalCacheDir().getAbsolutePath())) {
+        File externalCacheDir = context.getExternalCacheDir();
+        boolean isExternalCache = externalCacheDir != null
+                && directory.equals(externalCacheDir.getAbsolutePath());
+        if (!isWritable || isExternalCache) {
             batteryPath = EmulatorUtils.getBaseDir(context);
         }
         return batteryPath;

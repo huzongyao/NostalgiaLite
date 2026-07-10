@@ -557,7 +557,7 @@ public abstract class EmulatorActivity extends AppCompatActivity
         i.putExtra(SlotSelectionActivity.EXTRA_GAME, game);
         i.putExtra(SlotSelectionActivity.EXTRA_BASE_DIRECTORY, baseDir);
         i.putExtra(SlotSelectionActivity.EXTRA_DIALOG_TYPE_INT,
-                SlotSelectionActivity.DIALOAG_TYPE_SAVE);
+                SlotSelectionActivity.DIALOG_TYPE_SAVE);
         freeStartActivityForResult(this, i, REQUEST_SAVE);
     }
 
@@ -567,7 +567,7 @@ public abstract class EmulatorActivity extends AppCompatActivity
         i.putExtra(SlotSelectionActivity.EXTRA_GAME, game);
         i.putExtra(SlotSelectionActivity.EXTRA_BASE_DIRECTORY, baseDir);
         i.putExtra(SlotSelectionActivity.EXTRA_DIALOG_TYPE_INT,
-                SlotSelectionActivity.DIALOAG_TYPE_LOAD);
+                SlotSelectionActivity.DIALOG_TYPE_LOAD);
         freeStartActivityForResult(this, i, REQUEST_LOAD);
     }
 

@@ -264,7 +264,11 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
         GameRepository repository = getGameRepository();
 
         if (game.isInArchive()) {
-            final File cacheFile = new File(getExternalCacheDir(), game.checksum);
+            File cacheDir = getExternalCacheDir();
+            if (cacheDir == null) {
+                cacheDir = getCacheDir();
+            }
+            final File cacheFile = new File(cacheDir, game.checksum);
             final String cachePath = cacheFile.getAbsolutePath();
             game.path = cachePath;
             

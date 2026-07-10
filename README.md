@@ -1,106 +1,155 @@
-NostalgiaLite（游戏模拟器）
-==================
+NostalgiaLite
+=============
 
-三款经典游戏平台模拟器（FC/NES、GG、GBC）的 Android 移植版。
+[![Release](https://img.shields.io/github/v/release/huzongyao/NostalgiaLite?label=release)](https://github.com/huzongyao/NostalgiaLite/releases/latest)
 
-[![Release](https://img.shields.io/appveyor/ci/gruntjs/grunt.svg)](https://github.com/huzongyao/NostalgiaLite/releases/latest)
+NostalgiaLite 是三款经典掌机/主机模拟器的 Android 移植工程，包含 FC/NES、Game Boy Color、Sega Game Gear 三个独立应用模块，并共用同一套模拟器框架层。
 
-## 项目简介
+直接体验：[下载最新 APK](https://github.com/huzongyao/NostalgiaLite/releases/latest)
 
-本项目包含三个运行在 Android 平台上的经典游戏模拟器：
-- **FC (NES) 模拟器** — 任天堂红白机模拟器，基于 fceux 引擎
-- **GG 模拟器** — Sega Game Gear 模拟器，基于 sms_plus 引擎
-- **GBC 模拟器** — Game Boy Color 模拟器，基于 libgambatte 引擎
+## 支持平台
 
-直接下载体验：[下载 APK](https://github.com/huzongyao/NostalgiaLite/releases/latest)
+| 模块 | 应用包名 | 平台 | 核心引擎 | 常见 ROM |
+|------|----------|------|----------|----------|
+| `appnes` | `nostalgia.appnes` | FC / NES | fceux | `.nes`, `.zip` |
+| `appgbc` | `nostalgia.appgbc` | Game Boy / Game Boy Color | libgambatte | `.gb`, `.gbc`, `.zip` |
+| `appgg` | `nostalgia.appgg` | Sega Game Gear / Master System | sms_plus | `.gg`, `.sms`, `.zip` |
+
+## 功能特性
+
+| 功能 | 说明 |
+|------|------|
+| 多平台模拟 | 三个应用模块共享 `framework`，各自接入独立 C/C++ 模拟器内核 |
+| ROM 导入 | 支持系统文件选择器、本地文件扫描、从其他应用分享 ROM |
+| ZIP 支持 | 可识别 ZIP 压缩包内的 ROM，并缓存 ZIP 与游戏条目的关系 |
+| 即时存档 | 支持多槽位保存/读取，并为存档生成截图 |
+| 时间回溯 | 通过历史状态缓存回退到之前的游戏状态 |
+| 金手指 | 支持平台特定金手指和原始地址金手指 |
+| 截图 | 使用 MediaStore 保存到系统图库的 Pictures 目录 |
+| 输入控制 | 支持触摸虚拟按键、键盘和可扩展控制器映射 |
 
 ## 项目结构
 
-```
+```text
 NostalgiaLite/
-├── framework/          # 公共框架库模块
-│   ├── base/           # 基础类（JNI桥接、模拟器抽象、Activity基类）
-│   ├── controllers/    # 输入控制器（触摸、键盘、手柄）
-│   ├── data/           # 数据层（Room数据库、DAO、实体）
-│   ├── ui/             # UI组件（画廊、设置、金手指、时间回溯）
-│   └── utils/          # 工具类（文件、数据库、日志、注解）
-├── appnes/             # FC/NES 模拟器应用模块
-│   ├── java/           # Java 层（Core、Application、Emulator、Activity）
-│   └── cpp/            # C++ 层（JNI桥接、模拟器基类、fceux引擎封装）
-├── appgbc/             # GBC 模拟器应用模块
-│   ├── java/           # Java 层
-│   └── cpp/            # C++ 层（libgambatte引擎封装）
-└── appgg/              # GG 模拟器应用模块
-    ├── java/           # Java 层
-    └── cpp/            # C++ 层（sms_plus引擎封装）
+├── framework/                    # 公共框架库
+│   ├── src/main/java/nostalgia/framework/base/
+│   │   ├── JniEmulator.java      # Java 层模拟器基类
+│   │   ├── JniBridge.java        # JNI native 方法声明
+│   │   └── EmulatorActivity.java # 游戏运行 Activity 基类
+│   ├── src/main/java/nostalgia/framework/controllers/
+│   │   └── ...                   # 触摸、键盘、快捷存档等输入控制
+│   ├── src/main/java/nostalgia/framework/data/
+│   │   └── ...                   # Room 数据库、DAO、实体与 Repository
+│   ├── src/main/java/nostalgia/framework/ui/
+│   │   └── ...                   # 游戏列表、设置、金手指、时间回溯等 UI
+│   └── src/main/java/nostalgia/framework/utils/
+│       └── ...                   # 文件、日志、数据库、设备能力等工具类
+├── appnes/                       # FC/NES 应用模块，C++ 层封装 fceux
+├── appgbc/                       # GBC 应用模块，C++ 层封装 libgambatte
+├── appgg/                        # GG/SMS 应用模块，C++ 层封装 sms_plus
+├── misc/                         # 截图、素材等辅助文件
+└── gradle/                       # Gradle Wrapper
 ```
 
 ## 技术架构
 
-- **语言**: Java + C++ (JNI)
-- **构建工具**: Android Gradle Plugin + CMake
-- **数据库**: Room（自定义注解 ORM 兼容层）
-- **图形渲染**: OpenGL ES 2.0 + GLSL 着色器
-- **音频处理**: 双缓冲 PCM 音频流
-- **架构模式**: 模拟器抽象层（Emulator → JniEmulator → JniBridge → C++ Emulator）
+核心调用链：
 
-### 核心技术点
+```text
+Activity / Controller
+        ↓
+Emulator 接口
+        ↓
+JniEmulator
+        ↓
+JniBridge native 方法
+        ↓
+C/C++ 平台模拟器内核
+```
+
+主要技术点：
 
 | 技术点 | 说明 |
 |--------|------|
-| **三缓冲图形交换** | 稳定/工作/副本三缓冲区，避免渲染撕裂 |
-| **Bresenham 缩放渲染** | 高效的整数缩放算法，将原始画面放大到目标尺寸 |
-| **RGB 三通道分离纹理** | GBC/GG 使用 Alpha 通道分离存储 RGB，着色器合成显示 |
-| **双缓冲音频** | 读写分离的环形音频缓冲区，避免音频卡顿 |
-| **时间回溯** | 环形缓冲区保存历史状态，支持回退游玩 |
-| **金手指系统** | 支持原始地址金手指和平台特定格式 |
+| Java + C++ JNI | Java 负责应用、UI、输入和生命周期，C/C++ 负责模拟器核心 |
+| CMake Native Build | 每个应用模块都有独立 `src/main/cpp/CMakeLists.txt` |
+| OpenGL ES 2.0 | 用于游戏画面渲染和着色器处理 |
+| PCM 音频流 | `AudioTrack` 输出模拟器生成的音频数据 |
+| Room 数据库 | 管理 ROM、ZIP 条目、存档和游戏列表缓存 |
+| AndroidX | UI、兼容层和 Material 组件 |
 
-## 功能特性
+## 构建环境
 
-| 特性 | 说明 |
+当前工程配置：
+
+| 项目 | 版本 / 配置 |
+|------|-------------|
+| Android Gradle Plugin | `8.9.1` |
+| Gradle Wrapper | `8.11.1` |
+| Java 语言级别 | Java 8 |
+| App `compileSdk` / `targetSdk` | `36` / `36` |
+| Framework `compileSdk` / `targetSdk` | `33` / `33` |
+| `minSdk` | `15` |
+| NDK | 建议使用 `26.1.10909125` |
+| ABI | `armeabi-v7a`, `arm64-v8a`, `x86` |
+
+## 编译命令
+
+在项目根目录执行：
+
+```bash
+./gradlew :appnes:assembleDebug
+./gradlew :appgbc:assembleDebug
+./gradlew :appgg:assembleDebug
+```
+
+构建 Release 包：
+
+```bash
+./gradlew :appnes:assembleRelease
+./gradlew :appgbc:assembleRelease
+./gradlew :appgg:assembleRelease
+```
+
+构建产物命名格式为：
+
+```text
+<module>-<variant>-V<versionCode>.apk
+```
+
+例如：
+
+```text
+appnes-debug-V1501.apk
+```
+
+> 当前仓库包含 `demokey` 签名配置，适合本地调试和测试发布流程；正式发布前请替换为自己的签名文件，并避免提交私有密钥。
+
+## 使用说明
+
+1. 安装对应平台的 APK。
+2. 在游戏列表页点击导入按钮，选择 ROM 文件或 ZIP 压缩包。
+3. 也可以从文件管理器、网盘等应用将 ROM 分享到 NostalgiaLite。
+4. 进入游戏后使用屏幕虚拟按键操作，菜单中可进行截图、存档、读档、金手指和时间回溯。
+
+## 开发说明
+
+| 约定 | 说明 |
 |------|------|
-| 🎮 **多平台支持** | 支持FC(NES)、GG、GBC三种游戏平台 |
-| 📁 **安全的ROM导入** | 使用系统文件选择器，用户主动选择ROM文件 |
-| 🔗 **文件分享支持** | 支持从其他应用分享ROM文件到模拟器 |
-| 📸 **截图保存** | 一键截图并保存到系统图库 |
-| 💾 **存档管理** | 支持即时存档/读档，多槽位管理 |
-| 🎯 **金手指** | 支持多种金手指格式 |
-| ⏪ **时间回溯** | 可回退到之前的游戏状态 |
-| 🔒 **隐私保护** | 无需存储权限，符合Android隐私要求 |
-| 📱 **Android 15+支持** | 支持16KB页面大小，符合最新Google Play要求 |
+| 公共能力优先放在 `framework` | 三个模拟器共用的逻辑应避免在应用模块中重复实现 |
+| 第三方内核谨慎修改 | `fceux`、`libgambatte`、`sms_plus` 目录尽量只做必要适配 |
+| JNI 边界保持清晰 | Java 层只通过 `JniBridge` 调用 native 方法，平台差异由各应用模块实现 |
+| 日志保持有价值 | 错误和关键流程保留日志，避免在高频渲染/输入路径输出无意义日志 |
+| ROM 文件不入库 | 测试 ROM、个人存档、构建产物不应提交到仓库 |
 
-## 使用方法
-
-1. **导入ROM文件**
-   - 点击菜单中的文件夹图标
-   - 选择您的ROM文件（支持 .nes, .gb, .gbc, .gg, .sms, .zip）
-   - 或者从其他应用分享ROM文件到本应用
-
-2. **游戏控制**
-   - 触摸屏幕上的虚拟按键进行游戏
-   - 按菜单键打开游戏菜单
-   - 支持快速存档/读档功能
-
-3. **截图功能**
-   - 在游戏菜单中选择"截图"选项
-   - 截图会自动保存到系统图库
-
-## 编译构建
-
-* 需要 Android NDK（当前使用 26.1.10909125）
-* 使用 CMake 编译本地代码
-* Gradle 版本: 8.11.1（支持 JDK 21）
-* Android Gradle Plugin: 8.9.1
-
-### 第三方引擎
+## 第三方引擎
 
 | 引擎 | 用途 | 目录 |
 |------|------|------|
 | fceux | FC/NES 模拟 | `appnes/src/main/cpp/fceux/` |
-| libgambatte | GBC 模拟 | `appgbc/src/main/cpp/libgambatte/` |
+| libgambatte | GB/GBC 模拟 | `appgbc/src/main/cpp/libgambatte/` |
 | sms_plus | GG/SMS 模拟 | `appgg/src/main/cpp/sms_plus/` |
-
-> 注意：以上第三方引擎源代码不在本项目的注释范围内，请勿修改。
 
 ## 截图预览
 
@@ -108,10 +157,14 @@ NostalgiaLite/
 |:---:|:---:|:---:|
 | ![NES截图](https://github.com/huzongyao/NostalgiaLite/blob/master/misc/screen-nes.gif?raw=true) | ![GBC截图](https://github.com/huzongyao/NostalgiaLite/blob/master/misc/screen-gbc.gif?raw=true) | ![GG截图](https://github.com/huzongyao/NostalgiaLite/blob/master/misc/screen-gg.gif?raw=true) |
 
+## 版权与 ROM 说明
+
+本项目仅提供模拟器程序本身，不包含任何商业游戏 ROM。请仅使用你合法拥有的游戏备份文件。
+
 ## 关于作者
 
 * GitHub: [https://huzongyao.github.io/](https://huzongyao.github.io/)
-* ITEye博客：[https://hzy3774.iteye.com/](https://hzy3774.iteye.com/)
+* ITEye 博客：[https://hzy3774.iteye.com/](https://hzy3774.iteye.com/)
 * 新浪微博: [https://weibo.com/hzy3774](https://weibo.com/hzy3774)
 
 ## 联系方式
@@ -123,6 +176,6 @@ NostalgiaLite/
 
 ## 捐赠支持
 
-* 想捐钱我喝杯热水(¥0.01起捐)
+* 想捐钱我喝杯热水（¥0.01 起捐）
 
 ![donate](https://github.com/huzongyao/JChineseChess/blob/master/misc/donate.png?raw=true)

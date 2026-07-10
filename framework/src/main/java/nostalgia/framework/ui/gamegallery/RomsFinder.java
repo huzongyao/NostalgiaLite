@@ -6,14 +6,15 @@ import android.os.Environment;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -63,7 +64,7 @@ public class RomsFinder extends Thread {
         androidAppDataFolder = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android";
     }
     
-    // Constructor for importing a single file
+    /** 导入本地单个 ROM 文件或 ZIP 压缩包。 */
     public RomsFinder(Set<String> exts, Set<String> inZipExts, BaseGameGalleryActivity activity,
             OnRomsFinderListener listener, File singleFile) {
         this(exts, inZipExts, activity, listener, true, null);
@@ -71,7 +72,7 @@ public class RomsFinder extends Thread {
         this.importSingleFile = true;
     }
     
-    // Constructor for importing a single Uri
+    /** 导入系统文件选择器返回的单个 Uri。 */
     public RomsFinder(Set<String> exts, Set<String> inZipExts, BaseGameGalleryActivity activity,
             OnRomsFinderListener listener, Uri singleUri) {
         this(exts, inZipExts, activity, listener, true, null);
@@ -79,7 +80,7 @@ public class RomsFinder extends Thread {
         this.importSingleUri = true;
     }
     
-    // Constructor for importing multiple Uris
+    /** 批量导入系统文件选择器返回的多个 Uri。 */
     public RomsFinder(Set<String> exts, Set<String> inZipExts, BaseGameGalleryActivity activity,
             OnRomsFinderListener listener, ArrayList<Uri> uris) {
         this(exts, inZipExts, activity, listener, true, null);
@@ -91,16 +92,15 @@ public class RomsFinder extends Thread {
         return gameRepository.getAllGamesSortedByName();
     }
 
-    /** 递归搜索目录中的 ROM 和压缩包文件，最大深度 12 层 */
+    /** 搜索目录中的 ROM 和压缩包文件，最大深度 12 层，避免跟随循环路径重复扫描。 */
     private void getRomAndPackedFiles(File root, List<File> result, HashSet<String> usedPaths) {
         String dirPath = null;
-        Stack<DirInfo> dirStack = new Stack<>();
-        dirStack.removeAllElements();
-        dirStack.add(new DirInfo(root, 0));
+        Deque<DirInfo> dirStack = new ArrayDeque<>();
+        dirStack.addLast(new DirInfo(root, 0));
         final int MAX_LEVEL = 12;
 
-        while (running.get() && !dirStack.empty()) {
-            DirInfo dir = dirStack.remove(0);
+        while (running.get() && !dirStack.isEmpty()) {
+            DirInfo dir = dirStack.removeFirst();
             try {
                 dirPath = dir.file.getCanonicalPath();
             } catch (IOException e1) {
@@ -124,10 +124,10 @@ public class RomsFinder extends Thread {
                                 if (canonicalPath.equals(androidAppDataFolder)) {
                                     NLog.i(TAG, "ignore " + androidAppDataFolder);
                                 } else {
-                                    dirStack.add(new DirInfo(file, dir.level + 1));
+                                    dirStack.addLast(new DirInfo(file, dir.level + 1));
                                 }
                             } else {
-                                NLog.i(TAG, "cesta " + canonicalPath + " jiz byla prohledana");
+                                NLog.i(TAG, "skip already scanned path: " + canonicalPath);
                             }
                         } else {
                             result.add(file);
@@ -135,7 +135,7 @@ public class RomsFinder extends Thread {
                     }
                 }
             } else {
-                NLog.i(TAG, "cesta " + dirPath + " jiz byla prohledana");
+                NLog.i(TAG, "skip already scanned path: " + dirPath);
             }
         }
     }
@@ -178,7 +178,7 @@ public class RomsFinder extends Thread {
             String path = file.getCanonicalPath();
             NLog.i(TAG, "Importing file: " + path);
             
-            // Check if file already exists in database
+            // 路径已在数据库中时直接复用，避免重复插入同一 ROM。
             if (oldGames.containsKey(path)) {
                 NLog.i(TAG, "File already exists in library");
                 games.add(oldGames.get(path));
@@ -194,7 +194,7 @@ public class RomsFinder extends Thread {
                 checkZip(file);
             } else if (filenameExtFilter.accept(null, file.getName())) {
                 GameDescription game = new GameDescription(file);
-                game.inserTime = System.currentTimeMillis();
+                game.insertTime = System.currentTimeMillis();
                 gameRepository.insertGame(game);
                 games.add(game);
                 activity.runOnUiThread(() -> listener.onRomsFinderFoundFile(game.name));
@@ -316,7 +316,7 @@ public class RomsFinder extends Thread {
             checkZip(copiedFile);
         } else if (filenameExtFilter.accept(null, filename)) {
             GameDescription game = new GameDescription(copiedFile, checksum);
-            game.inserTime = System.currentTimeMillis();
+            game.insertTime = System.currentTimeMillis();
             gameRepository.insertGame(game);
             games.add(game);
             activity.runOnUiThread(() -> listener.onRomsFinderFoundFile(game.name));
@@ -330,10 +330,9 @@ public class RomsFinder extends Thread {
     private String getFilenameFromUri(Uri uri) {
         String result = null;
         try {
-            // Try to get filename from last path segment
+            // ContentProvider 不一定暴露真实文件名，这里先取最后一个路径片段作为兜底。
             String lastSegment = uri.getLastPathSegment();
             if (lastSegment != null) {
-                // If path has '/', use the last part
                 int lastSlash = lastSegment.lastIndexOf('/');
                 if (lastSlash >= 0) {
                     result = lastSegment.substring(lastSlash + 1);
@@ -409,16 +408,12 @@ public class RomsFinder extends Thread {
                             String filename = ze.getName();
                             if (inZipFileNameExtFilter.accept(dir, filename)) {
                                 counterRoms++;
-                                InputStream is = zip.getInputStream(ze);
-                                String checksum = EmuUtils.getMD5Checksum(is);
-                                try {
-                                    if (is != null) {
-                                        is.close();
-                                    }
-                                } catch (Exception ignored) {
+                                String checksum;
+                                try (InputStream is = zip.getInputStream(ze)) {
+                                    checksum = EmuUtils.getMD5Checksum(is);
                                 }
                                 GameDescription game = new GameDescription(ze.getName(), "", checksum);
-                                game.inserTime = System.currentTimeMillis();
+                                game.insertTime = System.currentTimeMillis();
                                 game.zipfile_id = zipRomFile._id;
                                 gameRepository.insertGame(game);
                                 zipRomFile.games.add(game);
@@ -429,7 +424,7 @@ public class RomsFinder extends Thread {
                         if (counterEntry > 20 && counterRoms == 0) {
                             listener.onRomsFinderFoundZipEntry(zipFile.getName() + "\n" + ze.getName(),
                                     max - 20 - 1);
-                            NLog.i(TAG, "Predcasne ukonceni prohledavani zipu. V prvnich 20 zaznamech v zipu neni ani jeden rom");
+                            NLog.i(TAG, "stop scanning zip early: no ROM found in first 20 entries");
                             break;
                         } else {
                             String name = ze.getName();
@@ -491,8 +486,7 @@ public class RomsFinder extends Thread {
                 String ext = EmuUtils.getExt(path).toLowerCase();
                 if (ext.equals("zip")) {
                     zips.add(file);
-                    try {
-                        ZipFile zzFile = new ZipFile(file);
+                    try (ZipFile zzFile = new ZipFile(file)) {
                         zipEntriesCount += zzFile.size();
                     } catch (Exception e) {
                         NLog.e(TAG, "", e);
@@ -504,7 +498,7 @@ public class RomsFinder extends Thread {
                     game = oldGames.get(path);
                 } else {
                     game = new GameDescription(file);
-                    game.inserTime = System.currentTimeMillis();
+                    game.insertTime = System.currentTimeMillis();
                     gameRepository.insertGame(game);
                     listener.onRomsFinderFoundFile(game.name);
                 }
@@ -609,15 +603,14 @@ public class RomsFinder extends Thread {
         void onRomsFinderCancel(boolean searchNew);
     }
 
-    /** 目录信息（用于递归搜索） */
-    private class DirInfo {
-        public File file;
-        public int level;
+    /** 目录搜索队列中的节点。 */
+    private static final class DirInfo {
+        final File file;
+        final int level;
 
-        public DirInfo(File f, int level) {
+        DirInfo(File f, int level) {
             this.level = level;
             this.file = f;
         }
     }
-
 }

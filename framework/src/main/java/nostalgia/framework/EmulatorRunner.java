@@ -77,9 +77,12 @@ public class EmulatorRunner {
 
         FilenameFilter filter = (dir1, filename) ->
                 filename.toLowerCase().endsWith(".sav");
-        String cacheDir = context.getExternalCacheDir().getAbsolutePath();
+        String cacheDir = dir.getAbsolutePath();
         String baseDir = EmulatorUtils.getBaseDir(context);
         String[] fileNames = dir.list(filter);
+        if (fileNames == null) {
+            return;
+        }
 
         for (String filename : fileNames) {
             File source = new File(cacheDir, filename);
@@ -199,8 +202,6 @@ public class EmulatorRunner {
 
             audioEnabled = sfx != null;
             emulator.start(gfx, sfx, settings);
-            String battery = context.getExternalCacheDir().getAbsolutePath();
-            NLog.e("bat", battery);
             BatterySaveUtils.createSavFileCopyIfNeeded(context, game.path);
             String batteryDir = BatterySaveUtils.getBatterySaveDir(context, game.path);
             String possibleBatteryFileFullPath = batteryDir + "/"

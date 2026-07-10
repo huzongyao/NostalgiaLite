@@ -213,13 +213,18 @@ public:
     bool saveState(const char *state, int slot) {
         std::string filename = std::string(state, strlen(state));
         std::ofstream stream(filename.c_str(), std::ios_base::binary);
+        if (!stream.is_open()) {
+            return false;
+        }
+
         gb.saveState(NULL, 0, stream);
-        return true;
+        stream.flush();
+        return stream.good();
     }
 
     /** 渲染历史状态帧 */
     bool renderHistory(JNIEnv *env, jobject bitmap, int pos, int w, int h) {
-        this->render(env, bitmap, w, h, travel[posToIdx(pos)]);
+        return this->render(env, bitmap, w, h, travel[posToIdx(pos)]);
     }
 
     /** 从内存流加载历史状态 */
@@ -237,7 +242,15 @@ public:
     bool doLoadState(const char *state, int slot) {
         std::string filename = std::string(state, strlen(state));
         std::ifstream stream(filename.c_str(), std::ios_base::binary);
+        if (!stream.is_open()) {
+            return false;
+        }
+
         gb.loadState(stream);
+        if (stream.bad()) {
+            return false;
+        }
+
         gfxLock.Lock();
         workingCopyDirty = true;
         gfxLock.Unlock();
@@ -296,4 +309,3 @@ GameBoyEmulator emulator;
 Bridge bridge(&emulator);
 
 }
-

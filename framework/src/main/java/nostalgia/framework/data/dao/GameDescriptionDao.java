@@ -69,7 +69,7 @@ public interface GameDescriptionDao {
     List<GameDescriptionEntity> getAllSortedByMostPlayed();
 
     /** 按插入时间降序获取所有游戏 */
-    @Query("SELECT * FROM GameDescription ORDER BY inserTime DESC")
+    @Query("SELECT * FROM GameDescription ORDER BY insertTime DESC")
     List<GameDescriptionEntity> getAllSortedByInsertTime();
 
     /** 获取游戏总数 */

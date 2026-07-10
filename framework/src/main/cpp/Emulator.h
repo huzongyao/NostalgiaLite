@@ -30,6 +30,10 @@ namespace emudroid {
         void Unlock();
 
     private:
+        CThreadLock(const CThreadLock &);
+
+        CThreadLock &operator=(const CThreadLock &);
+
         pthread_mutex_t mutexlock;
     };
 

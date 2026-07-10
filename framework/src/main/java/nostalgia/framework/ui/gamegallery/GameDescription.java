@@ -39,7 +39,7 @@ public class GameDescription implements Serializable, Comparable<GameDescription
     public long zipfile_id = -1;
 
     @Column(hasIndex = true)
-    public long inserTime = 0;
+    public long insertTime = 0;
 
     @Column(hasIndex = true)
     public long lastGameTime = 0;

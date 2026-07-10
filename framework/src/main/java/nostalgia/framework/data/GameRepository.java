@@ -207,7 +207,7 @@ public class GameRepository {
         game.path = entity.path;
         game.checksum = entity.checksum;
         game.zipfile_id = entity.zipfile_id;
-        game.inserTime = entity.inserTime;
+        game.insertTime = entity.insertTime;
         game.lastGameTime = entity.lastGameTime;
         game.runCount = entity.runCount;
         return game;
@@ -223,7 +223,7 @@ public class GameRepository {
         entity.path = game.path;
         entity.checksum = game.checksum;
         entity.zipfile_id = game.zipfile_id;
-        entity.inserTime = game.inserTime;
+        entity.insertTime = game.insertTime;
         entity.lastGameTime = game.lastGameTime;
         entity.runCount = game.runCount;
         return entity;

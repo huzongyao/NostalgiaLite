@@ -7,6 +7,7 @@
 
 #include <jni.h>
 #include <android/bitmap.h>
+#include <cstdlib>
 #include <string>
 #include <GLES/gl.h>
 
@@ -174,10 +175,8 @@ public:
             }
         }
 
-        CThreadLock lock = sfxLock;
-
         if (soundEnabled) {
-            lock.Lock();
+            sfxLock.Lock();
             int back = curSfx;
             int pos = sfxBufPos[back];
             int samples = snd.sample_count;
@@ -199,7 +198,7 @@ public:
             }
 
             sfxBufPos[back] = curPos;
-            lock.Unlock();
+            sfxLock.Unlock();
         }
         return true;
     }
@@ -388,7 +387,9 @@ public:
      */
     bool doLoadGame(const char *path, const char *batterySaveDir, const char *batteryFullPath) {
         batterySavePath = batteryFullPath;
-        bool res = load_rom(strdup(path));
+        char *romPath = strdup(path);
+        bool res = romPath != 0 && load_rom(romPath);
+        free(romPath);
 
         if (!started) {
             memset(&bitmap, 0, sizeof(bitmap_t));
@@ -427,16 +428,14 @@ public:
 
     /** 重置音频缓冲区，并标记图形副本为脏 */
     void resetSfx() {
-        CThreadLock lock = sfxLock;
-        lock.Lock();
+        sfxLock.Lock();
         sfxBufPos[0] = 0;
         sfxBufPos[1] = 0;
         curSfx = 0;
-        lock.Unlock();
-        CThreadLock lock2 = gfxLock;
-        lock2.Lock();
+        sfxLock.Unlock();
+        gfxLock.Lock();
         workingCopyDirty = true;
-        lock2.Unlock();
+        gfxLock.Unlock();
     }
 
     /** 设置基础目录（GG 不需要） */
@@ -480,6 +479,5 @@ void system_manage_sram(uint8 *sram, int slot, int mode) {
 }
 
 }
-
 
 

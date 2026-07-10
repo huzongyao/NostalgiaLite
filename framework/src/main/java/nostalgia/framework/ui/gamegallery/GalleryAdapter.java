@@ -63,7 +63,7 @@ public class GalleryAdapter extends BaseAdapter implements SectionIndexer {
     };
 
     private Comparator<GameDescription> insertDateComparator = (lhs, rhs) ->
-            (int) (-lhs.inserTime + rhs.inserTime);
+            Long.compare(rhs.insertTime, lhs.insertTime);
 
     private Comparator<GameDescription> lastPlayedDateComparator = (lhs, rhs) -> {
         long dif = lhs.lastGameTime - rhs.lastGameTime;

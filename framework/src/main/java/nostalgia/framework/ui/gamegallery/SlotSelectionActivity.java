@@ -40,8 +40,8 @@ public class SlotSelectionActivity extends AppCompatActivity {
     public static final String EXTRA_BASE_DIRECTORY = "EXTRA_BASE_DIR";
     public static final String EXTRA_SLOT = "EXTRA_SLOT";
     public static final String EXTRA_DIALOG_TYPE_INT = "EXTRA_DIALOG_TYPE_INT";
-    public static final int DIALOAG_TYPE_LOAD = 1;
-    public static final int DIALOAG_TYPE_SAVE = 2;
+    public static final int DIALOG_TYPE_LOAD = 1;
+    public static final int DIALOG_TYPE_SAVE = 2;
     private static final String TAG = "SlotSelectionActivity";
     private final static int SEND_SLOT = 0;
     private final static int REMOVE_SLOT = 1;
@@ -93,7 +93,7 @@ public class SlotSelectionActivity extends AppCompatActivity {
 
     /** 槽位被选中时的处理 */
     private void onSelected(GameDescription game, int slot, boolean isUsed) {
-        if (type == DIALOAG_TYPE_LOAD && (!isUsed)) {
+        if (type == DIALOG_TYPE_LOAD && (!isUsed)) {
             return;
         }
 
@@ -112,14 +112,14 @@ public class SlotSelectionActivity extends AppCompatActivity {
         game = (GameDescription) getIntent().getSerializableExtra(EXTRA_GAME);
         String baseDir = getIntent().getStringExtra(EXTRA_BASE_DIRECTORY);
         List<SlotInfo> slotInfos = SlotUtils.getSlots(baseDir, game.checksum);
-        type = getIntent().getIntExtra(EXTRA_DIALOG_TYPE_INT, DIALOAG_TYPE_LOAD);
+        type = getIntent().getIntExtra(EXTRA_DIALOG_TYPE_INT, DIALOG_TYPE_LOAD);
 
         setContentView(R.layout.activity_slot_selection);
         actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setTitle(type == DIALOAG_TYPE_LOAD ?
+            actionBar.setTitle(type == DIALOG_TYPE_LOAD ?
                     R.string.game_menu_load : R.string.game_menu_save);
         }
         slots[0] = findViewById(R.id.slot_0);
@@ -198,7 +198,7 @@ public class SlotSelectionActivity extends AppCompatActivity {
                 }
             }
         };
-        h.sendEmptyMessageDelayed(type == DIALOAG_TYPE_LOAD ? loadFocusIdx : saveFocusIdx, 500);
+        h.sendEmptyMessageDelayed(type == DIALOG_TYPE_LOAD ? loadFocusIdx : saveFocusIdx, 500);
     }
 
 }

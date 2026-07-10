@@ -268,13 +268,12 @@ void CThreadLock::Unlock() {
 
 /** 读取音频缓冲数据（双缓冲交换） */
 int Emulator::readSfxBuffer(JNIEnv *env, jobject obj, jshortArray data) {
-    CThreadLock lock = sfxLock;
-    lock.Lock();
+    sfxLock.Lock();
     int cur = curSfx;
     int len = sfxBufPos[cur];
     sfxBufPos[cur] = 0;
     curSfx = curSfx == 0 ? 1 : 0;
-    lock.Unlock();
+    sfxLock.Unlock();
     env->SetShortArrayRegion(data, 0, len, sfxBufs[cur]);
     return len;
 }
@@ -285,8 +284,7 @@ Emulator::~Emulator() {
 
 /** 渲染前交换图形缓冲（获取稳定帧索引） */
 int Emulator::swapBuffersBeforeRead() {
-    CThreadLock lock = gfxLock;
-    lock.Lock();
+    gfxLock.Lock();
 
     if (workingCopyDirty) {
         int temp = stableGfx;
@@ -296,19 +294,18 @@ int Emulator::swapBuffersBeforeRead() {
     }
 
     int res = stableGfx;
-    lock.Unlock();
+    gfxLock.Unlock();
     return res;
 }
 
 /** 渲染后交换图形缓冲（标记工作副本为脏） */
 void Emulator::swapBuffersAfterWrite() {
-    CThreadLock lock = gfxLock;
-    lock.Lock();
+    gfxLock.Lock();
     int temp = workingGfx;
     workingGfx = workingGfx_copy;
     workingGfx_copy = temp;
     workingCopyDirty = true;
-    lock.Unlock();
+    gfxLock.Unlock();
 }
 
 /** 初始化图形和音频缓冲区 */
