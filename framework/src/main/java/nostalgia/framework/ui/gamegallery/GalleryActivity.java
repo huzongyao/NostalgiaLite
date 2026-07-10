@@ -287,7 +287,17 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
                 }
                 
                 // 返回主线程处理
-                mainHandler.post(() -> updateGameAndStart(game, cacheFile));
+                if (cacheFile.exists()) {
+                    mainHandler.post(() -> updateGameAndStart(game, cacheFile));
+                } else {
+                    mainHandler.post(() ->
+                            new AlertDialog.Builder(this)
+                                    .setMessage(getString(R.string.gallery_rom_not_found))
+                                    .setTitle(R.string.error)
+                                    .setPositiveButton(R.string.ok, null)
+                                    .setCancelable(false)
+                                    .show());
+                }
             });
         } else {
             updateGameAndStart(game, gameFile);

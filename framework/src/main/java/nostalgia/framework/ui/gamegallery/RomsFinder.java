@@ -1,7 +1,9 @@
 package nostalgia.framework.ui.gamegallery;
 
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
+import android.provider.OpenableColumns;
 
 import java.io.File;
 import java.io.IOException;
@@ -223,8 +225,8 @@ public class RomsFinder extends Thread {
             NLog.i(TAG, "Importing file from Uri: " + uri.toString());
             
             String filename = getFilenameFromUri(uri);
-            if (filename == null) {
-                filename = "rom_" + System.currentTimeMillis();
+            if (filename == null || filename.length() == 0) {
+                filename = createFallbackFilename(uri);
             }
             
             File destDir = activity.getExternalFilesDir(null);
@@ -266,8 +268,8 @@ public class RomsFinder extends Thread {
                 NLog.i(TAG, "Importing file from Uri: " + uri.toString());
                 
                 String filename = getFilenameFromUri(uri);
-                if (filename == null) {
-                    filename = "rom_" + System.currentTimeMillis();
+                if (filename == null || filename.length() == 0) {
+                    filename = createFallbackFilename(uri);
                 }
                 
                 File destDir = activity.getExternalFilesDir(null);
@@ -312,7 +314,7 @@ public class RomsFinder extends Thread {
         }
         
         String ext = EmuUtils.getExt(filename).toLowerCase();
-        if (ext.equals("zip")) {
+        if (ext.equals("zip") || (ext.length() == 0 && isZipFile(copiedFile))) {
             checkZip(copiedFile);
         } else if (filenameExtFilter.accept(null, filename)) {
             GameDescription game = new GameDescription(copiedFile, checksum);
@@ -321,7 +323,7 @@ public class RomsFinder extends Thread {
             games.add(game);
             activity.runOnUiThread(() -> listener.onRomsFinderFoundFile(game.name));
         } else {
-            NLog.e(TAG, "Unsupported file type: " + ext);
+            NLog.e(TAG, "Unsupported file type: " + ext + " filename:" + filename);
             copiedFile.delete();
         }
     }
@@ -330,7 +332,20 @@ public class RomsFinder extends Thread {
     private String getFilenameFromUri(Uri uri) {
         String result = null;
         try {
-            // ContentProvider 不一定暴露真实文件名，这里先取最后一个路径片段作为兜底。
+            try (Cursor cursor = activity.getContentResolver().query(uri, null, null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                    if (nameIndex >= 0) {
+                        result = cursor.getString(nameIndex);
+                    }
+                }
+            }
+
+            if (result != null && result.length() > 0) {
+                return result;
+            }
+
+            // ContentProvider 不一定暴露真实文件名，这里再取最后一个路径片段作为兜底。
             String lastSegment = uri.getLastPathSegment();
             if (lastSegment != null) {
                 int lastSlash = lastSegment.lastIndexOf('/');
@@ -345,6 +360,25 @@ public class RomsFinder extends Thread {
         }
         return result;
     }
+
+    private String createFallbackFilename(Uri uri) {
+        String mimeType = activity.getContentResolver().getType(uri);
+        String extension = "";
+        if ("application/zip".equals(mimeType)
+                || "application/x-zip-compressed".equals(mimeType)
+                || "application/octet-stream".equals(mimeType)) {
+            extension = ".zip";
+        }
+        return "rom_" + System.currentTimeMillis() + extension;
+    }
+
+    private boolean isZipFile(File file) {
+        try (ZipFile ignored = new ZipFile(file)) {
+            return true;
+        } catch (IOException ignored) {
+            return false;
+        }
+    }
     
     /** 根据校验和查找已存在的游戏 */
     private GameDescription findGameByChecksum(String checksum) {
@@ -358,10 +392,13 @@ public class RomsFinder extends Thread {
 
     /** 检查 ZIP 压缩包内的 ROM 文件 */
     private void checkZip(File zipFile) {
-        File externalCache = activity.getExternalCacheDir();
+        File cacheDirFile = activity.getExternalCacheDir();
+        if (cacheDirFile == null) {
+            cacheDirFile = activity.getCacheDir();
+        }
 
-        if (externalCache != null) {
-            String cacheDir = externalCache.getAbsolutePath();
+        if (cacheDirFile != null) {
+            String cacheDir = cacheDirFile.getAbsolutePath();
             NLog.i(TAG, "check zip" + zipFile.getAbsolutePath());
             String hash = ZipRomFile.computeZipHash(zipFile);
             ZipRomFile zipRomFile = gameRepository.getZipFileByHash(hash);
@@ -450,7 +487,7 @@ public class RomsFinder extends Thread {
                 }
             }
         } else {
-            NLog.e(TAG, "external cache dir is null");
+            NLog.e(TAG, "cache dir is null");
             activity.showSDCardFailed();
         }
     }
