@@ -4,6 +4,8 @@ import android.app.ActivityManager;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
+
 import java.util.List;
 
 import nostalgia.framework.Emulator;
@@ -25,6 +27,17 @@ public class NesEmulatorActivity extends EmulatorActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         isLastOfStack = checkLastStack();
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                setEnabled(false);
+                getOnBackPressedDispatcher().onBackPressed();
+                if (isLastOfStack) {
+                    Intent intent = new Intent(NesEmulatorActivity.this, NesGalleryActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
     }
     /** 着色器 1：处理 NTSC 调色板索引（带偏移解码） */
     String shader1 = "precision mediump float;"
@@ -74,16 +87,6 @@ public class NesEmulatorActivity extends EmulatorActivity {
         return shader1;
     }
     
-    /** 按返回键时，若为任务栈末尾则返回游戏画廊 */
-        @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        if (isLastOfStack) {
-            Intent intent = new Intent(this, NesGalleryActivity.class);
-            startActivity(intent);
-        }
-    }
-
     /** 检查当前 Activity 是否为任务栈中唯一的活动 */
     private boolean checkLastStack() {
         ActivityManager mngr = (ActivityManager) getSystemService(ACTIVITY_SERVICE);

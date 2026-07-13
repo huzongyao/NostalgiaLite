@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 
@@ -92,6 +93,17 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
         
         // 设置长按监听器
         adapter.setOnItemLongClickListener(this::updateActionMode);
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (adapter.isMultiSelectMode()) {
+                    exitMultiSelectMode();
+                } else {
+                    setEnabled(false);
+                    getOnBackPressedDispatcher().onBackPressed();
+                }
+            }
+        });
         
         // 调用基类，通知初始化完成，可以处理分享了
         onExtensionsInitialized();
@@ -229,15 +241,6 @@ public abstract class GalleryActivity extends BaseGameGalleryActivity
             .show();
     }
     
-    @Override
-    public void onBackPressed() {
-        if (adapter.isMultiSelectMode()) {
-            exitMultiSelectMode();
-        } else {
-            super.onBackPressed();
-        }
-    }
-
     @Override
     protected void onResume() {
         super.onResume();

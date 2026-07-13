@@ -1,11 +1,13 @@
 package nostalgia.framework.base;
 
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
+
+import androidx.activity.ComponentActivity;
+import androidx.activity.OnBackPressedCallback;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -17,7 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * 先杀死旧进程，等待进程完全终止后重新启动模拟器 Activity。
  * </p>
  */
-public class RestarterActivity extends Activity {
+public class RestarterActivity extends ComponentActivity {
 
     public static final String EXTRA_PID = "pid";
     public static final String EXTRA_CLASS = "class";
@@ -30,6 +32,12 @@ public class RestarterActivity extends Activity {
         TextView tv = new TextView(this);
         tv.setText("Loading...");
         setContentView(tv);
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                // 重启过程中忽略返回，避免中断进程切换。
+            }
+        });
     }
 
     @Override
@@ -49,10 +57,6 @@ public class RestarterActivity extends Activity {
         }
         thread = new RestarterThread(pid, restartIntent);
         thread.start();
-    }
-
-    @Override
-    public void onBackPressed() {
     }
 
     @Override
